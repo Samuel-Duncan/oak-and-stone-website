@@ -15,11 +15,9 @@ const projectSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
-    default: '',
   },
   description: {
     type: String,
-    default: '',
   },
   currentPhase: {
     type: Number,
@@ -37,7 +35,6 @@ const projectSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: ['Residential', 'Commercial'],
-    default: '',
   },
   images: [imageSchema],
 });
