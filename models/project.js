@@ -15,20 +15,29 @@ const projectSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
+    default: '',
   },
   description: {
     type: String,
+    default: '',
   },
   currentPhase: {
     type: Number,
     required: true,
     min: 1,
     max: 4,
+    default: 1,
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+    enum: ['Residential', 'Commercial'],
+    default: '',
   },
   images: [imageSchema],
 });
