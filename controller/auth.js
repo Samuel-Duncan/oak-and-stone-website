@@ -1,9 +1,7 @@
-const express = require('express');
 const User = require('../models/user.js');
 const { sendEmail } = require('../utils/nodemailer.js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const router = express.Router();
 
 /**
  * Create a new user.
@@ -13,7 +11,7 @@ const router = express.Router();
  * @returns {object} A success message if the user is created successfully.
  * @throws {Error} If the email already exists or an error occurs while saving the user.
  */
-router.post('/signUp', async (req, res) => {
+exports.signUp = async (req, res) => {
   const { email, password } = req.body;
   try {
     const isUserExists = await User.findOne({ email });
@@ -31,11 +29,15 @@ router.post('/signUp', async (req, res) => {
       .status(201)
       .json({ message: 'User has been created successfully!' });
 
-    sendEmail(email, 'Welcome to iCinema', 'Welcome to iCinema');
+    sendEmail(
+      email,
+      'Welcome to Oak and Stone Client Portal!',
+      'Welcome to Oak and Stone Client Portal!',
+    );
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+};
 
 /**
  * Authenticate a user.
@@ -45,7 +47,7 @@ router.post('/signUp', async (req, res) => {
  * @returns {object} An access token and user information if authentication is successful.
  * @throws {Error} If the email or password is incorrect, or an error occurs during authentication.
  */
-router.post('/signIn', async (req, res) => {
+exports.signIn = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -86,6 +88,4 @@ router.post('/signIn', async (req, res) => {
       error: error.message,
     });
   }
-});
-
-module.exports = router;
+};

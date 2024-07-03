@@ -1,6 +1,4 @@
-const express = require('express');
 const User = require('../models/user.js');
-const router = express.Router();
 
 /**
  * Update a user by their ID.
@@ -9,7 +7,7 @@ const router = express.Router();
  * @returns {object} A success message and the updated user object.
  * @throws {Error} If the user is not found, an error occurs while updating them, or validation fails.
  */
-router.patch('/:userId', async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
     const updateUser = await User.findByIdAndUpdate(
       { _id: req.params.userId },
@@ -22,7 +20,7 @@ router.patch('/:userId', async (req, res) => {
   } catch (err) {
     res.status(500).json({ err: `Something went wrong: ${err}` });
   }
-});
+};
 
 /**
  * Delete a user by their ID.
@@ -31,7 +29,7 @@ router.patch('/:userId', async (req, res) => {
  * @returns {object} A success message and the deleted user object.
  * @throws {Error} If the user is not found or an error occurs while deleting them.
  */
-router.delete('/:userId', async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
     const deleteUser = await User.findByIdAndDelete(
       req.params.userId,
@@ -42,6 +40,4 @@ router.delete('/:userId', async (req, res) => {
   } catch (err) {
     res.status(500).json({ err: `Something went wrong: ${err}` });
   }
-});
-
-module.exports = router;
+};

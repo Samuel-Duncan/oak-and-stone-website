@@ -5,8 +5,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const auth = require('./controller/auth.js');
-const users = require('./controller/user.js');
+const auth = require('./route/auth.js');
+const users = require('./route/user.js');
 
 const app = express();
 

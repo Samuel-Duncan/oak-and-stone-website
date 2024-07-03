@@ -39,4 +39,8 @@ const projectSchema = new mongoose.Schema({
   images: [imageSchema],
 });
 
+projectSchema.virtual('url').get(function () {
+  return `${this._id}`;
+});
+
 module.exports = mongoose.model('Project', projectSchema);

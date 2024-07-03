@@ -14,7 +14,7 @@ const sendEmail = (email, subject, text) => {
     to: email,
     subject: subject,
     text: text,
-    html: '<b>Hello Dear User, we are happy that you join our family. Kind Regards, iCinema Team.</b>',
+    html: '<b>Hello Dear User, we are happy that you join our family. Kind Regards, Oak and Stone Team.</b>',
   };
 
   transporter.sendMail(mailOptions, function (err, data) {
