@@ -5,8 +5,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const auth = require('./route/auth.js');
-const users = require('./route/user.js');
+// Routes
+const users = require('./routes/user');
 
 const app = express();
 
@@ -24,7 +24,6 @@ app.use(cookieParser());
 // Connecting mongoDB
 const mongoose = require('./utils/mongodb.js'); //Database
 
-app.use('/api/auth', auth);
 app.use('/api/users', users);
 
 // catch 404 and forward to error handler
