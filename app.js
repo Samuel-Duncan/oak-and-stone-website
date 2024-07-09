@@ -2,10 +2,15 @@ const createError = require('http-errors');
 const cors = require('cors');
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
+const passport = require('./utils/passport.js');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+require('dotenv').config();
 
 // Routes
+const index = require('./routes/index');
+const auth = require('./routes/auth');
 const users = require('./routes/user');
 
 const app = express();
@@ -20,6 +25,20 @@ app.set('trust proxy', 1);
 // To prevent CORS errors
 app.use(cors());
 
+// Set up passport
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: false, // Set to true for https in production
+      maxAge: 1000 * 60 * 60 * 24,
+    }, // Session expires in 24 hours
+  }),
+);
+app.use(passport.session());
+
 // Set user local variable
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
@@ -30,10 +49,13 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Connecting mongoDB
 const mongoose = require('./utils/mongodb.js'); //Database
 
+app.use('/', index);
+app.use('/auth', auth);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
