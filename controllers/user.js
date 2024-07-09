@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 /**
  * Read list of users.
- * @route POST /api/users
+ * @route GET /users
  * @returns {array} An array of users if they exist
  * @throws {Error} If no users are found or if there is a server error
  */
@@ -27,9 +27,9 @@ exports.userList = async (req, res) => {
 
 /**
  * Read a single user.
- * @route POST /api/users/:userId
+ * @route GET /users/:userId
  * @returns {object} An object of user info
- * @throws {Error} If no users are found or if there is a server error
+ * @throws {Error} If no user is found or if there is a server error
  */
 exports.userDetail = async (req, res) => {
   try {
@@ -51,7 +51,7 @@ exports.userDetail = async (req, res) => {
 
 /**
  * Create a new user.
- * @route POST /api/users/sign-up
+ * @route POST /users/sign-up
  * @param {string} email - The email of the user.
  * @param {string} password - The password of the user.
  * @returns {object} A success message if the user is created successfully.
@@ -87,7 +87,7 @@ exports.signUp = async (req, res) => {
 
 /**
  * Authenticate a user.
- * @route POST /api/users/sign-in
+ * @route POST /users/sign-in
  * @param {string} email - The email of the user.
  * @param {string} password - The password of the user.
  * @returns {object} An access token and user information if authentication is successful.
@@ -138,7 +138,7 @@ exports.signIn = async (req, res) => {
 
 /**
  * Signs out current user.
- * @route DELETE /api/users/log-out
+ * @route DELETE /users/log-out
  * @param {string} userId - The ID of the user to update.
  * @returns {object} A success message and the updated user object.
  * @throws {Error} If the user is not found, an error occurs while updating them, or validation fails.
@@ -162,7 +162,7 @@ exports.signOut = async (req, res, next) => {
 
 /**
  * Update a user by their ID.
- * @route PATCH /api/users/:userId
+ * @route PATCH /users/:userId
  * @param {string} userId - The ID of the user to update.
  * @returns {object} A success message and the updated user object.
  * @throws {Error} If the user is not found, an error occurs while updating them, or validation fails.
@@ -184,7 +184,7 @@ exports.updateUser = async (req, res) => {
 
 /**
  * Delete a user by their ID.
- * @route DELETE /api/users/:userId
+ * @route DELETE /users/:userId
  * @param {string} userId - The ID of the user to delete.
  * @returns {object} A success message and the deleted user object.
  * @throws {Error} If the user is not found or an error occurs while deleting them.
