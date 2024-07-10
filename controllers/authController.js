@@ -1,8 +1,6 @@
 const User = require('../models/user.js');
 const { body, validationResult } = require('express-validator');
 const passport = require('../utils/passport.js');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const { sendEmail } = require('../utils/nodemailer.js');
 
 /**
@@ -71,14 +69,14 @@ async function signUpLogic(req, res, next) {
 
     if (!errors.isEmpty()) {
       res.render('signUpForm', {
-        title: 'Sign Up',
+        title: 'Create User',
         user,
         errors: errors.array(),
       });
     } else if (userExists) {
       // User already exists error handling
       res.render('signUpForm', {
-        title: 'Sign Up',
+        title: 'Create User',
         user,
         errors: [
           {
@@ -93,16 +91,25 @@ async function signUpLogic(req, res, next) {
         'Welcome to Oak and Stone!',
         'Welcome to Oak and Stone Client Portal!',
       );
-      res.redirect(`/users/${user._id}`);
+      res.redirect(user.url);
     }
   } catch (err) {
     console.error(err);
     res.status(500).render('signUpForm', {
-      title: 'Sign Up',
+      title: 'Create User',
       errors: [{ msg: 'Error creating user' }],
     });
   }
 }
+
+/**
+ * Authenticate a user.
+ * @route POST /users/sign-in
+ * @param {string} email - The email of the user.
+ * @param {string} password - The password of the user.
+ * @returns {object} An access token and user information if authentication is successful.
+ * @throws {Error} If the email or password is incorrect, or an error occurs during authentication.
+ */
 
 exports.signInGET = (req, res, next) => {
   res.render('signInForm', { title: 'Sign In' });
@@ -132,76 +139,18 @@ exports.signInPOST = (req, res, next) => {
 };
 
 /**
- * Authenticate a user.
- * @route POST /users/sign-in
- * @param {string} email - The email of the user.
- * @param {string} password - The password of the user.
- * @returns {object} An access token and user information if authentication is successful.
- * @throws {Error} If the email or password is incorrect, or an error occurs during authentication.
- */
-exports.signIn = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: 'Username or Password Incorrect' });
-    }
-
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password,
-    );
-
-    if (!isPasswordValid) {
-      return res
-        .status(401)
-        .json({ message: 'Username or Password Incorrect' });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    });
-
-    res.status(202).json({
-      accessToken: token,
-      user: {
-        id: user._id,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'Internal Server Error',
-      error: error.message,
-    });
-  }
-};
-
-/**
  * Signs out current user.
  * @route DELETE /users/log-out
  * @param {string} userId - The ID of the user to update.
  * @returns {object} A success message and the updated user object.
  * @throws {Error} If the user is not found, an error occurs while updating them, or validation fails.
  */
-exports.signOut = async (req, res, next) => {
-  try {
-    req.logout((err) => {
-      // Call logout from Passport (if using sessions)
-      if (err) {
-        return next(err);
-      }
-      // Invalidate JWT token on client-side (example)
-      res.cookie('jwt', '', { maxAge: 0, httpOnly: true }); // Clear the cookie
-      res.status(200).json({ message: 'Logged Out' }); // Success response
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
-  }
+
+exports.signOut = (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/');
+  });
 };

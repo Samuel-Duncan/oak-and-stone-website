@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const authController = require('../controllers/auth');
+const authController = require('../controllers/authController');
 
-// Sign up
+// Create User
 router.get('/sign-up', authController.signUpGET);
 router.post('/sign-up', authController.signUpPOST);
 

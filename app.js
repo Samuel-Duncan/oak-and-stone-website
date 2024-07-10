@@ -55,7 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const mongoose = require('./utils/mongodb.js'); //Database
 
 app.use('/', index);
-app.use('/auth', auth);
+app.use('/', auth);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
