@@ -12,6 +12,7 @@ require('dotenv').config();
 const index = require('./routes/index');
 const auth = require('./routes/auth');
 const users = require('./routes/user');
+const projects = require('./routes/project');
 
 const app = express();
 
@@ -55,8 +56,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 const mongoose = require('./utils/mongodb.js'); //Database
 
 app.use('/', index);
-app.use('/', auth);
+app.use('/auth', auth);
 app.use('/users', users);
+app.use('/users', projects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

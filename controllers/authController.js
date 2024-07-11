@@ -58,7 +58,7 @@ async function signUpLogic(req, res, next) {
   try {
     const errors = validationResult(req);
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: req.body.email });
 
     const user = new User({
       name: req.body.name,

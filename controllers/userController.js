@@ -7,7 +7,7 @@ const { body, validationResult } = require('express-validator');
  * @returns {array} An array of users if they exist
  * @throws {Error} If no users are found or if there is a server error
  */
-exports.userList = async (req, res) => {
+exports.userListGET = async (req, res) => {
   try {
     const allUsers = await User.find({}, { name: 1 })
       .sort({
@@ -39,7 +39,7 @@ exports.userList = async (req, res) => {
  * @returns {object} An object of user info
  * @throws {Error} If no user is found or if there is a server error
  */
-exports.userDetail = async (req, res) => {
+exports.userDetailGET = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId, {
       name: 1,
@@ -72,7 +72,7 @@ exports.userDetail = async (req, res) => {
  * @returns {object} A success message and the updated user object.
  * @throws {Error} If the user is not found, an error occurs while updating them, or validation fails.
  */
-exports.updateUserGET = async (req, res) => {
+exports.userUpdateGET = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).exec();
 
@@ -93,7 +93,7 @@ exports.updateUserGET = async (req, res) => {
   }
 };
 
-exports.updateUserPOST = [
+exports.userUpdatePOST = [
   // Name
   body('name')
     .trim()
@@ -122,19 +122,20 @@ exports.updateUserPOST = [
 
   // Phone number
   body('phoneNumber')
+    .trim()
     .optional() // Allow empty phone number
     .isMobilePhone('en-US', { strict: true }) // Validate for US/Canada format (strict mode)
     .withMessage('Invalid phone number format')
     .escape(),
 
-  updateUserLogic,
+  userUpdateLogic,
 ];
 
-async function updateUserLogic(req, res, next) {
+async function userUpdateLogic(req, res, next) {
   try {
     const errors = validationResult(req);
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: req.body.email });
 
     const user = new User({
       name: req.body.name,
@@ -185,7 +186,7 @@ async function updateUserLogic(req, res, next) {
  * @returns {object} A success message and the deleted user object.
  * @throws {Error} If the user is not found or an error occurs while deleting them.
  */
-exports.deleteUserGET = async (req, res) => {
+exports.userDeleteGET = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).exec();
 
@@ -204,7 +205,7 @@ exports.deleteUserGET = async (req, res) => {
   }
 };
 
-exports.deleteUserPOST = async (req, res) => {
+exports.userDeletePOST = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.body.userId);
     res.redirect('/users');
