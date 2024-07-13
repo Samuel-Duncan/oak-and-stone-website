@@ -16,6 +16,12 @@ router.get(
   projectController.projectDetailGET,
 );
 
+// Read User Project
+router.get(
+  '/:userId/user-project/:projectId',
+  projectController.userProjectDetailGET,
+);
+
 // Update Project
 router.get(
   '/:userId/project/:projectId/update',
