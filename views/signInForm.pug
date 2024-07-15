@@ -1,1 +1,12 @@
-p signInForm
+extends layout 
+
+block content 
+  h1 Sign In to Oak and Stone
+  form(method="POST" action="/auth/sign-in")
+    label(for="email") Email:
+      input(type="email" id="email" name="email" required)
+    label(for="password") Password:
+      input(type="password" id="password" name="password" required)
+    button(type="submit") Sign In
+    if errorMessage
+      p.error-message= errorMessage

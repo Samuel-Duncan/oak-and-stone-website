@@ -1,6 +1,6 @@
 const User = require('../models/user.js');
 const { body, validationResult } = require('express-validator');
-const passport = require('../utils/passport.js');
+const passport = require('../utils/passport');
 const { sendEmail } = require('../utils/nodemailer.js');
 
 /**
@@ -31,7 +31,6 @@ exports.signUpPOST = [
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Invalid email format')
-    .normalizeEmail()
     .escape(), // Sanitize to lowercase
 
   // Password
@@ -122,7 +121,7 @@ exports.signInPOST = (req, res, next) => {
       // Login failed - display error message
       res.render('signInForm', {
         title: 'Sign In',
-        errorMessage: 'Invalid username or password', // Customize the message
+        errorMessage: info.message || 'Invalid username or password', // Customize the message
       });
     } else {
       // Login successful - redirect to home
@@ -130,7 +129,7 @@ exports.signInPOST = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        return res.redirect('/');
+        return res.render('signInSuccess');
       });
     }
   })(req, res, next);
