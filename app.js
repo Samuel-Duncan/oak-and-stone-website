@@ -55,8 +55,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Connecting mongoDB
 const mongoose = require('./utils/mongodb.js'); //Database
 
-app.use('/', index);
 app.use('/auth', auth);
+app.use('/', index);
 app.use('/users', users);
 app.use('/users', projects);
 

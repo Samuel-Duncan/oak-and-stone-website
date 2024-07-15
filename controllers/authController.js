@@ -46,8 +46,6 @@ exports.signUpPOST = [
   // Phone number
   body('phoneNumber')
     .optional() // Allow empty phone number
-    .isMobilePhone('en-US', { strict: true }) // Validate for US/Canada format (strict mode)
-    .withMessage('Invalid phone number format')
     .escape(),
 
   // Sign Up Logic
@@ -86,12 +84,12 @@ async function signUpLogic(req, res, next) {
       });
     } else {
       await user.save();
+      res.render('signUpSuccess');
       sendEmail(
         user.email,
         'Welcome to Oak and Stone!',
         'Welcome to Oak and Stone Client Portal!',
       );
-      res.redirect(user.url);
     }
   } catch (err) {
     console.error(err);
