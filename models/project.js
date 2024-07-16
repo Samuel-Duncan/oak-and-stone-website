@@ -40,7 +40,7 @@ const projectSchema = new mongoose.Schema({
 });
 
 projectSchema.virtual('url').get(function () {
-  return `${this._id}`;
+  return `/project/${this._id}`;
 });
 
 module.exports = mongoose.model('Project', projectSchema);

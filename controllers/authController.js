@@ -87,7 +87,7 @@ async function signUpLogic(req, res, next) {
       });
     } else {
       await user.save();
-      res.render('signUpSuccess');
+      res.redirect('/users/');
       sendEmail(
         user.email,
         'Welcome to Oak and Stone!',
