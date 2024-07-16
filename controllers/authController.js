@@ -69,6 +69,8 @@ async function signUpLogic(req, res, next) {
         title: 'Create User',
         user,
         errors: errors.array(),
+        isUpdate: false,
+        formAction: '/auth/sign-up',
       });
     } else if (userExists) {
       // User already exists error handling
@@ -80,6 +82,8 @@ async function signUpLogic(req, res, next) {
             msg: 'Email already in use. Please choose a different one.',
           },
         ],
+        isUpdate: false,
+        formAction: '/auth/sign-up',
       });
     } else {
       await user.save();
@@ -95,6 +99,8 @@ async function signUpLogic(req, res, next) {
     res.status(500).render('signUpForm', {
       title: 'Create User',
       errors: [{ msg: 'Error creating user' }],
+      isUpdate: false,
+      formAction: '/auth/sign-up',
     });
   }
 }
@@ -129,7 +135,7 @@ exports.signInPOST = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        return res.render('signInSuccess');
+        return res.render('signInSuccess', { user: req.user });
       });
     }
   })(req, res, next);

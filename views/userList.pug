@@ -1,1 +1,12 @@
-p userList
+extends layout 
+
+block content 
+  h1 #{title}
+
+  if userList === undefined
+    p No users found!
+  else
+    ul
+      each user in userList
+        li
+          a(href=`/users/${user._id}`) #{user.name}

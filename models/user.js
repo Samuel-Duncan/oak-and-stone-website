@@ -39,7 +39,7 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.virtual('url').get(function () {
-  return `${this._id}`;
+  return `/users/${this._id}`;
 });
 
 const User = mongoose.model('User', userSchema);

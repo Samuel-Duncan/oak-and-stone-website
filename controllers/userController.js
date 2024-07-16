@@ -56,7 +56,7 @@ exports.userDetailGET = async (req, res) => {
 
     res.render('userDetail', {
       title: 'Client Details',
-      clientDetail: user,
+      user,
     });
   } catch (err) {
     res.status(500).render('error', {
@@ -74,22 +74,22 @@ exports.userDetailGET = async (req, res) => {
  */
 exports.userUpdateGET = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).exec();
-
-    if (user === null) {
-      const err = new Error('Client not found');
-      err.status = 404;
-      return next(err);
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res
+        .status(404)
+        .render('error', { message: 'User not found' });
     }
-
     res.render('signUpForm', {
       title: 'Update User',
-      user,
+      user: user,
+      isUpdate: true,
+      formAction: `/users/${user._id}/update`,
     });
   } catch (err) {
-    res.status(err.status || 500).render('error', {
-      message: 'Error fetching client: ' + err.message,
-    });
+    res
+      .status(500)
+      .render('error', { message: 'Error fetching user data' });
   }
 };
 
@@ -111,15 +111,6 @@ exports.userUpdatePOST = [
     .normalizeEmail()
     .escape(), // Sanitize to lowercase
 
-  // Password
-  body('password')
-    .trim()
-    .notEmpty()
-    .withMessage('Password is required')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters')
-    .escape(),
-
   // Phone number
   body('phoneNumber')
     .trim()
@@ -135,46 +126,64 @@ async function userUpdateLogic(req, res, next) {
   try {
     const errors = validationResult(req);
 
-    const userExists = await User.findOne({ email: req.body.email });
+    const existingUser = await User.findById(req.params.userId);
+    console.log(existingUser);
+    if (!existingUser) {
+      return res
+        .status(404)
+        .render('error', { message: 'User not found' });
+    }
 
-    const user = new User({
+    const updatedUserData = {
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password,
       phoneNumber: req.body.phoneNumber,
-      _id: req.params.userId,
-    });
+    };
 
     if (!errors.isEmpty()) {
-      res.render('signUpForm', {
+      return res.render('signUpForm', {
         title: 'Update User',
-        user,
+        user: { ...existingUser.toObject(), ...updatedUserData },
         errors: errors.array(),
+        isUpdate: true,
+        formAction: `/users/${req.params.userId}/update`,
       });
-    } else if (userExists) {
-      // User already exists error handling
-      res.render('signUpForm', {
-        title: 'Update User',
-        user,
-        errors: [
-          {
-            msg: 'Email already in use. Please choose a different one.',
-          },
-        ],
-      });
-    } else {
-      const updatedUser = await User.findByIdAndUpdate(
-        req.params.userId,
-        user,
-        {},
-      );
-      res.redirect(updatedUser.url);
     }
+
+    // Check if email is being changed and if it's already in use
+    if (existingUser.email !== updatedUserData.email) {
+      const userWithNewEmail = await User.findOne({
+        email: updatedUserData.email,
+      });
+      if (userWithNewEmail) {
+        return res.render('signUpForm', {
+          title: 'Update User',
+          user: { ...existingUser.toObject(), ...updatedUserData },
+          errors: [
+            {
+              msg: 'Email already in use. Please choose a different one.',
+            },
+          ],
+          isUpdate: true,
+          formAction: `/users/${req.params.userId}/update`,
+        });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      updatedUserData,
+      { new: true, runValidators: true },
+    );
+
+    res.redirect(updatedUser.url);
   } catch (err) {
     console.error(err);
     res.status(500).render('signUpForm', {
       title: 'Update User',
       errors: [{ msg: 'Error updating user' }],
+      isUpdate: true,
+      formAction: `/users/${req.params.userId}/update`,
     });
   }
 }
@@ -207,7 +216,7 @@ exports.userDeleteGET = async (req, res) => {
 
 exports.userDeletePOST = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.body.userId);
+    await User.findByIdAndDelete(req.params.userId);
     res.redirect('/users');
   } catch {
     res.status(err.status || 500).render('userDelete', {

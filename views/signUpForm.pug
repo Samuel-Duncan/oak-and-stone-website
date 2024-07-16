@@ -1,17 +1,18 @@
 extends layout 
 
 block content 
-  h1 Sign Up for Oak and Stone
-  form(method="POST" action="/auth/sign-up")
+  h1= isUpdate ? 'Update User' : 'Sign Up for Oak and Stone'
+  form(method="POST" action=formAction)
     label(for="name") Name:
       input(type="text" id="name" name="name" value=(user && user.name))
     label(for="email") Email:
       input(type="email" id="email" name="email" value=(user && user.email))
-    label(for="password") Password:
-      input(type="password" id="password" name="password")
+    if !isUpdate
+      label(for="password") Password:
+        input(type="password" id="password" name="password")
     label(for="phoneNumber") Phone Number (Optional):
       input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber))
-    button(type="submit") Sign Up
+    button(type="submit")= isUpdate ? 'Update User' : 'Create User'
   if errors
       each error in errors
         p.error-message= error.msg

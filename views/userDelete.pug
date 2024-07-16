@@ -1,1 +1,14 @@
-p userDelete
+extends layout
+
+block content
+  h1 Are you sure you want to delete #{user.name}?
+
+  p This action cannot be undone.
+
+  form(method="POST" action=`/users/${user._id}/delete`)
+    input(type="hidden" name="_method" value="DELETE")
+    button(type="submit" name="confirmDelete" value=user._id) Confirm Delete
+  a(href="/users") Cancel
+
+  if message
+    p.error-message= message

@@ -1,1 +1,15 @@
-p userDetail
+extends layout 
+
+block content 
+  h1 #{title}
+
+  if clientDetail === {}
+    p Client not found!
+  else
+    p Name: #{user.name}
+    p Email: #{user.email}
+    p Phone Number: #{user.phoneNumber}
+
+    div.actions
+      a(href=`/users/${user._id}/update`) Update
+      a(href=`/users/${user._id}/delete`, style="color: red") Delete
