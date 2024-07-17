@@ -108,7 +108,6 @@ exports.userUpdatePOST = [
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Invalid email format')
-    .normalizeEmail()
     .escape(), // Sanitize to lowercase
 
   // Phone number
