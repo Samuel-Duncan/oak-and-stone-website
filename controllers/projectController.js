@@ -5,7 +5,10 @@ const { cloudinary, upload } = require('../utils/cloudinary.js');
 const { sendEmail } = require('../utils/nodemailer.js');
 
 exports.projectCreateGET = (req, res, next) => {
-  res.render('projectForm', { title: 'Create Project' });
+  res.render('projectForm', {
+    title: 'Create Project',
+    formAction: `/users/${req.params.userId}/project`,
+  });
 };
 
 exports.projectCreatePOST = [
@@ -93,21 +96,23 @@ async function projectCreateLogic(req, res, next) {
       res.render('projectForm', {
         title: 'Create Project',
         project,
+        formAction: `/users/${req.params.userId}/project`,
         errors: errors.array(),
       });
     } else {
       await project.save();
+      res.redirect(`/users/${project.userId}${project.url}`);
       sendEmail(
         userEmail,
         'A new project has been created for you!',
         'Click the link below to keep track of the progress!',
       );
-      res.redirect(req.params.userId);
     }
   } catch (err) {
     console.error(err);
     res.status(500).render('projectForm', {
       title: 'Create Project',
+      formAction: `/users/${req.params.userId}/project`,
       errors: [{ msg: 'Error creating project' }],
     });
   }
