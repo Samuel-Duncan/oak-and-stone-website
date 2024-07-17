@@ -48,11 +48,14 @@ exports.userDetailGET = async (req, res) => {
       phoneNumber: 1,
     }).exec();
 
-    const projectId = await Project.findOne({
-      userId: user._id,
-    });
+    const project = await Project.findOne(
+      { userId: user._id },
+      { _id: 1 },
+    )
+      .lean()
+      .exec();
 
-    const projectExists = projectId !== null;
+    const projectExists = project !== null;
 
     if (user === null) {
       res.render('userDetail', {
@@ -64,8 +67,8 @@ exports.userDetailGET = async (req, res) => {
     res.render('userDetail', {
       title: 'Client Details',
       user,
-      projectId,
       projectExists,
+      projectId: project ? project._id : null,
     });
   } catch (err) {
     res.status(500).render('error', {
