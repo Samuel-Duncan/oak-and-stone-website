@@ -1,4 +1,5 @@
 const User = require('../models/user.js');
+const Project = require('../models/project.js');
 const { body, validationResult } = require('express-validator');
 
 /**
@@ -47,6 +48,12 @@ exports.userDetailGET = async (req, res) => {
       phoneNumber: 1,
     }).exec();
 
+    const projectId = await Project.findOne({
+      userId: user._id,
+    });
+
+    const projectExists = projectId !== null;
+
     if (user === null) {
       res.render('userDetail', {
         title: 'Client Details',
@@ -57,6 +64,8 @@ exports.userDetailGET = async (req, res) => {
     res.render('userDetail', {
       title: 'Client Details',
       user,
+      projectId,
+      projectExists,
     });
   } catch (err) {
     res.status(500).render('error', {

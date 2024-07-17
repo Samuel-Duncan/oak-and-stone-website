@@ -13,4 +13,7 @@ block content
     div.actions
       a(href=`/users/${user._id}/update`) Update
       a(href=`/users/${user._id}/delete`, style="color: red") Delete
-      a(href=`/users/${user._id}/project/create`) Create Project
+      if projectExists
+        a(href=`/users/${user._id}/project/${projectId}`) View Project
+      else 
+        a(href=`/users/${user._id}/project/create`) Create Project
