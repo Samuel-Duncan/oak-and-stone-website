@@ -1,1 +1,36 @@
-p projectDetail
+extends layout
+
+block content
+  if errMsg
+    h1= title
+    p.error-message= errMsg
+  else if projectDetail
+    h1= projectDetail.address
+    
+    p
+      strong Type: 
+      | #{projectDetail.type}
+    
+    p
+      strong Current Phase: 
+      | #{projectDetail.currentPhase}
+    
+    if projectDetail.description
+      h2 Description
+      p= projectDetail.description
+    
+    if projectDetail.images && projectDetail.images.length > 0
+      h2 Images
+      .image-gallery
+        each image in projectDetail.images
+          .image-container
+            img(src=image.url alt="Project Image")
+            p Uploaded on: #{image.createdAt.toLocaleDateString()}
+
+    
+    // You might want to add edit and delete links here if the user has permission
+    // a(href=`/project/${projectDetail._id}/edit`) Edit Project
+    // a(href=`/project/${projectDetail._id}/delete`) Delete Project
+  
+  else
+    p No project details available.
