@@ -32,6 +32,13 @@ block content
     div
       label(for='images') Images:
       input#images(type='file' name='images' multiple accept='image/*')
+    if images 
+      div(class="")
+        for image in images
+          div(class="")
+            img(src=image.url class="")
+            input(type='checkbox', name='image', id=image._id, value=image._id)
+            label(for=image._id) &nbsp;Delete
     
     button(type='submit') Submit
 

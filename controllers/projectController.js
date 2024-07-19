@@ -184,6 +184,7 @@ exports.projectUpdateGET = async (req, res) => {
       title: 'Update Project',
       formAction: `/users/${req.params.userId}/project/${project._id}`,
       project,
+      images: project.images.length > 0 ? project.images : [],
     });
   } catch (err) {
     res.status(err.status || 500).render('error', {
