@@ -5,8 +5,9 @@ block content
     h1= title
     p.error-message= errMsg
   else if projectDetail
+    a(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/update`) Edit Project
     h1= projectDetail.address
-    
+    h2 Details
     p
       strong Type: 
       | #{projectDetail.type}
@@ -29,7 +30,7 @@ block content
 
     
     // You might want to add edit and delete links here if the user has permission
-    // a(href=`/project/${projectDetail._id}/edit`) Edit Project
+    
     // a(href=`/project/${projectDetail._id}/delete`) Delete Project
   
   else

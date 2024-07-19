@@ -6,9 +6,15 @@ block content
   if clientDetail === {}
     p Client not found!
   else
-    p Name: #{user.name}
-    p Email: #{user.email}
-    p Phone Number: #{user.phoneNumber}
+    p
+      strong Name: 
+      | #{user.name}
+    p
+      strong Email: 
+      | #{user.email}
+    p
+      strong Phone Number: 
+      | #{user.phoneNumber}
 
     div.actions
       a(href=`/users/${user._id}/update`) Update

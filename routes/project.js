@@ -27,7 +27,7 @@ router.get(
   '/:userId/project/:projectId/update',
   projectController.projectUpdateGET,
 );
-router.patch(
+router.post(
   '/:userId/project/:projectId',
   projectController.projectUpdatePOST,
 );

@@ -182,6 +182,7 @@ exports.projectUpdateGET = async (req, res) => {
 
     res.render('projectForm', {
       title: 'Update Project',
+      formAction: `/users/${req.params.userId}/project/${project._id}`,
       project,
     });
   } catch (err) {
@@ -290,6 +291,7 @@ async function updateProjectLogic(req, res, next) {
     if (!errors.isEmpty()) {
       res.render('projectForm', {
         title: 'Update Project',
+        formAction: `/users/${req.params.userId}/project/${project._id}`,
         project,
         errors: errors.array(),
       });
@@ -299,7 +301,7 @@ async function updateProjectLogic(req, res, next) {
         project,
         {},
       );
-      res.redirect(updatedProject.url);
+      res.redirect(`/users/${project.userId}${updatedProject.url}`);
     }
   } catch (err) {
     console.error(err);
