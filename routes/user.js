@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const adminCheck = require('../utils/adminCheck');
 
 const userController = require('../controllers/userController');
+
+// Apply adminCheck to all routes in this router
+router.use(adminCheck);
 
 // Read list of users
 router.get('/', userController.userListGET);

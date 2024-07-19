@@ -12,6 +12,9 @@ router.get('/sign-in', authController.signInGET);
 router.post('/sign-in', authController.signInPOST);
 
 // Sign out
-router.delete('/sign-out', authController.signOut);
+router.get('/sign-out', authController.signOut);
+
+// Sign in Success
+router.get('/sign-in-success', authController.signInSuccess);
 
 module.exports = router;

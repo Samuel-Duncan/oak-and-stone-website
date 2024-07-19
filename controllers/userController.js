@@ -10,7 +10,10 @@ const { body, validationResult } = require('express-validator');
  */
 exports.userListGET = async (req, res) => {
   try {
-    const allUsers = await User.find({}, { name: 1 })
+    const allUsers = await User.find(
+      { isAdmin: { $ne: true } }, // This excludes users where isAdmin is true
+      { name: 1 },
+    )
       .sort({
         createdAt: -1,
       })

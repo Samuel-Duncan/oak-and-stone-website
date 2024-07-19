@@ -125,7 +125,7 @@ exports.signInPOST = (req, res, next) => {
     }
     if (!user) {
       // Login failed - display error message
-      res.render('signInForm', {
+      return res.render('signInForm', {
         title: 'Sign In',
         errorMessage: info.message || 'Invalid username or password', // Customize the message
       });
@@ -135,7 +135,7 @@ exports.signInPOST = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        return res.render('signInSuccess', { user: req.user });
+        return res.redirect('/auth/sign-in-success'); // Redirect instead of render
       });
     }
   })(req, res, next);
@@ -156,4 +156,8 @@ exports.signOut = (req, res, next) => {
     }
     res.redirect('/');
   });
+};
+
+exports.signInSuccess = (req, res) => {
+  res.render('signInSuccess', { user: req.user });
 };

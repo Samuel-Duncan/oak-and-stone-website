@@ -1,1 +1,10 @@
-h1 welcome #{user.name}
+if currentUser
+  p Welcome, #{currentUser.name}!
+  p Your email is: #{currentUser.email}
+  if currentUser.phoneNumber
+    p Your phone number is: #{currentUser.phoneNumber}
+  if currentUser.isAdmin
+    p You have admin privileges.
+  p Account created on: #{currentUser.createdAt.toLocaleDateString()}
+  p User profile: 
+    a(href=currentUser.url) View Profile

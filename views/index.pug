@@ -1,4 +1,11 @@
 extends layout
 
 block content
-  h1 homepage
+  h1 Homepage
+
+  if currentUser
+    p Welcome, #{currentUser.name}!
+    a(href="/auth/sign-out") Sign Out
+  else
+    p Welcome, guest! 
+    a(href="/auth/sign-in") Sign In
