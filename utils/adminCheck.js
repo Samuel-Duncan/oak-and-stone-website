@@ -1,4 +1,4 @@
-const adminCheck = (req, res, next) => {
+exports.adminCheck = (req, res, next) => {
   // Check if adminCheck should be skipped for this route
   if (req.adminCheckSkipped) {
     return next();
@@ -24,4 +24,7 @@ const adminCheck = (req, res, next) => {
   }
 };
 
-module.exports = adminCheck;
+exports.adminCheckSkipped = (req, res, next) => {
+  req.adminCheckSkipped = true;
+  next();
+};

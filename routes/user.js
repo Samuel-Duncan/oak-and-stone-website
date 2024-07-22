@@ -4,21 +4,30 @@ const adminCheck = require('../utils/adminCheck');
 
 const userController = require('../controllers/userController');
 
-// Apply adminCheck to all routes in this router
-router.use(adminCheck);
-
 // Read list of users
-router.get('/', userController.userListGET);
+router.get('/', adminCheck.adminCheck, userController.userListGET);
 
 // Read user
-router.get('/:userId', userController.userDetailGET);
+router.get(
+  '/:userId',
+  adminCheck.adminCheck,
+  userController.userDetailGET,
+);
 
 // Update user
-router.get('/:userId/update', userController.userUpdateGET);
+router.get(
+  '/:userId/update',
+  adminCheck.adminCheck,
+  userController.userUpdateGET,
+);
 router.post('/:userId/update', userController.userUpdatePOST);
 
 // Delete user
-router.get('/:userId/delete', userController.userDeleteGET);
+router.get(
+  '/:userId/delete',
+  adminCheck.adminCheck,
+  userController.userDeleteGET,
+);
 router.post('/:userId/delete', userController.userDeletePOST);
 
 module.exports = router;

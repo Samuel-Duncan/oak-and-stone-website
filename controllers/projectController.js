@@ -145,9 +145,10 @@ exports.projectDetailGET = async (req, res) => {
 exports.userProjectDetailGET = [
   async (req, res, next) => {
     try {
-      const userProject = await Project.find({
-        userId: req.user.userId,
-      }).sort({ timestamp: 1 });
+      const userProject = await Project.findOne({
+        _id: req.params.projectId,
+        userId: req.params.userId,
+      }).lean();
 
       if (!userProject) {
         return res.render('projectDetail', {

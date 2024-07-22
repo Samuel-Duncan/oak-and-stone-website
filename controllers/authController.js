@@ -1,4 +1,5 @@
 const User = require('../models/user.js');
+const Project = require('../models/project.js');
 const { body, validationResult } = require('express-validator');
 const passport = require('../utils/passport');
 const { sendEmail } = require('../utils/nodemailer.js');
@@ -135,7 +136,7 @@ exports.signInPOST = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        return res.redirect('/auth/sign-in-success'); // Redirect instead of render
+        return res.redirect(`/auth/sign-in-success`); // Redirect instead of render
       });
     }
   })(req, res, next);
@@ -158,6 +159,28 @@ exports.signOut = (req, res, next) => {
   });
 };
 
-exports.signInSuccess = (req, res) => {
-  res.render('signInSuccess', { user: req.user });
+exports.signInSuccess = async (req, res) => {
+  try {
+    if (req.user.isAdmin) {
+      return res.redirect('/users/');
+    }
+
+    // Find the most recent project for the user
+    const projectDetail = await Project.findOne({
+      userId: req.user.id,
+    }).lean();
+
+    // Render project details template if found
+    if (projectDetail) {
+      return res.render('signInSuccess', {
+        projectId: projectDetail._id,
+      });
+    } else {
+      // No project found, render the sign-in success template
+      return res.render('signInSuccess');
+    }
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    res.render('error', { message: 'Error fetching project' }); // Render error page
+  }
 };
