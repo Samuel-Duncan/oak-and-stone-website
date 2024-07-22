@@ -1,7 +1,7 @@
 extends layout 
 
 block content 
-  h1= isUpdate ? 'Update User' : 'Sign Up for Oak and Stone'
+  h1= title
   form(method="POST" action=formAction)
     label(for="name") Name:
       input(type="text" id="name" name="name" value=(user && user.name))

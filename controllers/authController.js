@@ -14,7 +14,7 @@ const { sendEmail } = require('../utils/nodemailer.js');
  */
 
 exports.signUpGET = (req, res, next) => {
-  res.render('signUpForm', { title: 'Sign Up' });
+  res.render('signUpForm', { title: 'Create Client' });
 };
 
 exports.signUpPOST = [

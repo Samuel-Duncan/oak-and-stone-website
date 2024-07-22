@@ -96,7 +96,7 @@ exports.userUpdateGET = async (req, res) => {
         .render('error', { message: 'User not found' });
     }
     res.render('signUpForm', {
-      title: 'Update User',
+      title: 'Update Client',
       user: user,
       isUpdate: true,
       formAction: `/users/${user._id}/update`,

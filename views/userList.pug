@@ -4,9 +4,11 @@ block content
   h1 #{title}
 
   if userList === undefined
-    p No users found!
+    p No client found!
   else
     ul
       each user in userList
         li
           a(href=`/users/${user._id}`) #{user.name}
+
+  a(href='/auth/sign-up') Create Client
