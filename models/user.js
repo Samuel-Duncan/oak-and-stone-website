@@ -22,11 +22,12 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, minLength: 6 },
     phoneNumber: {
       type: String,
-      unique: true, // Prevent duplicate phone numbers
+      default: null,
+      // Prevent duplicate phone numbers
     },
     isAdmin: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   { timestamps: true },

@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap');
+
+:root {
+  /* Colors */
+  --color-primary: #fff; /* White */
+  --color-secondary: #ccc; /* Light gray */
+  --color-text-primary: #000; /* Black */
+  --color-text-secondary: #efefef; /* Light gray text */
+  --color-accent: #fff; /* White (for checkbox accent) */
+  --color-background: rgba(0, 0, 0, 0.5); /* Black overlay */
+
+  /* Spacing */
+  --spacing-xs: 10px;
+  --spacing-sm: 15px;
+  --spacing-md: 20px;
+  --spacing-lg: 30px;
+  --spacing-xl: 35px;
+
+  /* Sizing */
+  --border-width: 1px;
+  --border-radius: 8px;
+  --input-height: 40px;
+  --font-size-base: 16px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: var(--spacing-xs);
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('../images/background-4.png'),
+    var(--color-background);
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: multiply;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
+}
+
+button {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  border: 2px solid transparent;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.15);
+}

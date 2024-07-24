@@ -1,18 +1,26 @@
 extends layout 
 
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/forms.css')
+
 block content 
-  h1= title
-  form(method="POST" action=formAction)
-    label(for="name") Name:
-      input(type="text" id="name" name="name" value=(user && user.name))
-    label(for="email") Email:
-      input(type="email" id="email" name="email" value=(user && user.email))
-    if !isUpdate
-      label(for="password") Password:
-        input(type="password" id="password" name="password")
-    label(for="phoneNumber") Phone Number (Optional):
-      input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber))
-    button(type="submit")= isUpdate ? 'Update User' : 'Create User'
-  if errors
+  div.form-wrapper  
+    form(method="POST" action=formAction)
+      h2= title
+      div.input-field  
+        input(type="text" id="name" name="name" value=(user && user.name) required)
+        label(for="name") Name:
+      div.input-field  
+        input(type="email" id="email" name="email" value=(user && user.email) required)
+        label(for="email") Email:
+      if !isUpdate
+        div.input-field
+          input(type="password" id="password" name="password" required)
+          label(for="password") Password:
+      div.input-field  
+        input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber))
+        label(for="phoneNumber") Phone Number:
+      button.form-button(type="submit")= isUpdate ? 'Update User' : 'Create Client'
+    if errors
       each error in errors
         p.error-message= error.msg

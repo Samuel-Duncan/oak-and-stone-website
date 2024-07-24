@@ -21,7 +21,7 @@ exports.userListGET = async (req, res) => {
 
     if (allUsers.length === 0) {
       res.render('userList', {
-        title: 'User List',
+        title: 'Client List',
         errorMessage: 'No clients found!',
       });
     }
