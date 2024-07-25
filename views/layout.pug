@@ -14,8 +14,8 @@ html
           ul
             li
               if currentUser
-                a(href="/auth/sign-out") Sign Out
+                a.header-button(href="/auth/sign-out") Sign Out
               else
-                a(href="/auth/sign-in") Sign In
+                a.header-button(href="/auth/sign-in") Sign In
     main
       block content

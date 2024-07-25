@@ -58,7 +58,7 @@ body {
 
 h2 {
   font-size: 2rem;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
   color: var(--color-primary);
 }
 
