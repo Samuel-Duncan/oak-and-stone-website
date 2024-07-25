@@ -4,15 +4,16 @@ block stylesheets
   link(rel='stylesheet', href='/stylesheets/forms.css')
 
 block content
-    div.form-wrapper
-      h2 Sign In
-      form(method="POST" action="/auth/sign-in")
-        div.input-field
-          input(type="email" id="email" name="email" required)
-          label(for="email") Email:
-        div.input-field
-          input(type="password" id="password" name="password" required)
-          label(for="password") Password:
-        button.form-button(type="submit") Sign In
-        if errorMessage
-          p.error-message= errorMessage
+    div.background
+      div.form-wrapper
+        h2 Sign In
+        form(method="POST" action="/auth/sign-in")
+          div.input-field
+            input(type="email" id="email" name="email" required)
+            label(for="email") Email:
+          div.input-field
+            input(type="password" id="password" name="password" required)
+            label(for="password") Password:
+          button.form-button(type="submit") Sign In
+          if errorMessage
+            p.error-message= errorMessage

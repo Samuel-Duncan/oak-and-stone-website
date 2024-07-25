@@ -31,6 +31,11 @@
 }
 
 body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.background {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +44,7 @@ body {
   padding: var(--spacing-xs);
 }
 
-body::before {
+.background::before {
   content: '';
   position: absolute;
   width: 100%;
@@ -74,4 +79,10 @@ button:hover {
   color: var(--color-primary);
   border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.15);
+}
+
+/* Main content area */
+main {
+  /* Adjust based on your header height */
+  min-height: 100vh; /* Ensures content area takes up at least full viewport height */
 }

@@ -56,33 +56,12 @@ form {
   transform: translateY(-120%);
 }
 
-.forget {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: var(--spacing-lg) 0 var(--spacing-xl) 0;
-  color: var(--color-primary);
-}
-
-#remember {
-  accent-color: var(--color-accent);
-}
-
-.forget label {
-  display: flex;
-  align-items: center;
-}
-
-.forget label p {
-  margin-left: var(--spacing-xs);
-}
-
-.register {
-  text-align: center;
-  margin-top: var(--spacing-lg);
-  color: var(--color-primary);
-}
-
 .form-button {
   margin: var(--spacing-md) 0;
+}
+
+@media (max-width: 400px) {
+  .form-wrapper {
+    width: 100%;
+  }
 }

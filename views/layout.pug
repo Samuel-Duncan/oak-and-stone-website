@@ -3,6 +3,19 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/index.css')
+    link(rel='stylesheet', href='/stylesheets/layout.css')
     block stylesheets
   body
-    block content
+    header.main-header
+      .header-content
+        .logo
+          img(src="/images/OSC Emblem.png", alt="Logo")
+        nav.main-nav
+          ul
+            li
+              if currentUser
+                a(href="/auth/sign-out") Sign Out
+              else
+                a(href="/auth/sign-in") Sign In
+    main
+      block content
