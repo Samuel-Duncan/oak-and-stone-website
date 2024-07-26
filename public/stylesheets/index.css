@@ -8,6 +8,7 @@
   --color-text-secondary: #efefef; /* Light gray text */
   --color-accent: #fff; /* White (for checkbox accent) */
   --color-background: rgba(0, 0, 0, 0.5); /* Black overlay */
+  --color-danger: rgb(222, 0, 0);
 
   /* Spacing */
   --spacing-xs: 10px;
@@ -54,6 +55,11 @@ body {
   background-position: center;
   background-size: cover;
   background-blend-mode: multiply;
+}
+
+a {
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 h2 {
