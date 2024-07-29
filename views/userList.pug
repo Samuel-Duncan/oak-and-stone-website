@@ -1,14 +1,19 @@
 extends layout 
 
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/userList.css')
+
 block content 
-  h1 #{title}
+  div.list-background
+    div.list-wrapper
+      h1 #{title}
 
-  if userList === undefined
-    p No client found!
-  else
-    ul
-      each user in userList
-        li
-          a(href=`/users/${user._id}`) #{user.name}
+      if userList === undefined
+        p No client found!
+      else
+        ul
+          each user in userList
+            li
+              a(href=`/users/${user._id}`) #{user.name}
 
-  a(href='/auth/sign-up') Create Client
+      a.list-button(href='/auth/sign-up') New Client

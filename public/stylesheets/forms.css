@@ -49,8 +49,7 @@ form {
   color: var(--color-primary);
 }
 
-.input-field input:focus ~ label,
-.input-field input:valid ~ label {
+.input-field input:focus ~ label {
   font-size: 0.8rem;
   top: var(--spacing-xs);
   transform: translateY(-120%);

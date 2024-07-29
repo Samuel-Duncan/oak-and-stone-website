@@ -155,7 +155,7 @@ exports.signOut = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.redirect('/');
+    res.redirect('/auth/sign-in');
   });
 };
 

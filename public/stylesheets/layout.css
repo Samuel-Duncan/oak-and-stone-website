@@ -18,7 +18,6 @@
 
 /* Custom styles for navbar-toggler */
 .navbar-toggler {
-  background: rgba(255, 255, 255, 0.15);
   color: var(--color-primary);
   border: none;
   font-weight: 600;
@@ -31,13 +30,8 @@
 }
 
 .navbar-toggler:hover {
-  color: var(--color-text-primary);
   border-color: var(--color-primary);
-  background: var(--color-primary);
-}
-
-.navbar-toggler:focus {
-  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .logo img {
@@ -54,8 +48,8 @@
 }
 
 .header-button {
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--color-primary);
+  color: var(--color-text-primary);
+  background: var(--color-primary);
   border: none;
   font-weight: 600;
   padding: 8px var(--spacing-sm);
@@ -67,9 +61,15 @@
 }
 
 .header-button:hover {
+  color: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-text-primary);
-  background: var(--color-primary);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-wrapper {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 @media (max-width: 480px) {

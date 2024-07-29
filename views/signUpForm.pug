@@ -9,14 +9,14 @@ block content
       form(method="POST" action=formAction)
         h2= title
         div.input-field  
-          input(type="text" id="name" name="name" value=(user && user.name) required)
+          input(type="text" id="name" name="name" value=(user && user.name))
           label(for="name") Name:
         div.input-field  
-          input(type="email" id="email" name="email" value=(user && user.email) required)
+          input(type="email" id="email" name="email" value=(user && user.email))
           label(for="email") Email:
         if !isUpdate
           div.input-field
-            input(type="password" id="password" name="password" required)
+            input(type="password" id="password" name="password")
             label(for="password") Password:
         div.input-field  
           input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber))

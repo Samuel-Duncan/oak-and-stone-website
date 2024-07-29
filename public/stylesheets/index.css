@@ -3,12 +3,13 @@
 :root {
   /* Colors */
   --color-primary: #fff; /* White */
+  --color-brand: #ff9a2f;
   --color-secondary: #ccc; /* Light gray */
   --color-text-primary: #000; /* Black */
   --color-text-secondary: #efefef; /* Light gray text */
   --color-accent: #fff; /* White (for checkbox accent) */
   --color-background: rgba(0, 0, 0, 0.5); /* Black overlay */
-  --color-danger: rgb(222, 0, 0);
+  --color-danger: rgb(255, 0, 0);
 
   /* Spacing */
   --spacing-xs: 10px;
@@ -60,8 +61,14 @@ body {
 a {
   text-decoration: none;
   transition: color 0.3s ease;
+  color: var(--color-brand);
 }
 
+a:hover {
+  color: var(--color-primary);
+}
+
+h1,
 h2 {
   font-size: 2rem;
   margin-bottom: var(--spacing-xs);
@@ -85,6 +92,28 @@ button:hover {
   color: var(--color-primary);
   border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.15);
+}
+
+ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  justify-content: center;
+}
+
+li::marker {
+  color: var(--color-primary);
+}
+
+.error-message {
+  color: var(--color-danger);
 }
 
 /* Main content area */

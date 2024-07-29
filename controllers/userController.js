@@ -27,7 +27,7 @@ exports.userListGET = async (req, res) => {
     }
 
     res.render('userList', {
-      title: 'User List',
+      title: 'Clients',
       userList: allUsers,
     });
   } catch (err) {
