@@ -3,7 +3,7 @@
 :root {
   /* Colors */
   --color-primary: #fff; /* White */
-  --color-brand: #ff9a2f;
+  --color-brand: #ff9500;
   --color-secondary: #ccc; /* Light gray */
   --color-text-primary: #000; /* Black */
   --color-text-secondary: #efefef; /* Light gray text */
@@ -106,6 +106,7 @@ ul {
 li {
   display: flex;
   justify-content: center;
+  font-weight: 600;
 }
 
 li::marker {
