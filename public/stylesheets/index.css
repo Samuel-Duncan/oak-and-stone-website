@@ -103,14 +103,12 @@ ul {
   margin: 0;
 }
 
-li {
+li,
+.user-list.li {
   display: flex;
+  color: var(--color-brand);
   justify-content: center;
   font-weight: 600;
-}
-
-li::marker {
-  color: var(--color-primary);
 }
 
 .error-message {

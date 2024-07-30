@@ -1,26 +1,29 @@
 extends layout 
 
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/userDetail.css')
+
 block content 
-  h1 #{title}
+  div.detail-background
+    div.detail-wrapper
+      h1 #{user.name}
 
-  if clientDetail === {}
-    p Client not found!
-  else
-    p
-      strong Name: 
-      | #{user.name}
-    p
-      strong Email: 
-      | #{user.email}
-    p
-      strong Phone Number: 
-      | #{user.phoneNumber}
+      if clientDetail === {}
+        p Client not found!
+      else
+        p
+          strong Email: 
+          | #{user.email}
+        if user.phoneNumber
+          p
+            strong Phone Number: 
+            | #{user.phoneNumber}
 
-    if currentUser && currentUser.isAdmin
-      div.actions
-        a(href=`/users/${user._id}/update`) Update
-        a(href=`/users/${user._id}/delete`, style="color: red") Delete
-        if projectExists
-          a(href=`/users/${user._id}/project/${projectId}`) View Project
-        else 
-          a(href=`/users/${user._id}/project/create`) Create Project
+        if currentUser && currentUser.isAdmin
+          div.actions
+            if projectExists
+              a.detail-button(href=`/users/${user._id}/project/${projectId}`) View Project
+            else 
+              a.detail-button(href=`/users/${user._id}/project/create`) Create Project
+            a.detail-button(href=`/users/${user._id}/update`) Update Client
+            a.detail-button.delete-button(href=`/users/${user._id}/delete`) Delete Client

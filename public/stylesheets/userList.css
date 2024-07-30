@@ -43,7 +43,7 @@
   font-size: var(--font-size-base);
   border: 2px solid transparent;
   transition: 0.3s ease;
-  margin: var(--spacing-xs) 0;
+  margin: var(--spacing-sm) 0;
 }
 
 .list-button:hover {

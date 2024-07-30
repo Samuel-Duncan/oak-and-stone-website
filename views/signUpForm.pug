@@ -7,21 +7,21 @@ block content
    div.background 
     div.form-wrapper  
       form(method="POST" action=formAction)
-        h2= title
+        h1= title
         div.input-field  
-          input(type="text" id="name" name="name" value=(user && user.name))
+          input(type="text" id="name" name="name" value=(user && user.name) required)
           label(for="name") Name:
         div.input-field  
-          input(type="email" id="email" name="email" value=(user && user.email))
+          input(type="email" id="email" name="email" value=(user && user.email) required)
           label(for="email") Email:
         if !isUpdate
           div.input-field
-            input(type="password" id="password" name="password")
+            input(type="password" id="password" name="password" required)
             label(for="password") Password:
         div.input-field  
-          input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber))
+          input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber) required)
           label(for="phoneNumber") Phone Number:
-        button.form-button(type="submit")= isUpdate ? 'Update User' : 'Create Client'
+        button.form-button(type="submit")= isUpdate ? 'Update Client' : 'Create Client'
       if errors
         each error in errors
           p.error-message= error.msg
