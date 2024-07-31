@@ -33,30 +33,14 @@
   gap: var(--spacing-sm);
 }
 
+.detail-icon {
+  margin-right: var(--spacing-xs);
+}
+
 .actions {
   display: flex;
   gap: var(--spacing-xs);
   flex-direction: column;
-}
-
-.detail-button {
-  background: var(--color-primary);
-  color: var(--color-text-primary);
-  font-weight: 600;
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  cursor: pointer;
-  border-radius: var(--border-radius);
-  font-size: var(--font-size-base);
-  border: 2px solid transparent;
-  transition: 0.3s ease;
-  margin: var(--spacing-sm) 0;
-}
-
-.detail-button:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.15);
 }
 
 .delete-button {

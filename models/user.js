@@ -24,6 +24,32 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
       // Prevent duplicate phone numbers
+      set: function (phoneNumber) {
+        const cleanedNumber = phoneNumber.replace(/\D/g, ''); // Remove non-digits
+        if (cleanedNumber.length === 10) {
+          return `(${cleanedNumber.substring(
+            0,
+            3,
+          )}) ${cleanedNumber.substring(
+            3,
+            6,
+          )}-${cleanedNumber.substring(6)}`;
+        } else if (
+          cleanedNumber.length === 11 &&
+          cleanedNumber.startsWith('1')
+        ) {
+          return `(${cleanedNumber.substring(
+            1,
+            4,
+          )}) ${cleanedNumber.substring(
+            4,
+            7,
+          )}-${cleanedNumber.substring(7)}`;
+        } else {
+          // Handle invalid phone number cases (e.g., throw an error, return null, etc.)
+          return null; // Or your desired handling for invalid numbers
+        }
+      },
     },
     isAdmin: {
       type: Boolean,

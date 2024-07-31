@@ -21,7 +21,7 @@ block content
         div.input-field  
           input(type="tel" id="phoneNumber" name="phoneNumber" value=(user && user.phoneNumber) required)
           label(for="phoneNumber") Phone Number:
-        button.form-button(type="submit")= isUpdate ? 'Update Client' : 'Create Client'
+        button.button(type="submit")= isUpdate ? 'Update Client' : 'Create Client'
       if errors
         each error in errors
           p.error-message= error.msg

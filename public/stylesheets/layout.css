@@ -48,22 +48,7 @@
 }
 
 .header-button {
-  color: var(--color-text-primary);
-  background: var(--color-primary);
-  border: none;
-  font-weight: 600;
   padding: 8px var(--spacing-sm);
-  cursor: pointer;
-  border-radius: var(--border-radius);
-  font-size: var(--font-size-base);
-  border: 2px solid transparent;
-  transition: 0.3s ease;
-}
-
-.header-button:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.15);
 }
 
 .nav-wrapper {
