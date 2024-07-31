@@ -42,8 +42,3 @@
   gap: var(--spacing-xs);
   flex-direction: column;
 }
-
-.delete-button {
-  background-color: var(--color-danger);
-  color: var(--color-primary);
-}

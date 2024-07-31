@@ -39,7 +39,26 @@ form {
   transition: 0.15s ease;
 }
 
-.input-field input {
+.textarea-input-field {
+  position: relative;
+  border-bottom: 2px solid var(--color-secondary);
+  margin: var(--spacing-md) 0;
+}
+
+.textarea-input-field label {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  color: var(--color-primary);
+  font-size: var(--font-size-base);
+  pointer-events: none;
+  transform: translateY(-220%);
+  transition: 0.15s ease;
+}
+
+.input-field input,
+.textarea-input-field textarea {
   width: 100%;
   height: var(--input-height);
   background: transparent;
