@@ -75,12 +75,6 @@ h2 {
   color: var(--color-primary);
 }
 
-button {
-}
-
-button:hover {
-}
-
 .button {
   background: var(--color-primary);
   color: var(--color-text-primary);
@@ -101,6 +95,11 @@ button:hover {
   background: rgba(255, 255, 255, 0.15);
 }
 
+.delete-button {
+  background-color: var(--color-danger);
+  color: var(--color-primary);
+}
+
 ul {
   list-style-type: none;
   display: flex;
@@ -119,6 +118,7 @@ li,
 }
 
 .error-message {
+  margin-top: var(--spacing-xs);
   color: var(--color-danger);
 }
 
