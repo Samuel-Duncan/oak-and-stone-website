@@ -104,6 +104,27 @@ form {
   border: transparent;
 }
 
+.image-container {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: repeat(
+    1,
+    minmax(3, 1fr)
+  ); /* Create one column */
+  gap: 12px;
+}
+
+.project-image {
+  height: 100px;
+  width: 250px;
+  object-fit: contain;
+}
+
+.delete-image-checkbox {
+  position: absolute;
+  transform: translate(-130px, 50px);
+}
+
 @media (max-width: 480px) {
   .form-wrapper {
     width: 100%;
