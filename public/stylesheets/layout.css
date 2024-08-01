@@ -1,10 +1,10 @@
 /* Header styles */
 .main-header {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0); /* Transparent white */
+  background-color: rgba(0, 0, 0, 0); /* Transparent background */
   z-index: 1000;
 }
 

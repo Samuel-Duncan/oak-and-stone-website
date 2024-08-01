@@ -4,8 +4,8 @@ block stylesheets
   link(rel='stylesheet', href='/stylesheets/forms.css')
 
 block content
-  div.background 
-    div.form-wrapper
+  div.form-background 
+    div.project-form-wrapper
       h1= title
       form(method='POST' action=formAction enctype='multipart/form-data')
         div.input-field
@@ -42,7 +42,7 @@ block content
                 input.delete-image-checkbox(type='checkbox', name='image', id=image._id, value=image._id)
                 label.sr-only(for=image._id) &nbsp;Delete
         
-        button.button(type='submit') Create Project
+        button.button.project-form-button(type='submit')= title
 
       if errors
         ul.errors

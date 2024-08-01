@@ -3,7 +3,46 @@ form {
   flex-direction: column;
 }
 
+.form-background {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: var(--spacing-xs);
+}
+
+.form-background::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../images/background-4.png'),
+    var(--color-background);
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: multiply;
+  z-index: -1;
+}
+
 .form-wrapper {
+  width: 400px;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+  border: var(--border-width) solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.project-form-wrapper {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translateX(-50%);
   width: 400px;
   border-radius: var(--border-radius);
   padding: var(--spacing-lg);
@@ -107,22 +146,20 @@ form {
 .image-container {
   margin-top: 0;
   display: grid;
-  grid-template-columns: repeat(
-    1,
-    minmax(3, 1fr)
-  ); /* Create one column */
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr); /* Create three columns */
+  gap: 8px;
+  width: 100%;
 }
 
 .project-image {
+  width: 100%; /* Make images fill their grid cell */
   height: 100px;
-  width: 250px;
   object-fit: contain;
 }
 
 .delete-image-checkbox {
   position: absolute;
-  transform: translate(-130px, 50px);
+  transform: translate(-58px, 45px);
 }
 
 @media (max-width: 480px) {
