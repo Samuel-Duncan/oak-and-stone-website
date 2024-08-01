@@ -16,23 +16,23 @@ block content
           textarea#description(name='description')
             if project && project.description
               = project.description
-        div.input-field
-          label(for='currentPhase') Current Phase:
-          select#currentPhase(name='currentPhase' required)
+        div.input-field.select-field
+          label.sr-only(for='currentPhase') Current Phase:
+          select#currentPhase.form-select(name='currentPhase' required)
             option(value='') Select Phase
             option(value='1' selected=(project && project.currentPhase === 1)) Phase 1
             option(value='2' selected=(project && project.currentPhase === 2)) Phase 2
             option(value='3' selected=(project && project.currentPhase === 3)) Phase 3
             option(value='4' selected=(project && project.currentPhase === 4)) Phase 4
         
-        div.input-field
-          label(for='type') Project Type:
-          select#type(name='type' required)
+        div.input-field.select-field
+          label.sr-only(for='type') Project Type:
+          select#type.form-select(name='type' required)
             option(value='') Select Type
             option(value='Residential' selected=(project && project.type === 'Residential')) Residential
             option(value='Commercial' selected=(project && project.type === 'Commercial')) Commercial
         
-        div.input-field
+        div.input-field.select-field
           input#images(type='file' name='images' multiple accept='image/*')
         if images 
           div(class="")
@@ -42,7 +42,7 @@ block content
                 input(type='checkbox', name='image', id=image._id, value=image._id)
                 label(for=image._id) &nbsp;Delete
         
-        button.button(type='submit') Submit
+        button.button(type='submit') Create Project
 
       if errors
         ul.errors
