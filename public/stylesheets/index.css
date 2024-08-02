@@ -12,6 +12,7 @@
   --color-danger: rgb(255, 0, 0);
 
   /* Spacing */
+  --spacing-xxs: 5px;
   --spacing-xs: 10px;
   --spacing-sm: 15px;
   --spacing-md: 20px;

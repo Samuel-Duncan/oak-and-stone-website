@@ -40,7 +40,7 @@ form {
 
 .project-form-wrapper {
   position: absolute;
-  top: 26%;
+  top: 15%;
   left: 50%;
   transform: translateX(-50%);
   width: 400px;
@@ -151,6 +151,23 @@ form {
   width: 100%;
 }
 
+.second-image-container {
+  position: relative;
+  width: 100%;
+  height: 100px;
+}
+
+.second-image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+  pointer-events: none;
+}
+
 .project-image {
   width: 100%; /* Make images fill their grid cell */
   height: 100px;
@@ -159,11 +176,13 @@ form {
 
 .delete-image-checkbox {
   position: absolute;
-  transform: translate(-58px, 45px);
+  transform: translate(-58px, 45px) scale(1.75);
+  cursor: pointer;
 }
 
 @media (max-width: 480px) {
-  .form-wrapper {
+  .form-wrapper,
+  .project-form-wrapper {
     width: 100%;
   }
 }

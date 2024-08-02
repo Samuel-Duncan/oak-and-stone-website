@@ -37,7 +37,7 @@ block content
         if images 
           div.image-container
             for image in images
-              div
+              div.second-image-container
                 img.project-image(src=image.url)
                 input.delete-image-checkbox(type='checkbox', name='image', id=image._id, value=image._id)
                 label.sr-only(for=image._id) &nbsp;Delete
