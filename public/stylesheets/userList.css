@@ -20,18 +20,6 @@
   background-blend-mode: multiply;
 }
 
-.list-wrapper {
-  width: 400px;
-  border-radius: var(--border-radius);
-  padding: var(--spacing-lg);
-  border: var(--border-width) solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
 .list-button {
   margin: var(--spacing-sm) 0;
   display: flex;

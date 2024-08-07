@@ -2,7 +2,7 @@
 
 :root {
   /* Colors */
-  --color-primary: #fff; /* White */
+  --color-primary: #eeeeee; /* White */
   --color-brand: #ff9500;
   --color-secondary: #ccc; /* Light gray */
   --color-text-primary: #000; /* Black */
@@ -24,6 +24,9 @@
   --border-radius: 8px;
   --input-height: 40px;
   --font-size-base: 16px;
+
+  /* Padding */
+  --padding-xs: 4px;
 }
 
 * {
@@ -132,6 +135,19 @@ main {
   min-height: 100vh; /* Ensures content area takes up at least full viewport height */
 }
 
+.wrapper {
+  color: var(--color-primary);
+  width: 400px;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  border: var(--border-width) solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -140,4 +156,10 @@ main {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@media (max-width: 480px) {
+  .wrapper {
+    width: 100%;
+  }
 }

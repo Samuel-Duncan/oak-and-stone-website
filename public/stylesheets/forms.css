@@ -176,7 +176,7 @@ form {
 
 .delete-image-checkbox {
   position: absolute;
-  transform: translate(-58px, 45px) scale(1.75);
+  transform: translate(-58px, 45px) scale(2);
   cursor: pointer;
 }
 
