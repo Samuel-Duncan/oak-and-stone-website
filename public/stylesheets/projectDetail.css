@@ -4,7 +4,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  max-width: 800px;
+  max-width: 900px;
   border-radius: var(--border-radius);
   padding: var(--spacing-lg);
   text-align: left;
@@ -15,7 +15,6 @@
   color: var(--color-primary);
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
 }
 
 .project-background {
@@ -63,6 +62,8 @@
   border-radius: var(--border-radius);
 }
 
+/* Rest of the CSS remains the same */
+
 .phase-indicator {
   display: flex;
   align-items: center;
@@ -106,12 +107,18 @@
   background-color: var(--color-brand);
 }
 
+.update-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
 .image-gallery {
-  overflow-y: auto;
-  max-height: calc(80vh - 300px); /* Adjust this value as needed */
-  padding-right: var(
-    --spacing-sm
-  ); /* Add some padding for the scrollbar */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .gallery-grid {
@@ -143,22 +150,10 @@
   font-size: 0.8rem;
 }
 
-/* Scrollbar styling for webkit browsers */
-.image-gallery::-webkit-scrollbar {
-  width: 8px;
+.project-button {
+  padding: 8px var(--spacing-md);
 }
 
-.image-gallery::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.image-gallery::-webkit-scrollbar-thumb {
-  background-color: var(--color-brand);
-  border-radius: 4px;
-}
-
-/* Responsive adjustments */
 @media (max-width: 600px) {
   .dashboard {
     width: 95%;
@@ -168,5 +163,15 @@
 
   .project-details {
     grid-template-columns: 1fr;
+  }
+
+  .image-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    width: 100%;
   }
 }

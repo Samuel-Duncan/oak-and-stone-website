@@ -309,6 +309,7 @@ async function updateProjectLogic(req, res, next) {
     console.error(err);
     res.status(500).render('projectForm', {
       title: 'Update Project',
+      formAction: `/users/${req.params.userId}/project/${project._id}`,
       errors: [{ msg: 'Error updating project' }],
     });
   }

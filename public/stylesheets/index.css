@@ -158,6 +158,10 @@ main {
   border: 0;
 }
 
+.secondary-text {
+  color: var(--color-secondary);
+}
+
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;

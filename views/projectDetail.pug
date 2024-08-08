@@ -13,33 +13,36 @@ block content
         .project-header
           h1= projectDetail.address
           if currentUser.isAdmin
-            a.button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/update`) Edit
+            a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/update`) Edit
         
         .project-details
           .detail-item
             h2 Type
-            p= projectDetail.type
+            p.secondary-text= projectDetail.type
           
           .detail-item
             h2 Current Phase
             .phase-indicator
               .phase-circle
                 .phase-fill(class=`phase-${projectDetail.currentPhase}`)
-              p= projectDetail.currentPhase
+              p.secondary-text= projectDetail.currentPhase
           
           if projectDetail.description
             .detail-item
               h2 Description
-              p= projectDetail.description
+              p.secondary-text= projectDetail.description
         
+        if projectDetail.updates && projectDetail.updates.length > 0
+          h2 Updates
+
         if projectDetail.images && projectDetail.images.length > 0
-            h2 Images
-            .image-gallery
-              .gallery-grid
-                each image in projectDetail.images
-                  .image-container
-                    img(src=image.url alt="Project Image")
-                    p.image-date Uploaded: #{image.createdAt.toLocaleDateString()}
+          h2 Images
+          .image-gallery
+            .gallery-grid
+              each image in projectDetail.images
+                .image-container
+                  img(src=image.url alt="Project Image")
+                  p.image-date Uploaded: #{image.createdAt.toLocaleDateString()}
 
         else
           p Nothing to see here yet.

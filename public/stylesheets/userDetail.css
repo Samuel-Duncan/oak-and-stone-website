@@ -24,12 +24,7 @@
   margin-right: var(--spacing-xs);
 }
 
-.color-secondary {
-  color: var(--color-secondary);
-}
-
 .actions {
   display: flex;
-  gap: var(--spacing-xs);
   flex-direction: column;
 }
