@@ -77,7 +77,7 @@ exports.updateUpdateGET = async (req, res) => {
   }
 };
 
-const updateUpdatePOST = [
+exports.updateUpdatePOST = [
   body('week')
     .notEmpty()
     .withMessage('Week is required')
@@ -108,7 +108,9 @@ const updateUpdatePOST = [
           update: {
             week: req.body.week,
             title: req.body.title,
-            description: req.body.description,
+            description: req.body.description
+              ? req.body.description
+              : null,
           },
           errors: errors.array(),
         });
