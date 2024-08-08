@@ -22,10 +22,24 @@ block content
           
           .detail-item
             h2 Current Phase
-            .phase-indicator
-              .phase-circle
-                .phase-fill(class=`phase-${projectDetail.currentPhase}`)
-              p.secondary-text= projectDetail.currentPhase
+            .phase-items
+              if projectDetail.currentPhase === 1
+                p.secondary-text 1 out of 4
+              else if projectDetail.currentPhase === 2
+                p.secondary-text 2 out of 4
+              else if projectDetail.currentPhase === 3
+                p.secondary-text 3 out of 4
+              else 
+                p.secondary-text 4 out of 4
+              div.progress(role='progressbar', aria-label='Warning example', aria-valuenow='75', aria-valuemin='0', aria-valuemax='100')
+                if projectDetail.currentPhase === 1
+                  div.progress-bar(style='width: 25%')
+                else if projectDetail.currentPhase === 2
+                  div.progress-bar(style='width: 50%')
+                else if projectDetail.currentPhase === 3
+                  div.progress-bar(style='width: 75%')
+                else 
+                  div.progress-bar(style='width: 100%')
           
           if projectDetail.description
             .detail-item
