@@ -1,5 +1,6 @@
 const Project = require('../models/project.js');
 const User = require('../models/user.js');
+const Update = require('../models/update.js');
 const { body, validationResult } = require('express-validator');
 const { cloudinary, upload } = require('../utils/cloudinary.js');
 const { sendEmail } = require('../utils/nodemailer.js');
@@ -131,9 +132,18 @@ exports.projectDetailGET = async (req, res) => {
       });
     }
 
+    const update = await Update.findOne({
+      projectId: project._id,
+    }).exec();
+
+    if (project.images && project.images.length > 0) {
+      project.images.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: project,
+      update: update ? update : null,
     });
   } catch (err) {
     res.status(500).render('error', {
@@ -155,6 +165,10 @@ exports.userProjectDetailGET = [
           title: 'Project Details',
           errMsg: 'No Project found!',
         });
+      }
+
+      if (userProject.images && userProject.images.length > 0) {
+        userProject.images.sort((a, b) => b.createdAt - a.createdAt);
       }
 
       res.render('projectDetail', {

@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 exports.updateCreateGET = (req, res, next) => {
   res.render('updateForm', {
     title: 'Create Update',
-    formAction: `/users/${req.params.userId}/project/${req.params.projectId}/update`,
+    formAction: `/users/${req.params.userId}/project/${req.params.projectId}/weekly-update`,
   });
 };
 
@@ -67,7 +67,7 @@ exports.updateUpdateGET = async (req, res) => {
 
     res.render('updateForm', {
       title: 'Edit Update',
-      formAction: `/users/${req.params.userId}/project/${req.params.projectId}/update/${update._id}`,
+      formAction: `/users/${req.params.userId}/project/${req.params.projectId}/weekly-update/${update._id}`,
       update,
     });
   } catch (err) {
@@ -128,7 +128,7 @@ exports.updateUpdatePOST = [
       console.error(err);
       res.status(500).render('updateForm', {
         title: 'Edit Update',
-        formAction: `/users/${req.params.userId}/project/${req.params.projectId}/update/${req.params.updateId}`,
+        formAction: `/users/${req.params.userId}/project/${req.params.projectId}/weekly-update/${req.params.updateId}`,
         errors: [{ msg: 'Error editing update' }],
       });
     }

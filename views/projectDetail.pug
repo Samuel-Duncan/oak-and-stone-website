@@ -46,8 +46,23 @@ block content
               h2 Description
               p.secondary-text= projectDetail.description
         
-        if projectDetail.updates && projectDetail.updates.length > 0
-          h2 Updates
+        .updates-container
+          .updates-header
+            h2 Weekly Update
+            if currentUser.isAdmin && update === null
+              a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
+            else if currentUser.isAdmin && update !== null
+              a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/${update._id}/edit`) Edit Update
+
+          if update !== null
+            .detail-item
+              h3 Week #{update.week} 
+              h4= update.title 
+              if update.description 
+                p.secondary-text= update.description
+          else
+            .detail-item
+              p No updates to see yet!
 
         if projectDetail.images && projectDetail.images.length > 0
           h2 Images
@@ -59,4 +74,4 @@ block content
                   p.image-date Uploaded: #{image.createdAt.toLocaleDateString()}
 
         else
-          p Nothing to see here yet.
+          p.secondary-text Nothing to see here yet.

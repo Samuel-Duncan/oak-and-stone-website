@@ -49,6 +49,16 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.updates-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.updates-container {
+  margin-bottom: var(--spacing-lg);
+}
+
 .project-details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

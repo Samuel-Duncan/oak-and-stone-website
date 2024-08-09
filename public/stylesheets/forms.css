@@ -171,7 +171,6 @@ form {
 .project-image {
   width: 100%; /* Make images fill their grid cell */
   height: 100px;
-  object-fit: contain;
 }
 
 .delete-image-checkbox {

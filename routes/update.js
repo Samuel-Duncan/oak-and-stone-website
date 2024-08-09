@@ -5,23 +5,23 @@ const adminCheck = require('../utils/adminCheck');
 
 // Create Update
 router.get(
-  '/:userId/project/:projectId/update/create',
+  '/:userId/project/:projectId/weekly-update/create',
   updateController.updateCreateGET,
 );
 
 router.post(
-  '/:userId/project/:projectId/update',
+  '/:userId/project/:projectId/weekly-update',
   updateController.updateCreatePOST,
 );
 
 // Edit Update
 router.get(
-  '/:userId/project/:projectId/update/:updateId/edit',
+  '/:userId/project/:projectId/weekly-update/:updateId/edit',
   updateController.updateUpdateGET,
 );
 
 router.post(
-  ':/userId/project/:projectId/update/:updateId',
+  ':/userId/project/:projectId/weekly-update/:updateId',
   updateController.updateUpdatePOST,
 );
 module.exports = router;
