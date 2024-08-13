@@ -16,9 +16,10 @@ block content
             a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/update`) Edit
         
         .project-details
-          .detail-item
-            h2 Type
-            p.secondary-text= projectDetail.type
+          if currentUser && currentUser.isAdmin
+            .detail-item
+              h2 Type
+              p.secondary-text= projectDetail.type
           
           .detail-item
             h2 Current Phase
@@ -41,14 +42,14 @@ block content
                 else 
                   div.progress-bar(style='width: 100%')
           
-          if projectDetail.description
+          if projectDetail.description && currentUser && currentUser.isAdmin
             .detail-item
               h2 Description
               p.secondary-text= projectDetail.description
         
         .updates-container
           .updates-header
-            h2 Weekly Update (Current)
+            h2 Current Status
             if currentUser.isAdmin && update === null
               a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
             else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null
@@ -56,10 +57,9 @@ block content
 
           if update !== null
             .detail-item
-              h3 Week #{update.week} 
-              h4.secondary-text= update.title 
+              h3 Week #{update.week} - #{update.title}
               if update.description 
-                p.secondary-text= update.description
+                p.update-description.secondary-text= update.description
           else
             .detail-item
               p No updates to see yet!

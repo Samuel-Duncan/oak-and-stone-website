@@ -167,6 +167,14 @@ main {
   flex-direction: column;
 }
 
+.svg-button {
+  margin: var(--spacing-sm) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xxs);
+}
+
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;

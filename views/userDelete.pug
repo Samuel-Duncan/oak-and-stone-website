@@ -11,9 +11,10 @@ block content
       p Are you sure you want to delete this client?
 
       form(method="POST" action=`/users/${user._id}/delete`)
-        input(type="hidden" name="_method" value="DELETE")
-        button.button.delete-button.confirm-delete(type="submit" name="confirmDelete" value=user._id) Confirm Delete
-      a.button(href="/users") Cancel
+        div.actions
+          input(type="hidden" name="_method" value="DELETE")
+          button.button.delete-button.confirm-delete(type="submit" name="confirmDelete" value=user._id) Confirm Delete
+          a.button(href="/users") Cancel
 
       if message
         p.error-message= message
