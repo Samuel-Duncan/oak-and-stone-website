@@ -134,7 +134,9 @@ exports.projectDetailGET = async (req, res) => {
 
     const update = await Update.findOne({
       projectId: project._id,
-    }).exec();
+    })
+      .sort({ createdAt: -1 })
+      .exec();
 
     if (project.images && project.images.length > 0) {
       project.images.sort((a, b) => b.createdAt - a.createdAt);
@@ -167,6 +169,12 @@ exports.userProjectDetailGET = [
         });
       }
 
+      const update = await Update.findOne({
+        projectId: userProject._id,
+      })
+        .sort({ createdAt: -1 })
+        .exec();
+
       if (userProject.images && userProject.images.length > 0) {
         userProject.images.sort((a, b) => b.createdAt - a.createdAt);
       }
@@ -174,6 +182,7 @@ exports.userProjectDetailGET = [
       res.render('projectDetail', {
         title: 'Project',
         projectDetail: userProject,
+        update: update ? update : null,
       });
     } catch (err) {
       res.status(500).render('error', {

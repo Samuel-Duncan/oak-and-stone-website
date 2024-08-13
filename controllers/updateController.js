@@ -2,6 +2,60 @@ const Update = require('../models/update');
 const Project = require('../models/project');
 const { body, validationResult } = require('express-validator');
 
+exports.updateListGET = async (req, res) => {
+  try {
+    const allUpdates = await Update.find({
+      projectId: req.params.projectId,
+    })
+      .sort({
+        createdAt: 1,
+      })
+      .exec();
+
+    if (allUpdates.length === 0) {
+      res.render('updateList', {
+        title: 'Weekly Updates',
+        errorMessage: 'No updates found!',
+      });
+    }
+
+    res.render('updateList', {
+      title: 'Weekly Updates',
+      updateList: allUpdates,
+      userId: req.params.userId,
+      projectId: req.params.projectId,
+    });
+  } catch (err) {
+    res.status(500).render('error', {
+      message: 'An error occurred while fetching updates.',
+    });
+  }
+};
+
+exports.updateDetailGET = async (req, res) => {
+  try {
+    const update = await Update.findById(req.params.updateId).exec();
+
+    if (update === null) {
+      res.render('updateDetail', {
+        title: 'Update Details',
+        errMsg: 'No update found!',
+      });
+    }
+
+    res.render('updateDetail', {
+      title: 'Update Details',
+      update: update ? update : null,
+      userId: req.params.userId,
+      projectId: req.params.projectId,
+    });
+  } catch (err) {
+    res.status(500).render('error', {
+      message: 'An error occurred while fetching this client.',
+    });
+  }
+};
+
 exports.updateCreateGET = (req, res, next) => {
   res.render('updateForm', {
     title: 'Create Update',
@@ -45,10 +99,15 @@ exports.updateCreatePOST = [
 
       await update.save();
 
-      res.status(201).json(update);
+      res.redirect(
+        `/users/${req.params.userId}/project/${req.params.projectId}/weekly-updates`,
+      );
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Error creating update' });
+      res.status(500).render('updateForm', {
+        title: 'Create Update',
+        formAction: `/users/${req.params.userId}/project/${req.params.projectId}/weekly-update`,
+        errors: [{ msg: 'Error creating update' }],
+      });
     }
   },
 ];
@@ -104,7 +163,7 @@ exports.updateUpdatePOST = [
       if (!errors.isEmpty()) {
         return res.render('updateForm', {
           title: 'Edit Update',
-          formAction: `/users/${req.params.userId}/project/${req.params.projectId}/update/${req.params.updateId}`,
+          formAction: `/users/${req.params.userId}/project/${req.params.projectId}/weekly-update/${req.params.updateId}`,
           update: {
             week: req.body.week,
             title: req.body.title,
@@ -121,7 +180,7 @@ exports.updateUpdatePOST = [
           {},
         );
         res.redirect(
-          `/users/${req.params.userId}/project/${req.params.projectId}`,
+          `/users/${req.params.userId}/project/${req.params.projectId}/weekly-updates`,
         );
       }
     } catch (err) {
@@ -134,3 +193,39 @@ exports.updateUpdatePOST = [
     }
   },
 ];
+
+exports.updateDeleteGET = async (req, res) => {
+  try {
+    const update = await Update.findById(req.params.updateId).exec();
+
+    if (update === null) {
+      res.redirect(
+        `/users/${req.params.userId}/project/${req.params.projectId}/weekly-updates`,
+      );
+    }
+
+    res.render('updateDelete', {
+      title: 'Delete Update',
+      update,
+      userId: req.params.userId,
+      projectId: req.params.projectId,
+    });
+  } catch (err) {
+    res.status(err.status || 500).render('error', {
+      message: 'Error fetching update: ' + err.message,
+    });
+  }
+};
+
+exports.updateDeletePOST = async (req, res) => {
+  try {
+    await Update.findByIdAndDelete(req.params.updateId);
+    res.redirect(
+      `/users/${req.params.userId}/project/${req.params.projectId}/weekly-updates`,
+    );
+  } catch {
+    res.status(err.status || 500).render('updateDelete', {
+      message: 'Error deleting client: ' + err.message,
+    });
+  }
+};

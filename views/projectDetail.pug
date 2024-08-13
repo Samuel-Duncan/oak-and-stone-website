@@ -48,16 +48,16 @@ block content
         
         .updates-container
           .updates-header
-            h2 Weekly Update
+            h2 Weekly Update (Current)
             if currentUser.isAdmin && update === null
               a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
-            else if currentUser.isAdmin && update !== null
-              a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/${update._id}/edit`) Edit Update
+            else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null
+              a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-updates`) View All
 
           if update !== null
             .detail-item
               h3 Week #{update.week} 
-              h4= update.title 
+              h4.secondary-text= update.title 
               if update.description 
                 p.secondary-text= update.description
           else

@@ -1,0 +1,25 @@
+extends layout
+
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/forms.css')
+
+block content
+  div.background
+    div.form-wrapper
+      form(method="POST" action=formAction)
+        h1= title
+        div.input-field
+          input(type="number" id="week" name="week" value=(update && update.week) required min="1")
+          label(for="week") Week:
+        div.input-field
+          input(type="text" id="title" name="title" value=(update && update.title) required)
+          label(for="title") Title:
+        div.textarea-input-field
+          textarea(id="description" name="description")
+            if update && update.description
+              = update.description
+          label(for="description") Description:
+        button.button(type="submit")= update ? 'Update' : 'Create Update'
+      if errors
+        each error in errors
+          p.error-message= error.msg

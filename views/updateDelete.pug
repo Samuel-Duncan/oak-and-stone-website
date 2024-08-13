@@ -1,0 +1,20 @@
+extends layout
+
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/userDelete.css')
+
+block content
+  div.client-delete-background
+    div.wrapper
+      h1 Week #{update.week}
+
+      p Are you sure you want to delete this update?
+
+      form(method="POST" action=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/delete`)
+        input(type="hidden" name="_method" value="DELETE")
+        div.actions
+          button.button.delete-button.confirm-delete(type="submit" name="confirmDelete" value=update._id) Confirm Delete
+          a.button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}`) Cancel
+
+      if message
+        p.error-message= message

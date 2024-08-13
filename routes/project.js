@@ -19,7 +19,6 @@ router.post(
 // Read Project
 router.get(
   '/:userId/project/:projectId',
-  adminCheck.adminCheck,
   projectController.projectDetailGET,
 );
 

@@ -162,6 +162,11 @@ main {
   color: var(--color-secondary);
 }
 
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;

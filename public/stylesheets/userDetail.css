@@ -24,7 +24,7 @@
   margin-right: var(--spacing-xs);
 }
 
-.actions {
+.info-text {
   display: flex;
   flex-direction: column;
 }
