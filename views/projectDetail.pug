@@ -48,20 +48,19 @@ block content
               p.secondary-text= projectDetail.description
         
         .updates-container
-          if update !== null
-            .detail-item
-              .updates-header
-                h2 Current Update 
-                if currentUser.isAdmin && update === null
-                  a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
-                else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null
-                  a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-updates`) View All
+          .detail-item
+            .updates-header
+              h2 Current Update 
+              if currentUser.isAdmin && update === null
+                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
+              else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null
+                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-updates`) View All
+            if update !== null
               p.secondary-text.subtitle Week #{update.week} - #{update.title}
               if update.description 
                 p.update-description.secondary-text= update.description
-          else
-            .detail-item
-              p No updates to see yet!
+            else
+              p.secondary-text No updates to see yet!
 
         if projectDetail.images && projectDetail.images.length > 0
           h2 Images
