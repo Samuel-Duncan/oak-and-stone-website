@@ -276,23 +276,20 @@ async function updateProjectLogic(req, res, next) {
       existingImages = existingImages.images; // Extract the actual image URLs
     }
 
-    const uploadedImages = [];
-
-    if (req.files) {
-      // ... existing upload logic (processing uploaded images)
-      // eslint-disable-next-line no-restricted-syntax
-      for (const file of req.files) {
-        try {
-          const result = await cloudinary.uploader.upload(file.path);
-          uploadedImages.push({ url: result.secure_url });
-        } catch (error) {
-          console.error('Error uploading image:', error);
-          errors.array().push({
-            msg: 'Error uploading image(s). Please try again.',
-          });
-        }
+    const uploadedImagesPromises = req.files.map(async (file) => {
+      try {
+        const result = await cloudinary.uploader.upload(file.path);
+        return { url: result.secure_url };
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        errors.array().push({
+          msg: 'Error uploading image(s). Please try again.',
+        });
+        return null; // Or handle errors differently
       }
-    }
+    });
+
+    const uploadedImages = await Promise.all(uploadedImagesPromises);
 
     const imagesToKeep = existingImages.filter(
       (image) =>

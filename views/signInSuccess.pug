@@ -1,13 +1,6 @@
 if currentUser
   p Welcome, #{currentUser.name}!
-  p Your email is: #{currentUser.email}
-  if currentUser.phoneNumber
-    p Your phone number is: #{currentUser.phoneNumber}
-  if currentUser.isAdmin
-    p You have admin privileges.
-  p Account created on: #{currentUser.createdAt.toLocaleDateString()}
   
-  h2 Project
   if projectId
       a(href=`${currentUser.url}/user-project/${projectId}`) View Project
   else 

@@ -12,7 +12,7 @@ block content
       else if projectDetail
         .project-header
           h1= projectDetail.address
-          if currentUser.isAdmin
+          if currentUser && currentUser.isAdmin
             a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/update`) Edit
         
         .project-details

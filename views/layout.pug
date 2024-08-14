@@ -28,7 +28,8 @@ html
                     li.nav-item
                       a.nav-link(href='/auth/sign-up/') Create Client
         .logo
-          img(src="/images/OSC Emblem.png", alt="Logo")
+          a(href="/")
+            img(src="/images/OSC Emblem.png", alt="Logo")
         if currentUser
           a.button.header-button(href="/auth/sign-out") Sign Out
         else

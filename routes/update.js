@@ -12,11 +12,13 @@ router.get(
 // Create Update
 router.get(
   '/:userId/project/:projectId/weekly-update/create',
+  adminCheck.adminCheck,
   updateController.updateCreateGET,
 );
 
 router.post(
   '/:userId/project/:projectId/weekly-update',
+  adminCheck.adminCheck,
   updateController.updateCreatePOST,
 );
 
@@ -29,11 +31,13 @@ router.get(
 // Edit Update
 router.get(
   '/:userId/project/:projectId/weekly-update/:updateId/edit',
+  adminCheck.adminCheck,
   updateController.updateUpdateGET,
 );
 
 router.post(
   '/:userId/project/:projectId/weekly-update/:updateId',
+  adminCheck.adminCheck,
   updateController.updateUpdatePOST,
 );
 module.exports = router;
@@ -46,5 +50,6 @@ router.get(
 );
 router.post(
   '/:userId/project/:projectId/weekly-update/:updateId/delete',
+  adminCheck.adminCheck,
   updateController.updateDeletePOST,
 );

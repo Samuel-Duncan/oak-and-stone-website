@@ -172,12 +172,12 @@ exports.signInSuccess = async (req, res) => {
 
     // Render project details template if found
     if (projectDetail) {
-      return res.render('signInSuccess', {
+      return res.render('index', {
         projectId: projectDetail._id,
       });
     } else {
       // No project found, render the sign-in success template
-      return res.render('signInSuccess');
+      return res.render('index');
     }
   } catch (err) {
     console.error(err); // Log the error for debugging

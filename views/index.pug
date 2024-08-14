@@ -1,11 +1,19 @@
 extends layout
 
-block content
-  h1 Homepage
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/homepage.css')
 
-  if currentUser
-    p Welcome, #{currentUser.name}!
-    a(href="/auth/sign-out") Sign Out
-  else
-    p Welcome, guest! 
-    a(href="/auth/sign-in") Sign In
+block content
+  .homepage-background
+    .wrapper.homepage-wrapper
+      if currentUser 
+        h1 Welcome, #{currentUser.name.split(' ')[0]}!
+        if currentUser && projectId
+          a.button(href=`/users/${currentUser._id}/project/${projectId}`) View Project
+        else if currentUser.isAdmin 
+          a(href="/users/").button View Clients 
+        else
+          p.secondary-text Nothing to see here yet!
+      else
+        h1 Welcome! 
+        a.button(href="/auth/sign-in") Sign In
