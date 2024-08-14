@@ -14,7 +14,7 @@ block content
         div.actions
           input(type="hidden" name="_method" value="DELETE")
           button.button.delete-button.confirm-delete(type="submit" name="confirmDelete" value=user._id) Confirm Delete
-          a.button(href="/users") Cancel
+          a.button(href=`/users/${user._id}`) Cancel
 
       if message
         p.error-message= message

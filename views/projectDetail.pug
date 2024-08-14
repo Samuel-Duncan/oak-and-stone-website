@@ -49,7 +49,7 @@ block content
         
         .updates-container
           .updates-header
-            h2 Current Status
+            h2 Current Update
             if currentUser.isAdmin && update === null
               a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
             else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null

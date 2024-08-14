@@ -24,6 +24,7 @@
   --border-radius: 8px;
   --input-height: 40px;
   --font-size-base: 16px;
+  --font-size-md: 24px;
 
   /* Padding */
   --padding-xs: 4px;
@@ -65,12 +66,6 @@ body {
   background-blend-mode: multiply;
 }
 
-a {
-  text-decoration: none;
-  transition: color 0.3s ease;
-  color: var(--color-brand);
-}
-
 a:hover {
   color: var(--color-primary);
 }
@@ -80,6 +75,13 @@ h2 {
   font-size: 2rem;
   margin-bottom: var(--spacing-xs);
   color: var(--color-primary);
+}
+
+a,
+.link {
+  text-decoration: none;
+  transition: color 0.3s ease;
+  color: var(--color-brand);
 }
 
 .button {
@@ -162,6 +164,10 @@ main {
   color: var(--color-secondary);
 }
 
+.medium-text {
+  font-size: var(--font-size-md);
+}
+
 .actions {
   display: flex;
   flex-direction: column;
@@ -173,6 +179,10 @@ main {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-xxs);
+}
+
+.text-left {
+  text-align: left;
 }
 
 @media (max-width: 480px) {
