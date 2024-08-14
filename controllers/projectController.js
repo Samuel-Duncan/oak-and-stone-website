@@ -13,7 +13,7 @@ exports.projectCreateGET = (req, res, next) => {
 };
 
 exports.projectCreatePOST = [
-  upload.array('images', 20), // UPLOAD IMAGES
+  upload.array('images', 10), // UPLOAD IMAGES
   // Address
   body('address')
     .notEmpty()
@@ -43,6 +43,8 @@ exports.projectCreatePOST = [
     .optional() // Allow the field to be empty
     .isArray() // Ensure it's an array
     .withMessage('Images must be provided as an array.')
+    .isLength({ max: 10 })
+    .withMessage('You can upload a maximum of 10 images.')
     .custom((value) => {
       if (!value || !value.length) return; // Skip if empty
 
@@ -62,22 +64,20 @@ async function projectCreateLogic(req, res, next) {
   try {
     const errors = validationResult(req);
 
-    const uploadedImages = [];
-
-    if (req.files) {
-      // eslint-disable-next-line no-restricted-syntax
-      for (const file of req.files) {
-        try {
-          const result = await cloudinary.uploader.upload(file.path);
-          uploadedImages.push({ url: result.secure_url });
-        } catch (error) {
-          console.error('Error uploading image:', error);
-          errors.array().push({
-            msg: 'Error uploading image(s). Please try again.',
-          });
-        }
+    const uploadedImagesPromises = req.files.map(async (file) => {
+      try {
+        const result = await cloudinary.uploader.upload(file.path);
+        return { url: result.secure_url };
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        errors.array().push({
+          msg: 'Error uploading image(s). Please try again.',
+        });
+        return null; // Or handle errors differently
       }
-    }
+    });
+
+    const uploadedImages = await Promise.all(uploadedImagesPromises);
 
     const userEmail = await User.findOne(
       { _id: req.params.userId },
@@ -218,7 +218,7 @@ exports.projectUpdateGET = async (req, res) => {
 };
 
 exports.projectUpdatePOST = [
-  upload.array('images', 20), // UPLOAD IMAGES
+  upload.array('images', 10), // UPLOAD IMAGES
   // Name
   body('address')
     .notEmpty()

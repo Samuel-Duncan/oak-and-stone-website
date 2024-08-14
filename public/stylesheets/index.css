@@ -185,6 +185,10 @@ main {
   text-align: left;
 }
 
+.subtitle {
+  font-weight: 600;
+}
+
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;
