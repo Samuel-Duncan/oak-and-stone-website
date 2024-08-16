@@ -25,8 +25,19 @@ block content
         if currentUser && currentUser.isAdmin
           div.actions
             if projectExists
-              a.button(href=`/users/${user._id}/project/${projectId}`) View Project
+              a#viewProject.button(href=`/users/${user._id}/project/${projectId}`)
+                span#button-text View Project
+                span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else 
               a.button(href=`/users/${user._id}/project/create`) Create Project
             a.button(href=`/users/${user._id}/update`) Update Client
             a.button.delete-button(href=`/users/${user._id}/delete`) Delete Client
+  script.
+    document.getElementById('viewProject').addEventListener('click', function(event) {
+      const buttonText = document.getElementById('button-text');
+      const spinner = document.getElementById('spinner-border');
+
+      // Disable the button and show the spinner
+      buttonText.textContent = '';
+      spinner.classList.remove('d-none');
+    });

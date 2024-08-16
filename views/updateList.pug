@@ -14,7 +14,7 @@ block content
         ul
           each update in updateList
             li
-              a(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}`) Week #{update.week} (#{update.title})
+              a(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}`) Week #{update.week}
 
       div.actions
         if currentUser.isAdmin

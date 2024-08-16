@@ -1,9 +1,14 @@
 extends layout
 
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/error.css')
+
 block content
-  if error
-    h1= message
-    h2= error.status 
-    pre #{error.stack}
-  else
-    p An unexpected error occurred.
+  .error-wrapper 
+    .error-background
+      if error
+        h1= message
+        h2= error.status 
+        pre #{error.stack}
+      else
+        p An unexpected error occurred.

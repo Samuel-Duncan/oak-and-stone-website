@@ -1,0 +1,13 @@
+.error-wrapper {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+  border: var(--border-width) solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}

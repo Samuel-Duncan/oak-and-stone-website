@@ -154,43 +154,36 @@ exports.projectDetailGET = async (req, res) => {
   }
 };
 
-exports.userProjectDetailGET = [
-  async (req, res, next) => {
-    try {
-      const userProject = await Project.findOne({
-        _id: req.params.projectId,
-        userId: req.params.userId,
-      }).lean();
+exports.userProjectDetailGET = async (req, res, next) => {
+  try {
+    const userProject = await Project.findOne({
+      _id: req.params.projectId,
+      userId: req.params.userId,
+    })
+      .populate('update') // Assuming 'update' is a populated field
+      .lean();
 
-      if (!userProject) {
-        return res.render('projectDetail', {
-          title: 'Project Details',
-          errMsg: 'No Project found!',
-        });
-      }
-
-      const update = await Update.findOne({
-        projectId: userProject._id,
-      })
-        .sort({ createdAt: -1 })
-        .exec();
-
-      if (userProject.images && userProject.images.length > 0) {
-        userProject.images.sort((a, b) => b.createdAt - a.createdAt);
-      }
-
-      res.render('projectDetail', {
-        title: 'Project',
-        projectDetail: userProject,
-        update: update ? update : null,
-      });
-    } catch (err) {
-      res.status(500).render('error', {
-        message: 'An error occurred while fetching this project.',
+    if (!userProject) {
+      return res.render('projectDetail', {
+        title: 'Project Details',
+        errMsg: 'No Project found!',
       });
     }
-  },
-];
+
+    if (userProject.images && userProject.images.length > 0) {
+      userProject.images.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    res.render('projectDetail', {
+      title: 'Project',
+      projectDetail: userProject,
+    });
+  } catch (err) {
+    res.status(500).render('error', {
+      message: 'An error occurred while fetching this project.',
+    });
+  }
+};
 
 exports.projectUpdateGET = async (req, res) => {
   try {

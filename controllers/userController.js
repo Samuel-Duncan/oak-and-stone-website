@@ -1,5 +1,6 @@
 const User = require('../models/user.js');
 const Project = require('../models/project.js');
+const Update = require('../models/update.js');
 const { body, validationResult } = require('express-validator');
 
 /**
@@ -15,7 +16,7 @@ exports.userListGET = async (req, res) => {
       { name: 1 },
     )
       .sort({
-        createdAt: -1,
+        name: 1,
       })
       .exec();
 
@@ -230,11 +231,26 @@ exports.userDeleteGET = async (req, res) => {
 
 exports.userDeletePOST = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.userId);
+    const user = await User.findByIdAndDelete(req.params.userId);
+
+    if (!user) {
+      return res.status(404).render('userDelete', {
+        message: 'User not found',
+      });
+    }
+
+    const project = await Project.findOneAndDelete({
+      userId: user._id,
+    });
+
+    if (project) {
+      await Update.deleteMany({ projectId: project._id });
+    }
+
     res.redirect('/users');
-  } catch {
+  } catch (err) {
     res.status(err.status || 500).render('userDelete', {
-      message: 'Error deleting client: ' + err.message,
+      message: 'Error deleting user: ' + err.message,
     });
   }
 };

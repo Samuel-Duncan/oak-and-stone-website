@@ -7,7 +7,7 @@ block content
   div.form-background 
     div.project-form-wrapper
       h1= title
-      form(method='POST' action=formAction enctype='multipart/form-data')
+      form#projectForm(method='POST' action=formAction enctype='multipart/form-data')
         div.input-field
           input#address(type='text' name='address' required value=(project && project.address))
           label(for='address') Address:
@@ -42,9 +42,22 @@ block content
                 input.delete-image-checkbox(type='checkbox', name='image', id=image._id, value=image._id)
                 label.sr-only(for=image._id) &nbsp;Delete
         
-        button.button.project-form-button(type='submit')= title
+        button#submitButton.button.project-form-button(type='submit')
+          span.button-text= title
+          span.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
 
       if errors
         ul.errors
           each error in errors
             li.error-item= error.msg
+  script.
+    document.getElementById('projectForm').addEventListener('submit', function(event) {
+      const submitButton = document.getElementById('submitButton');
+      const buttonText = submitButton.querySelector('.button-text');
+      const spinner = submitButton.querySelector('.spinner-border');
+
+      // Disable the button and show the spinner
+      submitButton.disabled = true;
+      buttonText.textContent = '';
+      spinner.classList.remove('d-none');
+    });
