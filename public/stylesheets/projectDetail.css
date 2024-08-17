@@ -109,6 +109,12 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.image-container:hover {
+  transform: scale(1.05);
 }
 
 .image-container img {
@@ -132,6 +138,15 @@
   padding: 8px var(--spacing-md);
 }
 
+.image-container img {
+  background-image: url('../images/placeholder-image.jpeg');
+  background-size: cover;
+}
+
+#modalImage {
+  max-height: 75vh;
+}
+
 @media (max-width: 600px) {
   .dashboard {
     width: 95%;
@@ -151,5 +166,10 @@
 @media (max-width: 480px) {
   .dashboard {
     width: 100%;
+  }
+  .updates-header > a {
+    min-width: fit-content;
+    flex: 1;
+    text-align: center;
   }
 }

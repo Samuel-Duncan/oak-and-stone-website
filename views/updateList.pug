@@ -23,4 +23,25 @@ block content
               path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             span New Update
 
-        a.button.svg-button(href=`/users/${userId}/project/${projectId}`) Back to Project
+        a#viewProject.button.svg-button(href=`/users/${userId}/project/${projectId}`) 
+          span#button-text Back to Project
+          span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+
+  script.
+    document.getElementById('viewProject').addEventListener('click', function(event) {
+      const buttonText = document.getElementById('button-text');
+      const spinner = document.getElementById('spinner-border');
+
+      // Disable the button and show the spinner
+      buttonText.classList.add('d-none');
+      spinner.classList.remove('d-none');
+    });
+
+    window.addEventListener('pageshow', function(event) {
+      const buttonText = document.getElementById('button-text');
+      const spinner = document.getElementById('spinner-border');
+
+      // Restore the button text and hide the spinner
+      buttonText.classList.remove('d-none') // Set this to whatever the original text was
+      spinner.classList.add('d-none');
+    });

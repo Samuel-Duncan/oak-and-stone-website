@@ -89,8 +89,8 @@ li a {
 }
 
 .button {
-  background: var(--color-primary);
   color: var(--color-text-primary);
+  background: var(--color-primary);
   font-weight: 600;
   border: none;
   padding: var(--spacing-sm) var(--spacing-md);

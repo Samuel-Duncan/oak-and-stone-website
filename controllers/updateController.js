@@ -8,7 +8,7 @@ exports.updateListGET = async (req, res) => {
       projectId: req.params.projectId,
     })
       .sort({
-        createdAt: -1,
+        createdAt: 1,
       })
       .exec();
 
