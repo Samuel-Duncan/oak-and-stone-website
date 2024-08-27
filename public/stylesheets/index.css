@@ -111,7 +111,7 @@ li a {
 
 .button-secondary {
   color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.25);
   font-weight: 600;
   border: none;
   padding: var(--spacing-sm) var(--spacing-md);
