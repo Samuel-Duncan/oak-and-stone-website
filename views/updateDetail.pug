@@ -5,7 +5,7 @@ block stylesheets
 
 block content 
   div.detail-background
-    div.wrapper
+    div.detail-wrapper
       if update === null
         p Update not found!
       else
@@ -17,6 +17,6 @@ block content
         div.actions
           if currentUser && currentUser.isAdmin
             a.button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/edit`) Edit
-          a.button.svg-button(href=`/users/${userId}/project/${projectId}/weekly-updates`) Back
+          a.button-secondary.svg-button(href=`/users/${userId}/project/${projectId}/weekly-updates`) Back
           if currentUser && currentUser.isAdmin
             a.button.delete-button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/delete`) Delete

@@ -20,6 +20,19 @@
   background-blend-mode: multiply;
 }
 
+.detail-wrapper {
+  color: var(--color-primary);
+  width: 400px;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  border: var(--border-width) solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
 .detail-icon {
   margin-right: var(--spacing-xs);
 }

@@ -109,6 +109,26 @@ li a {
   background: rgba(255, 255, 255, 0.15);
 }
 
+.button-secondary {
+  color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  border: 2px solid transparent;
+  transition: 0.3s ease;
+  margin: var(--spacing-xs) 0;
+  text-align: center;
+}
+
+.button-secondary:hover {
+  color: var(--color-text-primary);
+  background: var(--color-primary);
+}
+
 .delete-button {
   background-color: var(--color-danger);
   color: var(--color-primary);

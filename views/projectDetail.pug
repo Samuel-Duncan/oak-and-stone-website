@@ -72,7 +72,7 @@ block content
               each image in projectDetail.images
                 div.image-container(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
                   img(src=image.url alt="Project Image")
-                  p.image-date Uploaded: #{image.createdAt.toLocaleDateString()}
+                  p.image-date #{image.createdAt.toLocaleDateString()}
 
         else
           h2 Images
