@@ -100,6 +100,7 @@ li a {
   border: 2px solid transparent;
   transition: 0.3s ease;
   margin: var(--spacing-xs) 0;
+  text-align: center;
 }
 
 .button:hover {
@@ -191,6 +192,28 @@ main {
 
 .subtitle {
   font-weight: 600;
+}
+
+.danger-text {
+  color: var(--color-danger);
+}
+
+.accordion > * {
+  background-color: transparent;
+}
+
+.accordion-button {
+  margin-bottom: var(--spacing-lg);
+  margin-top: var(--spacing-xs);
+  padding: 10px;
+}
+
+.accordion-button:focus {
+  background-color: var(--color-secondary);
+}
+
+.accordion-body {
+  padding: 0;
 }
 
 @media (max-width: 480px) {

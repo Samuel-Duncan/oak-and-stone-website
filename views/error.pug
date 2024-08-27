@@ -4,11 +4,7 @@ block stylesheets
   link(rel='stylesheet', href='/stylesheets/error.css')
 
 block content
-  .error-wrapper 
-    .error-background
-      if error
-        h1= message
-        h2= error.status 
-        pre #{error.stack}
-      else
-        p An unexpected error occurred.
+  div.error-background
+    div.wrapper.error-wrapper
+      h1.danger-text Oops! Something went wrong.
+      a.button(href="/") Return Home

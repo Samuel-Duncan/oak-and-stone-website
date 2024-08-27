@@ -67,14 +67,15 @@ block content
 
         if projectDetail.images && projectDetail.images.length > 0
           h2 Images
-            .image-gallery
-              .gallery-grid
-                each image in projectDetail.images
-                  div.image-container(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
-                    img(src=image.url alt="Project Image")
-                    p.image-date Uploaded: #{image.createdAt.toLocaleDateString()}
+          .image-gallery
+            .gallery-grid
+              each image in projectDetail.images
+                div.image-container(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
+                  img(src=image.url alt="Project Image")
+                  p.image-date Uploaded: #{image.createdAt.toLocaleDateString()}
 
         else
+          h2 Images
           p.secondary-text Nothing to see here yet.
 
   if projectDetail.images && projectDetail.images.length > 0
@@ -85,8 +86,6 @@ block content
             button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
           div.modal-body
             img#modalImage.img-fluid(src="/images/placeholder-image.png" alt="Modal Image")
-          div.modal-footer
-            button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Close
 
   script.
     document.addEventListener('DOMContentLoaded', function() {

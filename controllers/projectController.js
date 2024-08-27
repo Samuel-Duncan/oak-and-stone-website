@@ -2,7 +2,11 @@ const Project = require('../models/project.js');
 const User = require('../models/user.js');
 const Update = require('../models/update.js');
 const { body, validationResult } = require('express-validator');
-const { cloudinary, upload } = require('../utils/cloudinary.js');
+const {
+  cloudinary,
+  upload,
+  addTransformation,
+} = require('../utils/cloudinary.js');
 const { sendEmail } = require('../utils/nodemailer.js');
 
 exports.projectCreateGET = (req, res, next) => {
@@ -13,7 +17,7 @@ exports.projectCreateGET = (req, res, next) => {
 };
 
 exports.projectCreatePOST = [
-  upload.array('images', 10), // UPLOAD IMAGES
+  upload.array('images', 20), // UPLOAD IMAGES
   // Address
   body('address')
     .notEmpty()
@@ -43,8 +47,8 @@ exports.projectCreatePOST = [
     .optional() // Allow the field to be empty
     .isArray() // Ensure it's an array
     .withMessage('Images must be provided as an array.')
-    .isLength({ max: 10 })
-    .withMessage('You can upload a maximum of 10 images.')
+    .isLength({ max: 20 })
+    .withMessage('You can upload a maximum of 20 images.')
     .custom((value) => {
       if (!value || !value.length) return; // Skip if empty
 
@@ -66,7 +70,14 @@ async function projectCreateLogic(req, res, next) {
 
     const uploadedImagesPromises = req.files.map(async (file) => {
       try {
-        const result = await cloudinary.uploader.upload(file.path);
+        const result = await cloudinary.uploader.upload(file.path, {
+          transformation: [
+            { width: 1920, height: 1080, crop: 'limit' },
+            { quality: 'auto:eco' },
+            { fetch_format: 'auto' },
+            { strip: 'all' },
+          ],
+        });
         return { url: result.secure_url };
       } catch (error) {
         console.error('Error uploading image:', error);
@@ -103,11 +114,17 @@ async function projectCreateLogic(req, res, next) {
     } else {
       await project.save();
       res.redirect(`/users/${project.userId}${project.url}`);
-      sendEmail(
-        userEmail,
-        'A new project has been created for you!',
-        'Click the link below to keep track of the progress!',
-      );
+      try {
+        await sendEmail(
+          userEmail.email, // Make sure to use userEmail.email instead of just userEmail
+          'A new project has been created for you!',
+          'Click the link below to keep track of the progress!',
+        );
+        console.log('Email sent successfully');
+      } catch (emailError) {
+        console.error('Failed to send email:', emailError);
+        // Decide if you want to handle this error differently
+      }
     }
   } catch (err) {
     console.error(err);
@@ -211,7 +228,7 @@ exports.projectUpdateGET = async (req, res) => {
 };
 
 exports.projectUpdatePOST = [
-  upload.array('images', 10), // UPLOAD IMAGES
+  upload.array('images', 20), // UPLOAD IMAGES
   // Name
   body('address')
     .notEmpty()
@@ -272,7 +289,9 @@ async function updateProjectLogic(req, res, next) {
     const uploadedImagesPromises = req.files.map(async (file) => {
       try {
         const result = await cloudinary.uploader.upload(file.path);
-        return { url: result.secure_url };
+        return {
+          url: addTransformation(result.secure_url),
+        };
       } catch (error) {
         console.error('Error uploading image:', error);
         errors.array().push({

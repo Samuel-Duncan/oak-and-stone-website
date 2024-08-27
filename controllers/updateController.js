@@ -1,6 +1,7 @@
 const Update = require('../models/update');
 const Project = require('../models/project');
 const { body, validationResult } = require('express-validator');
+const { sendEmail } = require('../utils/nodemailer.js');
 
 exports.updateListGET = async (req, res) => {
   try {
@@ -115,7 +116,7 @@ exports.updateCreatePOST = [
 exports.updateUpdateGET = async (req, res) => {
   try {
     const update = await Update.findOne({
-      projectId: req.params.projectId,
+      _id: req.params.updateId,
     }).exec();
 
     if (update === null) {

@@ -30,8 +30,8 @@ block content
                 span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else 
               a.button(href=`/users/${user._id}/project/create`) Create Project
-            a.button(href=`/users/${user._id}/update`) Update Client
-            a.button.delete-button(href=`/users/${user._id}/delete`) Delete Client
+            a.button(href=`/users/${user._id}/update`) Update
+            a.button.delete-button(href=`/users/${user._id}/delete`) Delete
   script.
     document.getElementById('viewProject').addEventListener('click', function(event) {
       const buttonText = document.getElementById('button-text');

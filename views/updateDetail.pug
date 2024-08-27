@@ -15,7 +15,8 @@ block content
           p.secondary-text.text-left #{update.description}
 
         div.actions
+          if currentUser && currentUser.isAdmin
+            a.button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/edit`) Edit
           a.button.svg-button(href=`/users/${userId}/project/${projectId}/weekly-updates`) Back
           if currentUser && currentUser.isAdmin
-              a.button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/edit`) Edit
-              a.button.delete-button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/delete`) Delete
+            a.button.delete-button(href=`/users/${userId}/project/${projectId}/weekly-update/${update._id}/delete`) Delete

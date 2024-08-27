@@ -179,6 +179,25 @@ form {
   cursor: pointer;
 }
 
+.accordion > * {
+  background-color: transparent;
+}
+
+.accordion-button {
+  margin-bottom: var(--spacing-lg);
+  margin-top: var(--spacing-xs);
+  padding: 10px;
+}
+
+.accordion-button:focus {
+  background-color: var(--color-primary);
+  box-shadow: var(--color-brand);
+}
+
+.accordion-body {
+  padding: 0;
+}
+
 @media (max-width: 480px) {
   .form-wrapper,
   .project-form-wrapper {

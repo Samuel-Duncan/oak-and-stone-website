@@ -89,11 +89,21 @@ async function signUpLogic(req, res, next) {
     } else {
       await user.save();
       res.redirect('/users/');
-      sendEmail(
-        user.email,
-        'Welcome to Oak and Stone!',
-        'Welcome to Oak and Stone Client Portal!',
-      );
+
+      const welcomeHtml = `
+        <h1>Welcome to Oak & Stone Client Portal, ${
+          user.name.split(' ')[0]
+        }!</h1>
+        <p>We're excited to welcome you to our secure client portal. Now you can stay up to date with the progress of your project!</p>
+        <h2>Login Credentials</h2>
+        <p>You can access your account with the following credentials</p>
+        <p><strong>Username:</strong> ${user.email}</p>
+        <p><strong>Password:</strong> ${req.body.password}</p>
+        <p>Please visit our portal at <a href="localhost:3000/">localhost:3000/</a> to get started.</p>
+        <p>Thank you for choosing Oak & Stone!</p>
+      `;
+
+      sendEmail(user.email, 'Welcome to Oak and Stone!', welcomeHtml);
     }
   } catch (err) {
     console.error(err);

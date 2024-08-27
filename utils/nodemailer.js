@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
 
-const sendEmail = (email, subject, text) => {
+const sendEmail = (email, subject, html) => {
   let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'aol',
     auth: {
       user: process.env.MAIL_USERNAME, // Placeholder, replace with secure retrieval
       pass: process.env.MAIL_PASSWORD, // Placeholder, replace with secure retrieval
@@ -13,8 +13,7 @@ const sendEmail = (email, subject, text) => {
     from: process.env.MAIL_USERNAME,
     to: email,
     subject: subject,
-    text: text,
-    html: '<b>Hello Dear User, we are happy that you join our family. Kind Regards, Oak and Stone Team.</b>',
+    html: html,
   };
 
   transporter.sendMail(mailOptions, function (err, data) {
@@ -26,4 +25,4 @@ const sendEmail = (email, subject, text) => {
   });
 };
 
-module.exports = sendEmail;
+module.exports = { sendEmail };
