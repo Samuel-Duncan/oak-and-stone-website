@@ -198,24 +198,6 @@ main {
   color: var(--color-danger);
 }
 
-.accordion > * {
-  background-color: transparent;
-}
-
-.accordion-button {
-  margin-bottom: var(--spacing-lg);
-  margin-top: var(--spacing-xs);
-  padding: 10px;
-}
-
-.accordion-button:focus {
-  background-color: var(--color-secondary);
-}
-
-.accordion-body {
-  padding: 0;
-}
-
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;

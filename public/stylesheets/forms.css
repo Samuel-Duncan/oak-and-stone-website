@@ -185,7 +185,7 @@ form {
 
 .accordion-button {
   margin-bottom: var(--spacing-lg);
-  margin-top: var(--spacing-xs);
+  margin-top: 9px;
   padding: 10px;
 }
 
