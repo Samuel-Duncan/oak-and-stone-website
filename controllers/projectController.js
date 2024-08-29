@@ -90,9 +90,9 @@ async function projectCreateLogic(req, res, next) {
 
     const uploadedImages = await Promise.all(uploadedImagesPromises);
 
-    const userEmail = await User.findOne(
+    const user = await User.findOne(
       { _id: req.params.userId },
-      'email',
+      'name email',
     );
 
     const project = new Project({
@@ -115,10 +115,20 @@ async function projectCreateLogic(req, res, next) {
       await project.save();
       res.redirect(`/users/${project.userId}${project.url}`);
       try {
+        const projectHtml = `
+        <h1>New Project created!</h1>
+        <p>Dear, ${user.name.split(' ')[0]}</p>
+        <p>We're excited to inform you that a new project for ${
+          project.address
+        } has been created for you.</p>
+        <p>To track the progress of your project, please click the link below:</p>
+        <p><a href="localhost:3000/">localhost:3000/</a></p>
+        <p>Thank you for choosing Oak & Stone!</p>
+      `;
         await sendEmail(
-          userEmail.email, // Make sure to use userEmail.email instead of just userEmail
+          user.email,
           'A new project has been created for you!',
-          'Click the link below to keep track of the progress!',
+          projectHtml,
         );
         console.log('Email sent successfully');
       } catch (emailError) {
@@ -136,24 +146,53 @@ async function projectCreateLogic(req, res, next) {
   }
 }
 
+exports.projectListGET = async (req, res) => {
+  try {
+    const allProjects = await Project.find({
+      userId: req.params.userId,
+    })
+      .sort({
+        createdAt: 1,
+      })
+      .exec();
+
+    if (allProjects.length === 0) {
+      res.render('projectList', {
+        title: 'Projects',
+        errorMessage: 'No projects found!',
+      });
+    }
+
+    res.render('projectList', {
+      title: 'Projects',
+      projectList: allProjects,
+      userId: req.params.userId,
+    });
+  } catch (err) {
+    res.status(500).render('error', {
+      message: 'An error occurred while fetching projects.',
+    });
+  }
+};
+
 exports.projectDetailGET = async (req, res) => {
   try {
-    const project = await Project.findOne({
-      userId: req.params.userId,
-    }).exec();
+    const [project, projectCount, update, userName] =
+      await Promise.all([
+        Project.findById(req.params.projectId).exec(),
+        Project.countDocuments({ userId: req.user._id }).exec(),
+        Update.findOne({ projectId: req.params.projectId })
+          .sort({ createdAt: -1 })
+          .exec(),
+        User.findById(req.params.userId).select('name').lean().exec(),
+      ]);
 
     if (project === null) {
-      res.render('projectDetail', {
+      return res.render('projectDetail', {
         title: 'Project Details',
         errMsg: 'No Project found!',
       });
     }
-
-    const update = await Update.findOne({
-      projectId: project._id,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
 
     if (project.images && project.images.length > 0) {
       project.images.sort((a, b) => b.createdAt - a.createdAt);
@@ -162,7 +201,9 @@ exports.projectDetailGET = async (req, res) => {
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: project,
-      update: update ? update : null,
+      update: update || null,
+      moreThanOneProject: projectCount > 1,
+      userName: userName ? userName.name : 'Unknown User',
     });
   } catch (err) {
     res.status(500).render('error', {
@@ -173,13 +214,17 @@ exports.projectDetailGET = async (req, res) => {
 
 exports.userProjectDetailGET = async (req, res, next) => {
   try {
-    const userProject = await Project.findOne({
-      _id: req.params.projectId,
-      userId: req.params.userId,
-    })
-      .populate('update') // Assuming 'update' is a populated field
-      .lean();
+    const [userProject, projectCount] = await Promise.all([
+      Project.findOne({
+        _id: req.params.projectId,
+        userId: req.params.userId,
+      })
+        .populate('update')
+        .lean(),
+      Project.countDocuments({ userId: req.params.userId }),
+    ]);
 
+    console.log(projectCount);
     if (!userProject) {
       return res.render('projectDetail', {
         title: 'Project Details',
@@ -194,6 +239,7 @@ exports.userProjectDetailGET = async (req, res, next) => {
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: userProject,
+      moreThanOneProject: projectCount > 1,
     });
   } catch (err) {
     res.status(500).render('error', {
@@ -204,14 +250,18 @@ exports.userProjectDetailGET = async (req, res, next) => {
 
 exports.projectUpdateGET = async (req, res) => {
   try {
-    const project = await Project.findOne({
-      userId: req.params.userId,
-    }).exec();
+    const project = await Project.findById(
+      req.params.projectId,
+    ).exec();
 
     if (project === null) {
       const err = new Error('Project not found');
       err.status = 404;
       return next(err);
+    }
+
+    if (project.images && project.images.length > 0) {
+      project.images.sort((a, b) => b.createdAt - a.createdAt);
     }
 
     res.render('projectForm', {
@@ -276,9 +326,9 @@ async function updateProjectLogic(req, res, next) {
   try {
     const errors = validationResult(req);
 
-    let existingImages = await Project.findOne({
-      userId: req.params.userId,
-    }).select('images');
+    let existingImages = await Project.findById(
+      req.params.projectId,
+    ).select('images');
 
     if (!existingImages) {
       existingImages = []; // Set to empty array if item not found

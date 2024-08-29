@@ -8,19 +8,25 @@ router.get('/', async function (req, res, next) {
   try {
     if (req.user) {
       // User is signed in
-      const projectDetail = await Project.findOne({
+      const projectDetails = await Project.find({
         userId: req.user.id,
       }).lean();
 
-      if (projectDetail) {
+      if (projectDetails.length > 0 && projectDetails.length === 1) {
         res.render('index', {
           title: 'Oak and Stone Client Portal',
-          projectId: projectDetail._id,
+          projectId: projectDetails[0]._id,
+        });
+      } else if (projectDetails.length > 1) {
+        res.render('index', {
+          title: 'Oak and Stone Client Portal',
+          projectId: null,
+          moreThanOneProject: true,
         });
       } else {
         res.render('index', {
           title: 'Oak and Stone Client Portal',
-          message: 'No project found for this user.',
+          message: 'No projects found for this user.',
         });
       }
     } else {

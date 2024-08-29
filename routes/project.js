@@ -16,6 +16,9 @@ router.post(
   projectController.projectCreatePOST,
 );
 
+// Read Project List
+router.get('/:userId/projects', projectController.projectListGET);
+
 // Read Project
 router.get(
   '/:userId/project/:projectId',

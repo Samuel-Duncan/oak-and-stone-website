@@ -2,7 +2,9 @@ const nodemailer = require('nodemailer');
 
 const sendEmail = (email, subject, html) => {
   let transporter = nodemailer.createTransport({
-    service: 'aol',
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.MAIL_USERNAME, // Placeholder, replace with secure retrieval
       pass: process.env.MAIL_PASSWORD, // Placeholder, replace with secure retrieval

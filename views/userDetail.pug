@@ -24,12 +24,16 @@ block content
 
         if currentUser && currentUser.isAdmin
           div.actions
-            if projectExists
+            a.button(href=`/users/${user._id}/project/create`) Create Project
+            if projectExists && moreThanOneProject 
+              a#viewProject.button(href=`/users/${user._id}/projects`)
+                span#button-text View Projects
+                span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+            else if projectExists && !moreThanOneProject
               a#viewProject.button(href=`/users/${user._id}/project/${projectId}`)
                 span#button-text View Project
                 span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
-            else 
-              a.button(href=`/users/${user._id}/project/create`) Create Project
+
             a.button-secondary(href=`/users/${user._id}/update`) Edit
             a.button.delete-button(href=`/users/${user._id}/delete`) Delete
   script.

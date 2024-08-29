@@ -8,10 +8,14 @@ block content
     div.wrapper.homepage-wrapper
       if currentUser 
         h1 Welcome, #{currentUser.name.split(' ')[0]}!
-        if currentUser && projectId
+        if projectId
           a#viewProject.button(href=`/users/${currentUser._id}/project/${projectId}`)
             span#button-text View Project
             span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+        else if moreThanOneProject
+          a#viewProject.button(href=`/users/${currentUser._id}/projects`)
+            span#button-text View Projects
+            span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')     
         else if currentUser.isAdmin 
           a(href="/users/").button View Clients 
         else

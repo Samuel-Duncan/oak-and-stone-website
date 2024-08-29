@@ -96,14 +96,18 @@ async function signUpLogic(req, res, next) {
         }!</h1>
         <p>We're excited to welcome you to our secure client portal. Now you can stay up to date with the progress of your project!</p>
         <h2>Login Credentials</h2>
-        <p>You can access your account with the following credentials</p>
+        <p>You can access your account with the following credentials:</p>
         <p><strong>Username:</strong> ${user.email}</p>
         <p><strong>Password:</strong> ${req.body.password}</p>
-        <p>Please visit our portal at <a href="localhost:3000/">localhost:3000/</a> to get started.</p>
+        <p>As of now, there is nothing to see yet. Please look out for another email as soon as progress becomes available to view!</p>
         <p>Thank you for choosing Oak & Stone!</p>
       `;
 
-      sendEmail(user.email, 'Welcome to Oak and Stone!', welcomeHtml);
+      sendEmail(
+        user.email,
+        'Oak and Stone Portal Login Info',
+        welcomeHtml,
+      );
     }
   } catch (err) {
     console.error(err);
@@ -146,7 +150,7 @@ exports.signInPOST = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        return res.redirect(`/auth/sign-in-success`); // Redirect instead of render
+        return res.redirect('/'); // Redirect instead of render
       });
     }
   })(req, res, next);
@@ -167,30 +171,4 @@ exports.signOut = (req, res, next) => {
     }
     res.redirect('/auth/sign-in');
   });
-};
-
-exports.signInSuccess = async (req, res) => {
-  try {
-    if (req.user.isAdmin) {
-      return res.redirect('/users/');
-    }
-
-    // Find the most recent project for the user
-    const projectDetail = await Project.findOne({
-      userId: req.user.id,
-    }).lean();
-
-    // Render project details template if found
-    if (projectDetail) {
-      return res.render('index', {
-        projectId: projectDetail._id,
-      });
-    } else {
-      // No project found, render the sign-in success template
-      return res.render('index');
-    }
-  } catch (err) {
-    console.error(err); // Log the error for debugging
-    res.render('error', { message: 'Error fetching project' }); // Render error page
-  }
 };

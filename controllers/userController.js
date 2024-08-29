@@ -52,14 +52,15 @@ exports.userDetailGET = async (req, res) => {
       phoneNumber: 1,
     }).exec();
 
-    const project = await Project.findOne(
+    const project = await Project.find(
       { userId: user._id },
       { _id: 1 },
     )
       .lean()
       .exec();
 
-    const projectExists = project !== null;
+    const projectExists = project.length !== 0;
+    const moreThanOneProject = project.length > 1;
 
     if (user === null) {
       res.render('userDetail', {
@@ -68,11 +69,14 @@ exports.userDetailGET = async (req, res) => {
       });
     }
 
+    console.log(project);
+
     res.render('userDetail', {
       title: 'Client Details',
       user,
       projectExists,
-      projectId: project ? project._id : null,
+      moreThanOneProject,
+      projectId: project.length === 1 ? project[0]._id : null,
     });
   } catch (err) {
     res.status(500).render('error', {
@@ -239,12 +243,15 @@ exports.userDeletePOST = async (req, res) => {
       });
     }
 
-    const project = await Project.findOneAndDelete({
-      userId: user._id,
-    });
+    const projects = await Project.find({ userId: user._id });
 
-    if (project) {
-      await Update.deleteMany({ projectId: project._id });
+    if (projects.length > 0) {
+      // Delete all projects associated with the user
+      await Project.deleteMany({ userId: user._id });
+
+      // Delete all updates associated with the deleted projects
+      const projectIds = projects.map((project) => project._id);
+      await Update.deleteMany({ projectId: { $in: projectIds } });
     }
 
     res.redirect('/users');

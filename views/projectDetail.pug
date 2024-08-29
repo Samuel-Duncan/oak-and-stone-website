@@ -16,13 +16,19 @@ block content
             a#viewProject.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/update`) 
               span#button-text Edit
               span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+          
+          if moreThanOneProject
+            a#viewProject.button.header-button.project-button(href=`/users/${projectDetail.userId}/projects/`) 
+              span#button-text Back
+              span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+
 
         
         .project-details
-          if currentUser && currentUser.isAdmin
+          if currentUser.isAdmin
             .detail-item
-              h2 Type
-              p.secondary-text= projectDetail.type
+              h2 Client 
+              p.secondary-text= userName
           
           .detail-item
             h2 Current Phase
@@ -44,11 +50,11 @@ block content
                   div.progress-bar(style='width: 75%')
                 else 
                   div.progress-bar(style='width: 100%')
-          
-          if projectDetail.description && currentUser && currentUser.isAdmin
+
+          if currentUser && currentUser.isAdmin
             .detail-item
-              h2 Description
-              p.secondary-text= projectDetail.description
+              h2 Type
+              p.secondary-text= projectDetail.type
         
         .updates-container
           .detail-item
