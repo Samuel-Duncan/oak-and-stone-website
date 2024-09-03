@@ -43,4 +43,16 @@ router.get(
   projectController.userProjectDetailGET,
 );
 
+// Delete update
+router.get(
+  '/:userId/project/:projectId/delete',
+  adminCheck.adminCheck,
+  projectController.projectDeleteGET,
+);
+router.post(
+  '/:userId/project/:projectId/delete',
+  adminCheck.adminCheck,
+  projectController.projectDeletePOST,
+);
+
 module.exports = router;

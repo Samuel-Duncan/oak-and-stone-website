@@ -1,6 +1,7 @@
 const User = require('../models/user.js');
 const Project = require('../models/project.js');
 const Update = require('../models/update.js');
+const File = require('../models/file.js');
 const { body, validationResult } = require('express-validator');
 
 /**
@@ -235,7 +236,7 @@ exports.userDeleteGET = async (req, res) => {
 
 exports.userDeletePOST = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.userId);
+    const user = await User.findById(req.params.userId);
 
     if (!user) {
       return res.status(404).render('userDelete', {
@@ -243,16 +244,25 @@ exports.userDeletePOST = async (req, res) => {
       });
     }
 
+    // Find all projects associated with the user
     const projects = await Project.find({ userId: user._id });
 
+    // If there are projects, delete them and their associated updates and files
     if (projects.length > 0) {
-      // Delete all projects associated with the user
-      await Project.deleteMany({ userId: user._id });
-
-      // Delete all updates associated with the deleted projects
       const projectIds = projects.map((project) => project._id);
+
+      // Delete all updates associated with the projects
       await Update.deleteMany({ projectId: { $in: projectIds } });
+
+      // Delete all files associated with the projects
+      await File.deleteMany({ projectId: { $in: projectIds } });
+
+      // Delete all projects
+      await Project.deleteMany({ userId: user._id });
     }
+
+    // Finally, delete the user
+    await User.findByIdAndDelete(req.params.userId);
 
     res.redirect('/users');
   } catch (err) {

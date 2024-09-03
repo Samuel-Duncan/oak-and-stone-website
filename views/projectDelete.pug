@@ -1,0 +1,42 @@
+extends layout
+
+block stylesheets
+  link(rel='stylesheet', href='/stylesheets/userDelete.css')
+
+block content
+  div.client-delete-background
+    div.wrapper
+      h1 #{project.address}
+
+      p Are you sure you want to delete this project?
+
+      form(method="POST" action=`/users/${userId}/project/${projectId}/delete`)
+        input(type="hidden" name="_method" value="DELETE")
+        div.actions
+          button.button.delete-button.confirm-delete(type="submit" name="confirmDelete" value=project._id) Confirm Delete
+          a#viewProject.button(href=`/users/${userId}/project/${projectId}`)
+            span#button-text Cancel
+            span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+            
+
+      if message
+        p.error-message= message
+  
+  script.
+    document.getElementById('viewProject').addEventListener('click', function(event) {
+      const buttonText = document.getElementById('button-text');
+      const spinner = document.getElementById('spinner-border');
+
+      // Disable the button and show the spinner
+      buttonText.classList.add('d-none');
+      spinner.classList.remove('d-none');
+    });
+
+    window.addEventListener('pageshow', function(event) {
+      const buttonText = document.getElementById('button-text');
+      const spinner = document.getElementById('spinner-border');
+
+      // Restore the button text and hide the spinner
+      buttonText.classList.remove('d-none') // Set this to whatever the original text was
+      spinner.classList.add('d-none');
+    });

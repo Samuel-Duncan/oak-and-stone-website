@@ -67,6 +67,15 @@ block content
 
       // Disable the button and show the spinner
       submitButton.disabled = true;
-      buttonText.textContent = '';
+      buttonText.classList.add('d-none');
       spinner.classList.remove('d-none');
+    });
+
+    window.addEventListener('pageshow', function(event) {
+      const buttonText = document.getElementById('button-text');
+      const spinner = document.getElementById('spinner-border');
+
+      // Restore the button text and hide the spinner
+      buttonText.classList.remove('d-none') // Set this to whatever the original text was
+      spinner.classList.add('d-none');
     });

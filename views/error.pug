@@ -6,5 +6,8 @@ block stylesheets
 block content
   div.error-background
     div.wrapper.error-wrapper
-      h1.danger-text Oops! Something went wrong.
+      h2.danger-text Oops! Something went wrong.
+      h1= message
+      h2= error.status
+      pre #{error.stack}
       a.button(href="/") Return Home
