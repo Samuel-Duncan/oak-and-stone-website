@@ -27,7 +27,7 @@ function addTransformation(url, fileType) {
 
   // For images, apply the existing transformation
   const transformation =
-    'c_limit,w_1920,h_1080,q_auto:eco,f_auto,fl_strip_profile';
+    'c_limit,w_1280,h_720,q_auto:eco,f_auto,fl_strip_profile';
   const parts = url.split('/upload/');
 
   if (parts.length !== 2) {

@@ -33,24 +33,23 @@ block content
             option(value='Commercial' selected=(project && project.type === 'Commercial')) Commercial
 
         div.input-field.select-field
+          p.images-label Add Images
           input#images(type='file' name='images' multiple accept='image/*')
         
-        if images 
-          div.accordion.accordion-flush#accordionFlushExample
-            div.accordion-item
-              h2.accordion-header
-                button.accordion-button.collapsed(type='button', data-bs-toggle='collapse', data-bs-target='#flush-collapseOne', aria-expanded='false', aria-controls='flush-collapseOne')
-                  | Images
+        div.accordion.accordion-flush#accordionFlushExample
+          div.accordion-item
+            h2.accordion-header
+              button.accordion-button.collapsed(type='button', data-bs-toggle='collapse', data-bs-target='#flush-collapseOne', aria-expanded='false', aria-controls='flush-collapseOne')
+                | Images
+            div#flush-collapseOne.accordion-collapse.collapse(data-bs-parent='#accordionFlushExample')
+              div.accordion-body
+                div.image-container
+                  for image in images
+                    div.second-image-container
+                      img.project-image(src=image.url)
+                      input.delete-image-checkbox(type='checkbox', name='imagesToRemove[]', id=image._id, value=image._id)
+                      label.sr-only(for=image._id) &nbsp;Delete
 
-              div#flush-collapseOne.accordion-collapse.collapse(data-bs-parent='#accordionFlushExample')
-                div.accordion-body
-                  div.image-container
-                    for image in images
-                      div.second-image-container
-                        img.project-image(src=image.url)
-                        input.delete-image-checkbox(type='checkbox', name='image', id=image._id, value=image._id)
-                        label.sr-only(for=image._id) &nbsp;Delete
-        
         button#submitButton.button.project-form-button(type='submit')
           span.button-text= title
           span.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')

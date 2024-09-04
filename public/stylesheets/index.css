@@ -129,6 +129,10 @@ li a {
   background: var(--color-primary);
 }
 
+.image-delete:hover {
+  background-color: rgb(255, 98, 98);
+}
+
 .button-tertiary {
   background-color: var(--color-brand);
 }

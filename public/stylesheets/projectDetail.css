@@ -148,6 +148,14 @@
   background-size: cover;
 }
 
+.delete-image-button {
+  position: absolute;
+  bottom: 0;
+  left: 100;
+  right: 0;
+  top: 0;
+}
+
 #modalImage {
   max-height: 75vh;
 }

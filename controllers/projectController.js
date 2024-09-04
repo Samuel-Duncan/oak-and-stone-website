@@ -408,3 +408,42 @@ exports.projectDeletePOST = async (req, res) => {
     });
   }
 };
+
+exports.deleteImage = async (req, res) => {
+  try {
+    const { projectId, imageId } = req.params;
+
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res
+        .status(404)
+        .render('error', { message: 'Project not found' });
+    }
+
+    // Find the index of the image to remove
+    const imageIndex = project.images.findIndex(
+      (img) => img._id.toString() === imageId,
+    );
+
+    if (imageIndex === -1) {
+      return res
+        .status(404)
+        .render('error', { message: 'Image not found' });
+    }
+
+    // Remove the image from the array
+    project.images.splice(imageIndex, 1);
+
+    // Save the updated project
+    await project.save();
+
+    // Redirect back to the project detail page
+    res.redirect(`/users/${req.params.userId}/project/${projectId}`);
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).render('error', {
+      message: 'An error occurred while deleting the image',
+    });
+  }
+};

@@ -55,4 +55,10 @@ router.post(
   projectController.projectDeletePOST,
 );
 
+router.post(
+  '/:userId/project/:projectId/image/:imageId/delete',
+  adminCheck.adminCheck,
+  projectController.deleteImage,
+);
+
 module.exports = router;
