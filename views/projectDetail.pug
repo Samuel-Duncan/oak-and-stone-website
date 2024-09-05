@@ -18,8 +18,8 @@ block content
                 span#button-text Edit
                 span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
               a.button.header-button.project-button.delete-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/delete`)
-                svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16")
-                  path(d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5")
+                svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16")
+                  path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z")
           
           if moreThanOneProject
             a#viewProject.button.header-button.project-button(href=`/users/${projectDetail.userId}/projects/`) 
@@ -65,7 +65,9 @@ block content
             .updates-header
               h2 Current Update 
               if currentUser.isAdmin && update === null
-                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`) Add Update
+                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`)
+                  svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
+                    path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
               else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null
                 a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-updates`) View All
             if update !== null
@@ -80,7 +82,9 @@ block content
             .updates-header 
               h2 Files 
               if currentUser && currentUser.isAdmin && projectDetail && projectDetail._id
-                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/create`) Add File
+                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/create`)
+                  svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
+                    path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             if files && files.length > 0
               each file in files 
                 if file && file.cloudinaryUrl && file.filename
@@ -90,29 +94,42 @@ block content
                     if currentUser && currentUser.isAdmin && projectDetail && projectDetail._id && file && file._id
                       form(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/${file._id}/delete` method="POST" style="display: inline;")
                         button#viewProject.button.header-button.project-button.file-button.delete-button(type="submit") 
-                          span#button-text Delete
+                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16")
+                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z")
                           span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else
               p.secondary-text No files to see yet!
 
         if projectDetail.images && projectDetail.images.length > 0
-          h2 Images
-          .image-gallery
-            .gallery-grid
-              each image in projectDetail.images
-                div.image-container
-                  div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
-                    img(src=image.url alt="Project Image")
-                    p.image-date #{image.createdAt.toLocaleDateString()}
-                  if currentUser && currentUser.isAdmin
-                    form.delete-image-button(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/image/${image._id}/delete` method="POST")
-                      button.btn.btn-sm.delete-button.image-delete(type="submit")
-                        svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16")
-                          path(d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5")
+          .detail-item
+            .updates-header
+              h2 Images
+              if currentUser.isAdmin
+                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
+                  svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
+                      path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
+            .image-gallery
+              .gallery-grid
+                each image in projectDetail.images
+                  div.image-container(id=`image-container-${image._id}`)
+                    div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
+                      img(src=image.url alt="Project Image")
+                      p.image-date #{image.createdAt.toLocaleDateString()}
+                    if currentUser && currentUser.isAdmin
+                      form.delete-image-button(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/image/${image._id}/delete` method="POST")
+                        button.btn.btn-sm.delete-button.image-delete(type="submit")
+                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16")
+                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z")
 
         else
-          h2 Images
-          p.secondary-text Nothing to see here yet.
+          .detail-item
+            .updates-header
+                h2 Images
+                if currentUser.isAdmin
+                  a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
+                    svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
+                      path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
+            p.secondary-text No images to see yet!
 
   if projectDetail.images && projectDetail.images.length > 0
     div#exampleModal.modal.fade(tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true")
@@ -124,6 +141,37 @@ block content
             img#modalImage.img-fluid(src="/images/placeholder-image.png" alt="Modal Image")
 
   script.
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.delete-image-button').forEach(form => {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const formAction = this.getAttribute('action');
+          fetch(formAction, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.message === 'Image deleted successfully') {
+              // Find the parent image-container and remove it
+              const imageContainer = this.closest('.image-container');
+              if (imageContainer) {
+                imageContainer.remove();
+              }
+            } else {
+              throw new Error(data.message || 'Failed to delete the image');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete the image. Please try again.');
+          });
+        });
+      });
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
       const modal = document.getElementById('exampleModal');
       const modalImage = document.getElementById('modalImage');

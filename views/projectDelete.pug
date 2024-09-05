@@ -14,7 +14,7 @@ block content
         input(type="hidden" name="_method" value="DELETE")
         div.actions
           button.button.delete-button.confirm-delete(type="submit" name="confirmDelete" value=project._id) Confirm Delete
-          a#viewProject.button(href=`/users/${userId}/project/${projectId}`)
+          a#viewProject.button-secondary(href=`/users/${userId}/project/${projectId}`)
             span#button-text Cancel
             span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             

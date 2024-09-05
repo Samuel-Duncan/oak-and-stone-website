@@ -14,14 +14,13 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'Progress',
-    allowedFormats: ['jpeg', 'png', 'jpg', 'pdf'],
-    resource_type: 'auto', // This allows Cloudinary to handle different file types
+    allowedFormats: ['jpeg', 'png', 'jpg', 'pdf', 'doc', 'docx'],
+    resource_type: 'auto',
   },
 });
 
 function addTransformation(url, fileType) {
-  if (fileType === 'pdf') {
-    // For PDFs, we don't need to change the URL structure
+  if (fileType === 'pdf' || fileType === 'document') {
     return `${url}?fl_attachment=true`;
   }
 

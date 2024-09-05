@@ -25,11 +25,11 @@ block content
         if currentUser && currentUser.isAdmin
           div.actions
             if projectExists && moreThanOneProject 
-              a#viewProject.button.button-tertiary(href=`/users/${user._id}/projects`)
+              a#viewProject.button.button(href=`/users/${user._id}/projects`)
                 span#button-text View Projects
                 span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else if projectExists && !moreThanOneProject
-              a#viewProject.button.button-tertiary(href=`/users/${user._id}/project/${projectId}`)
+              a#viewProject.button.button(href=`/users/${user._id}/project/${projectId}`)
                 span#button-text View Project
                 span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
 

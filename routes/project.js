@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminCheck = require('../utils/adminCheck.js');
+const { upload } = require('../utils/cloudinary.js');
 
 const projectController = require('../controllers/projectController');
 
@@ -43,7 +44,7 @@ router.get(
   projectController.userProjectDetailGET,
 );
 
-// Delete update
+// Delete project
 router.get(
   '/:userId/project/:projectId/delete',
   adminCheck.adminCheck,
@@ -55,6 +56,21 @@ router.post(
   projectController.projectDeletePOST,
 );
 
+//IMAGES
+// add GET
+router.get(
+  '/:userId/project/:projectId/images',
+  adminCheck.adminCheck,
+  projectController.addImagesGET,
+);
+// add POST
+router.post(
+  '/:userId/project/:projectId/images',
+  adminCheck.adminCheck,
+  upload.array('images'),
+  projectController.addImagesPOST,
+);
+// delete POST
 router.post(
   '/:userId/project/:projectId/image/:imageId/delete',
   adminCheck.adminCheck,

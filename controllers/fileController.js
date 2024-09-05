@@ -21,13 +21,26 @@ exports.fileCreatePOST = [
         return res.render('error', { message: 'No file uploaded' });
       }
 
-      const fileType = req.file.mimetype.startsWith('image/')
-        ? 'image'
-        : 'pdf';
+      let fileType;
+      if (req.file.mimetype.startsWith('image/')) {
+        fileType = 'image';
+      } else if (req.file.mimetype === 'application/pdf') {
+        fileType = 'pdf';
+      } else if (
+        req.file.mimetype === 'application/msword' ||
+        req.file.mimetype ===
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
+        fileType = 'document';
+      } else {
+        return res.render('error', {
+          message: 'Unsupported file type',
+        });
+      }
 
       const newFile = new File({
         filename: req.file.originalname,
-        cloudinaryUrl: req.file.path, // Store the original Cloudinary URL
+        cloudinaryUrl: req.file.path,
         cloudinaryPublicId: req.file.filename,
         fileType: fileType,
         projectId: req.params.projectId,

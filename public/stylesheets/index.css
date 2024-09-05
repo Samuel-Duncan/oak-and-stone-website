@@ -239,6 +239,10 @@ main {
   margin-left: var(--spacing-xxs);
 }
 
+.main-header-button {
+  padding: 8px var(--spacing-xs);
+}
+
 .text-wrap {
   word-wrap: break-word;
   text-decoration: underline;
@@ -248,6 +252,10 @@ main {
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;
+  }
+
+  .main-header-button {
+    padding: 4px 8px;
   }
 
   .main-title-font {

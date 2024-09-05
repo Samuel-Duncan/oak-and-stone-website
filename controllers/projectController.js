@@ -69,12 +69,6 @@ async function projectCreateLogic(req, res, next) {
   try {
     const errors = validationResult(req);
 
-    // Use the files already uploaded by multer and CloudinaryStorage
-    const uploadedImages = req.files.map((file) => ({
-      url: file.path, // This is already the Cloudinary URL
-      publicId: file.filename, // This is the public ID assigned by Cloudinary
-    }));
-
     const user = await User.findOne(
       { _id: req.params.userId },
       'name email',
@@ -86,7 +80,6 @@ async function projectCreateLogic(req, res, next) {
       currentPhase: req.body.currentPhase,
       userId: req.params.userId,
       type: req.body.type,
-      images: uploadedImages,
     });
 
     if (!errors.isEmpty()) {
@@ -307,25 +300,6 @@ async function updateProjectLogic(req, res, next) {
         .render('error', { message: 'Project not found' });
     }
 
-    // Handle existing images
-    let imagesToKeep = existingProject.images.filter(
-      (image) =>
-        !req.body.imagesToRemove ||
-        !req.body.imagesToRemove.includes(image._id.toString()),
-    );
-
-    // Handle new images uploaded via multer and CloudinaryStorage
-    const newImages = req.files.map((file) => ({
-      url: addTransformation(
-        file.path,
-        file.mimetype.startsWith('image/') ? 'image' : 'pdf',
-      ),
-      publicId: file.filename,
-    }));
-
-    // Combine remaining existing and new images
-    const combinedImages = [...imagesToKeep, ...newImages];
-
     // Prepare updated project data
     const updatedProjectData = {
       address: req.body.address,
@@ -333,7 +307,6 @@ async function updateProjectLogic(req, res, next) {
       currentPhase: req.body.currentPhase,
       userId: req.params.userId, // Ensure we keep the userId
       type: req.body.type,
-      images: combinedImages,
     };
 
     if (!errors.isEmpty()) {
@@ -409,6 +382,86 @@ exports.projectDeletePOST = async (req, res) => {
   }
 };
 
+exports.addImagesGET = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.projectId);
+
+    if (!project) {
+      return res
+        .status(404)
+        .render('error', { message: 'Project not found' });
+    }
+
+    res.render('imageForm', {
+      title: 'Upload Images',
+      formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
+      project: project,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('error', {
+      message: 'Error loading image management form: ' + err.message,
+    });
+  }
+};
+
+exports.addImagesPOST = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+
+    const project = await Project.findById(req.params.projectId);
+
+    if (!project) {
+      return res
+        .status(404)
+        .render('error', { message: 'Project not found' });
+    }
+
+    if (!errors.isEmpty()) {
+      return res.render('imageForm', {
+        title: 'Upload Images',
+        formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
+        project: project,
+        errors: errors.array(),
+      });
+    }
+
+    // Handle existing images
+    let imagesToKeep = project.images;
+    if (req.body.imagesToRemove) {
+      imagesToKeep = project.images.filter(
+        (image) =>
+          !req.body.imagesToRemove.includes(image._id.toString()),
+      );
+    }
+
+    // Handle new images uploaded via multer and CloudinaryStorage
+    const newImages = req.files
+      ? req.files.map((file) => ({
+          url: addTransformation(file.path, 'image'),
+          publicId: file.filename,
+        }))
+      : [];
+
+    // Combine remaining existing and new images
+    project.images = [...imagesToKeep, ...newImages];
+
+    await project.save();
+
+    res.redirect(
+      `/users/${req.params.userId}/project/${req.params.projectId}`,
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('imageForm', {
+      title: 'Manage Images',
+      formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
+      project: req.body, // To preserve form data in case of error
+      error: 'Error managing images: ' + err.message,
+    });
+  }
+};
+
 exports.deleteImage = async (req, res) => {
   try {
     const { projectId, imageId } = req.params;
@@ -416,9 +469,7 @@ exports.deleteImage = async (req, res) => {
     const project = await Project.findById(projectId);
 
     if (!project) {
-      return res
-        .status(404)
-        .render('error', { message: 'Project not found' });
+      return res.status(404).json({ message: 'Project not found' });
     }
 
     // Find the index of the image to remove
@@ -427,9 +478,7 @@ exports.deleteImage = async (req, res) => {
     );
 
     if (imageIndex === -1) {
-      return res
-        .status(404)
-        .render('error', { message: 'Image not found' });
+      return res.status(404).json({ message: 'Image not found' });
     }
 
     // Remove the image from the array
@@ -438,12 +487,13 @@ exports.deleteImage = async (req, res) => {
     // Save the updated project
     await project.save();
 
-    // Redirect back to the project detail page
-    res.redirect(`/users/${req.params.userId}/project/${projectId}`);
+    // Send a success response
+    res.status(200).json({ message: 'Image deleted successfully' });
   } catch (error) {
     console.error('Error deleting image:', error);
-    res.status(500).render('error', {
+    res.status(500).json({
       message: 'An error occurred while deleting the image',
+      error: error.message,
     });
   }
 };

@@ -14,24 +14,16 @@ block content
 
       form#projectForm(action=formAction method="POST" enctype="multipart/form-data")
         div.input-field.select-field
-          label.sr-only(for="file") Select file to upload:
-          input#file(type="file" name="file" accept=".pdf,.doc,.docx" required)
+          input#images(type='file' name='images' multiple accept='image/*')
         
         button#submitButton.button(type="submit")
-          span.button-text Upload File
+          span.button-text Upload Images
           span.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
 
       if message
         .success-message
           p= message
 
-      if files && files.length > 0
-        h2 Uploaded Files
-        ul.file-list
-          each file in files
-            li
-              a(href=file.url target="_blank")= file.filename
-              span  - Uploaded on #{file.createdAt.toLocaleDateString()}
   script.
     document.getElementById('projectForm').addEventListener('submit', function(event) {
       const submitButton = document.getElementById('submitButton');
