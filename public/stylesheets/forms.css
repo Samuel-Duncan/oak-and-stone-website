@@ -38,6 +38,10 @@ form {
   -webkit-backdrop-filter: blur(8px);
 }
 
+.project-form-button {
+  margin-top: var(--spacing-lg);
+}
+
 .project-form-wrapper {
   position: absolute;
   top: 15%;

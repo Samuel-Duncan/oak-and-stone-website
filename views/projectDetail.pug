@@ -71,7 +71,7 @@ block content
               else if currentUser.isAdmin && update !== null || !currentUser.isAdmin && update !== null
                 a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-updates`) View All
             if update !== null
-              p.secondary-text.subtitle Week #{update.week} - #{update.title}
+              p.secondary-text.subtitle.project-detail-subtitle Week #{update.week} - #{update.title}
               if update.description 
                 p.update-description.secondary-text= update.description
             else
