@@ -9,7 +9,7 @@
   --color-text-secondary: #efefef; /* Light gray text */
   --color-accent: #fff; /* White (for checkbox accent) */
   --color-background: rgba(0, 0, 0, 0.4); /* Black overlay */
-  --color-danger: rgb(255, 0, 0);
+  --color-danger: rgb(217, 0, 0);
 
   /* Spacing */
   --spacing-xxs: 5px;
@@ -130,7 +130,7 @@ li a {
 }
 
 .image-delete:hover {
-  background-color: rgb(255, 98, 98);
+  background-color: rgb(253, 80, 80);
 }
 
 .button-tertiary {
@@ -232,11 +232,12 @@ main {
 }
 
 .file-button {
-  padding-left: var(--spacing-xs) !important;
-  padding-right: var(--spacing-xs) !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
-  margin-left: var(--spacing-xxs);
+  margin-left: var(--spacing-xs);
+  border-radius: 50% !important;
 }
 
 .main-header-button {

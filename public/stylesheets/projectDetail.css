@@ -56,8 +56,8 @@
 
 .updates-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .updates-container {
@@ -108,19 +108,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-md);
-  margin-top: var(--spacing-xs);
+  margin-top: var(--spacing-md);
 }
 
 .image-container {
   position: relative;
-  overflow: hidden;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: transform 0.3s ease;
-}
-
-.image-container:hover {
-  transform: scale(1.05);
 }
 
 .image-container img {
@@ -151,10 +146,9 @@
 
 .delete-image-button {
   position: absolute;
-  bottom: 0;
-  left: 100;
   right: 0;
   top: 0;
+  transform: translate(25%, -45%);
 }
 
 #modalImage {
@@ -196,7 +190,7 @@
 
   .header-button,
   .header-button:has(> svg) {
-    padding: 2px var(--spacing-xs);
+    padding: 4px var(--spacing-xs);
   }
 
   .dashboard {

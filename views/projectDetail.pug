@@ -18,8 +18,8 @@ block content
                 span#button-text Edit
                 span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
               a.button.header-button.project-button.delete-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/delete`)
-                svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16")
-                  path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z")
+                svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1")
+                  path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
           
           if moreThanOneProject
             a#viewProject.button.header-button.project-button(href=`/users/${projectDetail.userId}/projects/`) 
@@ -27,7 +27,7 @@ block content
               span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
 
 
-        
+        // DETAILS
         .project-details
           if currentUser.isAdmin
             .detail-item
@@ -60,6 +60,7 @@ block content
               h2 Type
               p.secondary-text= projectDetail.type
         
+        // CURRENT UPDATE
         .updates-container
           .detail-item
             .updates-header
@@ -77,6 +78,7 @@ block content
             else
               p.secondary-text No updates to see yet!
 
+        // FILES
         .updates-container 
           .detail-item 
             .updates-header 
@@ -93,19 +95,20 @@ block content
                     |  
                     if currentUser && currentUser.isAdmin && projectDetail && projectDetail._id && file && file._id
                       form(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/${file._id}/delete` method="POST" style="display: inline;")
-                        button#viewProject.button.header-button.project-button.file-button.delete-button(type="submit") 
-                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16")
-                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z")
+                        button#viewProject.button.header-button.project-button.file-button.delete-button.image-delete(type="submit") 
+                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1")
+                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
                           span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else
               p.secondary-text No files to see yet!
 
+        // IMAGES
         if projectDetail.images && projectDetail.images.length > 0
           .detail-item
             .updates-header
               h2 Images
               if currentUser.isAdmin
-                a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
+                a.button.header-button.project-button.add-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
                       path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             .image-gallery
@@ -117,9 +120,9 @@ block content
                       p.image-date #{image.createdAt.toLocaleDateString()}
                     if currentUser && currentUser.isAdmin
                       form.delete-image-button(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/image/${image._id}/delete` method="POST")
-                        button.btn.btn-sm.delete-button.image-delete(type="submit")
-                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16")
-                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z")
+                        button.button.header-button.project-button.file-button.delete-button.image-delete(type="submit")
+                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1")
+                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
 
         else
           .detail-item
