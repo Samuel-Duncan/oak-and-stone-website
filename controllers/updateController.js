@@ -3,6 +3,7 @@ const Project = require('../models/project');
 const User = require('../models/user.js');
 const { body, validationResult } = require('express-validator');
 const { sendEmail } = require('../utils/nodemailer.js');
+require('dotenv').config();
 
 exports.updateListGET = async (req, res) => {
   try {
@@ -88,7 +89,7 @@ exports.updateCreatePOST = [
 
       const [project, user] = await Promise.all([
         Project.findById(req.params.projectId),
-        User.findOne({ _id: req.params.userId }, 'name email'),
+        User.findById(req.params.userId, 'name email'),
       ]);
 
       if (!project) {
@@ -109,18 +110,17 @@ exports.updateCreatePOST = [
 
       try {
         const userHtml = `
-        <h1>New Weekly Update!</h1>
         <p>Dear, ${user.name.split(' ')[0]}</p>
         <p>We're excited to inform you that a new weekly update for the project at ${
           project.address
-        } is available for you.</p>
+        } is available to view.</p>
         <p>To track the progress of your project, please click the link below:</p>
-        <p><a href="localhost:3000/">localhost:3000/</a></p>
-        <p>Thank you for choosing Oak & Stone!</p>
+        <p><a href="${process.env.LINK}">localhost:3000/</a></p>
+        <p>Thank you for choosing Oak and Stone!</p>
       `;
         await sendEmail(
           user.email,
-          'A new project has been created for you!',
+          'Weekly Update from Oak and Stone',
           userHtml,
         );
         console.log('Email sent successfully');

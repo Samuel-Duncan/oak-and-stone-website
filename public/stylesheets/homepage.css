@@ -15,8 +15,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('../images/background-4.png'),
-    var(--color-background);
+  background: url('../images/Gigi\ hammer\ swing\ full\ color\ \(1\).png'),
+    rgba(0, 0, 0, 0.5);
   background-position: center;
   background-size: cover;
   background-blend-mode: multiply;
@@ -25,4 +25,10 @@
 
 .homepage-wrapper {
   text-align: center;
+}
+
+@media (max-width: 480px) {
+  .homepage-background::before {
+    background-position: 25%;
+  }
 }

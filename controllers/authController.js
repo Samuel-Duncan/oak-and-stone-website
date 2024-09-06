@@ -91,7 +91,7 @@ async function signUpLogic(req, res, next) {
       res.redirect('/users/');
 
       const welcomeHtml = `
-        <h1>Welcome to Oak & Stone Client Portal, ${
+        <h1>Welcome to the Oak and Stone Client Portal, ${
           user.name.split(' ')[0]
         }!</h1>
         <p>We're excited to welcome you to our secure client portal. Now you can stay up to date with the progress of your project!</p>

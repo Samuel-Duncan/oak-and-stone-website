@@ -9,6 +9,7 @@ const {
   addTransformation,
 } = require('../utils/cloudinary.js');
 const { sendEmail } = require('../utils/nodemailer.js');
+require('dotenv').config();
 
 exports.projectCreateGET = (req, res, next) => {
   res.render('projectForm', {
