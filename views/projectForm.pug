@@ -11,11 +11,6 @@ block content
         div.input-field
           input#address(type='text' name='address' required value=(project && project.address))
           label(for='address') Address:
-        div.textarea-input-field
-          label(for='description') Description (optional):
-          textarea#description(name='description')
-            if project && project.description
-              = project.description
         div.input-field.select-field
           label.sr-only(for='currentPhase') Current Phase:
           select#currentPhase.form-select(name='currentPhase' required)

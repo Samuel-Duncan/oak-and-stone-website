@@ -116,7 +116,7 @@ block content
                 each image in projectDetail.images
                   div.image-container(id=`image-container-${image._id}`)
                     div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
-                      img(src=image.url alt="Project Image")
+                      img.gallery-image(src=image.url alt="Project Image")
                       p.image-date #{image.createdAt.toLocaleDateString()}
                     if currentUser && currentUser.isAdmin
                       form.delete-image-button(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/image/${image._id}/delete` method="POST")
