@@ -19,3 +19,8 @@
   background-size: cover;
   background-blend-mode: multiply;
 }
+
+.update-list-background::before {
+  background: url('../images/Client\ Log\ In\ Photo-1.png'),
+    var(--color-background);
+}

@@ -8,7 +8,7 @@
   --color-text-primary: #000; /* Black */
   --color-text-secondary: #efefef; /* Light gray text */
   --color-accent: #fff; /* White (for checkbox accent) */
-  --color-background: rgba(0, 0, 0, 0.4); /* Black overlay */
+  --color-background: rgba(0, 0, 0, 0.6); /* Black overlay */
   --color-danger: rgb(217, 0, 0);
 
   /* Spacing */
