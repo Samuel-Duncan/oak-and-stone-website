@@ -13,7 +13,7 @@ const { body, validationResult } = require('express-validator');
 exports.userListGET = async (req, res) => {
   try {
     const allUsers = await User.find(
-      { isAdmin: { $ne: true } }, // This excludes users where isAdmin is true
+      { isAdmin: { $ne: true } },
       { name: 1 },
     )
       .sort({
@@ -21,16 +21,11 @@ exports.userListGET = async (req, res) => {
       })
       .exec();
 
-    if (allUsers.length === 0) {
-      res.render('userList', {
-        title: 'Client List',
-        errorMessage: 'No clients found!',
-      });
-    }
-
     res.render('userList', {
       title: 'Clients',
       userList: allUsers,
+      errorMessage:
+        allUsers.length === 0 ? 'No clients found!' : null,
     });
   } catch (err) {
     res.status(500).render('error', {
