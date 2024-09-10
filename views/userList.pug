@@ -8,7 +8,7 @@ block content
     div.wrapper
       h1 #{title}
 
-      if userList === undefined
+      if errorMessage === null || userList === undefined
         p.user-list-li No clients found!
       else
         ul
