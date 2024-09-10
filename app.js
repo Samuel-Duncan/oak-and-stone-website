@@ -14,7 +14,7 @@ require('dotenv').config();
 //Config RateLimit
 const limiter = RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 250,
 });
 
 const logInLimiter = RateLimit({
@@ -49,7 +49,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: true, // Set to true for https in production
+      secure: false, // Set to true for https in production
       maxAge: null,
     }, // Session doesn't expire
   }),

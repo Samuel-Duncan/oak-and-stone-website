@@ -73,7 +73,7 @@ a:hover {
 h1,
 h2 {
   font-size: 2rem;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-xxs);
   color: var(--color-primary);
 }
 
@@ -99,7 +99,7 @@ li a {
   font-size: var(--font-size-base);
   border: 2px solid transparent;
   transition: 0.3s ease;
-  margin: var(--spacing-xs) 0;
+  margin: var(--spacing-xxs) 0;
   text-align: center;
 }
 
@@ -120,7 +120,7 @@ li a {
   font-size: var(--font-size-base);
   border: 2px solid transparent;
   transition: 0.3s ease;
-  margin: var(--spacing-xs) 0;
+  margin: var(--spacing-xxs) 0;
   text-align: center;
 }
 
@@ -207,7 +207,7 @@ main {
 }
 
 .svg-button {
-  margin: var(--spacing-sm) 0;
+  margin: var(--spacing-xxs) 0;
   display: flex;
   align-items: center;
   justify-content: center;
