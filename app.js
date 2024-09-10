@@ -6,7 +6,21 @@ const session = require('express-session');
 const passport = require('./utils/passport.js');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const compression = require('compression');
+const helmet = require('helmet');
+const RateLimit = require('express-rate-limit');
 require('dotenv').config();
+
+//Config RateLimit
+const limiter = RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+});
+
+const logInLimiter = RateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 10,
+});
 
 // Routes
 const index = require('./routes/index');
@@ -36,8 +50,8 @@ app.use(
     saveUninitialized: true,
     cookie: {
       secure: false, // Set to true for https in production
-      maxAge: 1000 * 60 * 60 * 24,
-    }, // Session expires in 24 hours
+      maxAge: null,
+    }, // Session doesn't expire
   }),
 );
 app.use(passport.session());
@@ -52,13 +66,31 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(compression());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'img-src': ["'self'", 'data:', 'https://res.cloudinary.com'],
+        'script-src': ["'self'", "'unsafe-inline'"],
+        'style-src': [
+          "'self'",
+          "'unsafe-inline'",
+          'https://fonts.googleapis.com',
+        ],
+        'font-src': ["'self'", 'https://fonts.gstatic.com'],
+      },
+    },
+  }),
+);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Connecting mongoDB
 const mongoose = require('./utils/mongodb.js'); //Database
 
-app.use('/auth', auth);
-app.use('/', index);
+app.use('/auth', logInLimiter, auth);
+app.use('/', limiter, index);
 app.use('/users', users);
 app.use('/users', projects);
 app.use('/users', updates);
