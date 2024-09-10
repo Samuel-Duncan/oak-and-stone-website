@@ -106,7 +106,7 @@ block content
         if projectDetail.images && projectDetail.images.length > 0
           .detail-item
             .updates-header
-              h2 Images
+              h2 Pictures
               if currentUser.isAdmin
                 a.button.header-button.project-button.add-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
@@ -127,7 +127,7 @@ block content
         else
           .detail-item
             .updates-header
-                h2 Images
+                h2 Photos
                 if currentUser.isAdmin
                   a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
                     svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")

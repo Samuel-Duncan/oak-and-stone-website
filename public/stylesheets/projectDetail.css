@@ -4,7 +4,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  max-width: 900px;
+  max-width: 950px;
   border-radius: var(--border-radius);
   padding: var(--spacing-lg);
   text-align: left;

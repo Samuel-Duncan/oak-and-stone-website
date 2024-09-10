@@ -16,7 +16,7 @@ block content
         div.input-field.select-field
           input#images(type='file' name='images' multiple accept='image/*')
         
-        button#submitButton.button(type="submit")
+        button#submitButton.button.svg-button(type="submit")
           span.button-text Upload Images
           span.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
 
@@ -32,7 +32,7 @@ block content
 
       // Disable the button and show the spinner
       submitButton.disabled = true;
-      buttonText.classList.add('d-none');
+      buttonText.textContent = 'One moment...';
       spinner.classList.remove('d-none');
     });
 
