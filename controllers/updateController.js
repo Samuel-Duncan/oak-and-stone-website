@@ -115,7 +115,9 @@ exports.updateCreatePOST = [
           project.address
         } is available to view.</p>
         <p>To track the progress of your project, please click the link below:</p>
-        <p><a href="${process.env.LINK}">localhost:3000/</a></p>
+        <p><a href="${
+          process.env.LINK
+        }">Oak and Stone Client Portal</a></p>
         <p>Thank you for choosing Oak and Stone!</p>
       `;
         await sendEmail(
