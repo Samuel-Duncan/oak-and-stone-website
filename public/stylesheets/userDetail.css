@@ -38,6 +38,7 @@
 }
 
 .info-text {
+  margin-top: -16px;
   display: flex;
   flex-direction: column;
 }
