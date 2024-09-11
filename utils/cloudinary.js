@@ -23,28 +23,31 @@ const storage = new CloudinaryStorage({
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
 
 function addTransformation(url, fileType) {
-  if (fileType === 'pdf' || fileType === 'document') {
-    return `${url}?fl_attachment=true`;
-  }
-
-  // For images, apply the existing transformation
-  const transformation =
-    'c_limit,w_1280,h_720,q_auto:eco,f_auto,fl_strip_profile';
-  const parts = url.split('/upload/');
-
-  if (parts.length !== 2) {
-    console.error('Invalid Cloudinary URL structure');
-    return url;
-  }
-
-  return `${parts[0]}/upload/${transformation}/${parts[1]}`;
+  // ... (keep this function as is)
 }
+
+// Create a multer instance with file size limit
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (req, file, cb) => {
+    if (file.size > MAX_FILE_SIZE) {
+      cb(
+        new Error(
+          `File size limit exceeded. Maximum allowed size is ${
+            MAX_FILE_SIZE / (1024 * 1024)
+          }MB`,
+        ),
+        false,
+      );
+    } else {
+      cb(null, true);
+    }
+  },
+});
 
 module.exports = {
   cloudinary: cloudinary,
-  upload: multer({
-    storage: storage,
-    limits: { fileSize: MAX_FILE_SIZE },
-  }),
+  upload: upload,
   addTransformation,
 };
