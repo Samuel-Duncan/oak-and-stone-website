@@ -2,6 +2,7 @@ extends layout
 
 block stylesheets
   link(rel='stylesheet', href='/stylesheets/forms.css')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.0/browser-image-compression.min.js')
 
 block content
   div.form-background
@@ -25,22 +26,70 @@ block content
           p= message
 
   script.
-    document.getElementById('projectForm').addEventListener('submit', function(event) {
+    async function compressImage(file) {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true
+      };
+
+      try {
+        return await imageCompression(file, options);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        return file; // Return original file if compression fails
+      }
+    }
+
+    document.getElementById('projectForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+
       const submitButton = document.getElementById('submitButton');
       const buttonText = submitButton.querySelector('.button-text');
       const spinner = submitButton.querySelector('.spinner-border');
 
       // Disable the button and show the spinner
       submitButton.disabled = true;
-      buttonText.textContent = 'Uploading...';
+      buttonText.textContent = 'Compressing and Uploading...';
       spinner.classList.remove('d-none');
+
+      const fileInput = document.getElementById('images');
+      const files = fileInput.files;
+      const formData = new FormData();
+
+      for (let i = 0; i < files.length; i++) {
+        const compressedFile = await compressImage(files[i]);
+        formData.append('images', compressedFile, compressedFile.name);
+      }
+
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        // Redirect to the URL returned by the server
+        window.location.href = response.url;
+      } catch (error) {
+        console.error('Error:', error);
+        // Handle error (e.g., show error message to user)
+        buttonText.textContent = 'Upload Failed';
+      } finally {
+        // Re-enable the button and hide the spinner
+        submitButton.disabled = false;
+        spinner.classList.add('d-none');
+      }
     });
 
     window.addEventListener('pageshow', function(event) {
-      const buttonText = document.getElementById('button-text');
-      const spinner = document.getElementById('spinner-border');
+      const buttonText = document.getElementById('submitButton').querySelector('.button-text');
+      const spinner = document.getElementById('submitButton').querySelector('.spinner-border');
 
       // Restore the button text and hide the spinner
-      buttonText.classList.remove('d-none') // Set this to whatever the original text was
+      buttonText.textContent = 'Upload Images';
       spinner.classList.add('d-none');
     });

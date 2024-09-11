@@ -16,7 +16,6 @@ const storage = new CloudinaryStorage({
     folder: 'Progress',
     allowedFormats: ['jpeg', 'png', 'jpg', 'pdf', 'doc', 'docx'],
     resource_type: 'auto',
-    max_bytes: 20 * 1024 * 1024, // 20 MB
   },
 });
 
@@ -38,15 +37,8 @@ function addTransformation(url, fileType) {
   return `${parts[0]}/upload/${transformation}/${parts[1]}`;
 }
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: MAX_FILE_SIZE },
-});
-
 module.exports = {
   cloudinary: cloudinary,
-  upload: upload,
+  upload: multer({ storage }),
   addTransformation,
 };
