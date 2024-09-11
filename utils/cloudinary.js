@@ -19,6 +19,9 @@ const storage = new CloudinaryStorage({
   },
 });
 
+// Increase the file size limit (in bytes)
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
+
 function addTransformation(url, fileType) {
   if (fileType === 'pdf' || fileType === 'document') {
     return `${url}?fl_attachment=true`;
@@ -39,6 +42,9 @@ function addTransformation(url, fileType) {
 
 module.exports = {
   cloudinary: cloudinary,
-  upload: multer({ storage }),
+  upload: multer({
+    storage: storage,
+    limits: { fileSize: MAX_FILE_SIZE },
+  }),
   addTransformation,
 };
