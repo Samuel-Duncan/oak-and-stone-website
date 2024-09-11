@@ -413,24 +413,12 @@ exports.addImagesPOST = async (req, res) => {
     const project = await Project.findById(req.params.projectId);
 
     if (!project) {
-      if (
-        req.xhr ||
-        req.headers['x-requested-with'] === 'XMLHttpRequest'
-      ) {
-        return res.status(404).json({ error: 'Project not found' });
-      }
       return res
         .status(404)
         .render('error', { message: 'Project not found' });
     }
 
     if (!errors.isEmpty()) {
-      if (
-        req.xhr ||
-        req.headers['x-requested-with'] === 'XMLHttpRequest'
-      ) {
-        return res.status(400).json({ errors: errors.array() });
-      }
       return res.render('imageForm', {
         title: 'Upload Images',
         formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
@@ -450,15 +438,10 @@ exports.addImagesPOST = async (req, res) => {
 
     // Handle new images uploaded via multer and CloudinaryStorage
     const newImages = req.files
-      ? await Promise.all(
-          req.files.map(async (file) => {
-            // If the file is already compressed, we don't need to do anything extra
-            return {
-              url: addTransformation(file.path, 'image'),
-              publicId: file.filename,
-            };
-          }),
-        )
+      ? req.files.map((file) => ({
+          url: addTransformation(file.path, 'image'),
+          publicId: file.filename,
+        }))
       : [];
 
     // Combine remaining existing and new images
@@ -466,40 +449,17 @@ exports.addImagesPOST = async (req, res) => {
 
     await project.save();
 
-    // If it's an AJAX request, send a JSON response
-    if (
-      req.xhr ||
-      req.headers['x-requested-with'] === 'XMLHttpRequest'
-    ) {
-      res.json({
-        success: true,
-        redirectUrl: `/users/${req.params.userId}/project/${req.params.projectId}`,
-      });
-    } else {
-      // For non-AJAX requests, redirect as before
-      res.redirect(
-        `/users/${req.params.userId}/project/${req.params.projectId}`,
-      );
-    }
+    res.redirect(
+      `/users/${req.params.userId}/project/${req.params.projectId}`,
+    );
   } catch (err) {
     console.error(err);
-    // If it's an AJAX request, send a JSON response
-    if (
-      req.xhr ||
-      req.headers['x-requested-with'] === 'XMLHttpRequest'
-    ) {
-      res
-        .status(500)
-        .json({ error: 'Error managing images: ' + err.message });
-    } else {
-      // For non-AJAX requests, render the error page as before
-      res.status(500).render('imageForm', {
-        title: 'Manage Images',
-        formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
-        project: req.body, // To preserve form data in case of error
-        error: 'Error managing images: ' + err.message,
-      });
-    }
+    res.status(500).render('imageForm', {
+      title: 'Manage Images',
+      formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
+      project: req.body, // To preserve form data in case of error
+      error: 'Error managing images: ' + err.message,
+    });
   }
 };
 
