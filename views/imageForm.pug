@@ -122,7 +122,7 @@ block content
 
       // Disable the button and show the spinner
       submitButton.disabled = true;
-      buttonText.textContent = 'Compressing...';
+      buttonText.textContent = 'Uploading...';
       spinner.classList.remove('d-none');
 
       const formData = await createFormDataWithCompressedImages(this);

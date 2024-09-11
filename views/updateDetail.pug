@@ -1,11 +1,11 @@
 extends layout 
 
 block stylesheets
-  link(rel='stylesheet', href='/stylesheets/userDetail.css')
+  link(rel='stylesheet', href='/stylesheets/updateDetail.css')
 
 block content 
-  div.detail-background.update-detail-background
-    div.detail-wrapper
+  div.update-detail-background
+    div.update-detail-wrapper
       if update === null
         p Update not found!
       else

@@ -31,11 +31,11 @@ block content
         .project-details
           if currentUser.isAdmin
             .detail-item
-              h2 Client 
+              h2.dashboard-header Client 
               p.secondary-text= userName
           
           .detail-item
-            h2 Phase
+            h2.dashboard-header Phase
             .phase-items
               if projectDetail.currentPhase === 1
                 p.secondary-text 1 out of 4
@@ -57,14 +57,14 @@ block content
 
           if currentUser && currentUser.isAdmin
             .detail-item
-              h2 Type
+              h2.dashboard-header Type
               p.secondary-text= projectDetail.type
         
         // CURRENT UPDATE
         .updates-container
           .detail-item
             .updates-header
-              h2 Current Update 
+              h2.dashboard-header Current Update 
               if currentUser.isAdmin && update === null
                 a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-update/create`)
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
@@ -82,7 +82,7 @@ block content
         .updates-container 
           .detail-item 
             .updates-header 
-              h2 Files 
+              h2.dashboard-header Files 
               if currentUser && currentUser.isAdmin && projectDetail && projectDetail._id
                 a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/create`)
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
@@ -106,7 +106,7 @@ block content
         if projectDetail.images && projectDetail.images.length > 0
           .detail-item
             .updates-header
-              h2 Pictures
+              h2.dashboard-header Pictures
               if currentUser.isAdmin
                 a.button.header-button.project-button.add-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")

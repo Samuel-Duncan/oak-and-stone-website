@@ -46,7 +46,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
 }
 
 .project-button-container {
@@ -202,6 +202,14 @@
   }
 
   .detail-item {
-    padding: var(--spacing-xs);
+    padding: var(--spacing-sm);
+  }
+
+  .dashboard-header {
+    font-size: 1.5rem;
+  }
+
+  .project-header {
+    margin-bottom: var(--spacing-sm);
   }
 }

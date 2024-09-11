@@ -247,6 +247,10 @@ main {
   overflow-wrap: break-word;
 }
 
+.list-title {
+  margin-bottom: -6px;
+}
+
 @media (max-width: 480px) {
   .wrapper {
     width: 100%;
