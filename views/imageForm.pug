@@ -26,178 +26,146 @@ block content
 
   script.
     // Function to compress an image
-    async function compressImage(file, maxWidth, maxHeight, quality) {
+    async function compressImage(file, maxSizeMB = 1) {
       return new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
+        reader.onload = function(event) {
           const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
+          img.onload = function() {
             const canvas = document.createElement('canvas');
             let width = img.width;
             let height = img.height;
-
+            
+            // Calculate the width and height, constraining the proportions
             if (width > height) {
-              if (width > maxWidth) {
-                height = Math.round((height * maxWidth) / width);
-                width = maxWidth;
+              if (width > 1280) {
+                height *= 1280 / width;
+                width = 1280;
               }
             } else {
-              if (height > maxHeight) {
-                width = Math.round((width * maxHeight) / height);
-                height = maxHeight;
+              if (height > 720) {
+                width *= 720 / height;
+                height = 720;
               }
             }
-
+            
             canvas.width = width;
             canvas.height = height;
-
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-
-            canvas.toBlob(
-              (blob) => {
-                resolve(
-                  new File([blob], file.name, {
-                    type: 'image/jpeg',
-                    lastModified: Date.now(),
-                  }),
-                );
-              },
-              'image/jpeg',
-              quality,
-            );
+            
+            // Convert the canvas to a Blob
+            canvas.toBlob((blob) => {
+              resolve(new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              }));
+            }, 'image/jpeg', 0.7); // Adjust quality here (0.7 is 70% quality)
           };
+          img.src = event.target.result;
         };
+        reader.readAsDataURL(file);
       });
     }
 
     // Function to handle file selection and compression
-    async function handleFileSelect(event) {
-      const files = event.target.files;
+    async function handleFiles(files) {
       const compressedFiles = [];
       let totalSize = 0;
       const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
 
-      for (let i = 0; i < files.length; i++) {
-        let compressedFile = await compressImage(
-          files[i],
-          1280,
-          720,
-          0.7,
-        );
-
-        // If the total size exceeds the limit, try compressing more
-        while (
-          totalSize + compressedFile.size > maxTotalSize &&
-          compressedFile.size > 50000
-        ) {
-          compressedFile = await compressImage(
-            compressedFile,
-            1280,
-            720,
-            0.5,
-          );
-        }
-
-        if (totalSize + compressedFile.size <= maxTotalSize) {
-          compressedFiles.push(compressedFile);
+      for (let file of files) {
+        if (file.type.startsWith('image/')) {
+          const compressedFile = await compressImage(file);
           totalSize += compressedFile.size;
+          
+          if (totalSize > maxTotalSize) {
+            alert('Total file size exceeds 10MB. Please remove some images.');
+            return null;
+          }
+          
+          compressedFiles.push(compressedFile);
         } else {
-          console.warn(
-            `Skipping file ${files[i].name} as it would exceed the total size limit`,
-          );
+          compressedFiles.push(file);
         }
       }
-
-      // Replace the original FileList with our compressed FileList
-      event.target.files = new FileList(compressedFiles);
+      
+      return compressedFiles;
     }
 
-    // Custom FileList class to make our array of Files behave like a FileList
-    class FileList {
-      constructor(files) {
-        this.files = files;
+    // Function to create a FormData object with compressed images
+    async function createFormDataWithCompressedImages(formElement) {
+      const formData = new FormData(formElement);
+      const fileInput = formElement.querySelector('input[type="file"]');
+      const compressedFiles = await handleFiles(fileInput.files);
+      
+      if (!compressedFiles) return null;
+      
+      // Remove the original file input data
+      formData.delete('images');
+      
+      // Append compressed files
+      for (let file of compressedFiles) {
+        formData.append('images', file);
       }
-
-      item(index) {
-        return this.files[index];
-      }
-
-      get length() {
-        return this.files.length;
-      }
-
-      *[Symbol.iterator]() {
-        yield* this.files;
-      }
+      
+      return formData;
     }
 
-    // Add event listener to the file input
-    document
-      .getElementById('images')
-      .addEventListener('change', handleFileSelect);
+    // Event listener for form submission
+    document.getElementById('projectForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      const submitButton = document.getElementById('submitButton');
+      const buttonText = submitButton.querySelector('.button-text');
+      const spinner = submitButton.querySelector('.spinner-border');
 
-    // Modify form submission to include compressed files
-    document
-      .getElementById('projectForm')
-      .addEventListener('submit', function (event) {
-        event.preventDefault();
+      // Disable the button and show the spinner
+      submitButton.disabled = true;
+      buttonText.textContent = 'Compressing...';
+      spinner.classList.remove('d-none');
 
-        const submitButton = document.getElementById('submitButton');
-        const buttonText = submitButton.querySelector('.button-text');
-        const spinner = submitButton.querySelector('.spinner-border');
+      const formData = await createFormDataWithCompressedImages(this);
+      
+      if (!formData) {
+        // Re-enable the button and hide the spinner
+        submitButton.disabled = false;
+        buttonText.textContent = 'Upload Images';
+        spinner.classList.add('d-none');
+        return;
+      }
 
-        // Disable the button and show the spinner
-        submitButton.disabled = true;
-        buttonText.textContent = 'One moment...';
-        spinner.classList.remove('d-none');
-
-        // Create a new FormData object
-        const formData = new FormData(this);
-
-        // Send the form data using fetch
-        fetch(this.action, {
+      // Send the form data using fetch
+      try {
+        const response = await fetch(this.action, {
           method: 'POST',
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            // Handle the response
-            if (data.success) {
-              window.location.href = data.redirectUrl;
-            } else {
-              // Show error message
-              const errorElement = document.createElement('div');
-              errorElement.className = 'error-message';
-              errorElement.textContent =
-                data.error || 'An error occurred';
-              this.appendChild(errorElement);
-            }
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-            // Show error message
-            const errorElement = document.createElement('div');
-            errorElement.className = 'error-message';
-            errorElement.textContent =
-              'An error occurred while uploading';
-            this.appendChild(errorElement);
-          })
-          .finally(() => {
-            // Re-enable the button and hide the spinner
-            submitButton.disabled = false;
-            buttonText.textContent = 'Upload Images';
-            spinner.classList.add('d-none');
-          });
-      });
+          body: formData
+        });
 
+        if (response.ok) {
+          window.location.href = response.url; // Redirect to the response URL
+        } else {
+          throw new Error('Server responded with an error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while uploading. Please try again.');
+        
+        // Re-enable the button and hide the spinner
+        submitButton.disabled = false;
+        buttonText.textContent = 'Upload Images';
+        spinner.classList.add('d-none');
+      }
+    });
+
+    // Reset button state on page show (e.g., when navigating back)
     window.addEventListener('pageshow', function(event) {
-      const buttonText = document.querySelector('#submitButton .button-text');
-      const spinner = document.querySelector('#submitButton .spinner-border');
+      const submitButton = document.getElementById('submitButton');
+      const buttonText = submitButton.querySelector('.button-text');
+      const spinner = submitButton.querySelector('.spinner-border');
 
       // Restore the button text and hide the spinner
+      submitButton.disabled = false;
       buttonText.textContent = 'Upload Images';
       spinner.classList.add('d-none');
     });
