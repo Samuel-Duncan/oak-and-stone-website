@@ -26,73 +26,10 @@ block content
 
   script.
     document.getElementById('projectForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-  
-      const form = event.target;
-      const formData = new FormData(form);
-      const xhr = new XMLHttpRequest();
-      
       const submitButton = document.getElementById('submitButton');
       const buttonText = submitButton.querySelector('.button-text');
       const spinner = submitButton.querySelector('.spinner-border');
-      
-      // Create progress bar
-      const progressBar = document.createElement('div');
-      progressBar.className = 'progress-bar';
-      progressBar.style.width = '0%';
-      progressBar.style.height = '20px';
-      progressBar.style.backgroundColor = '#4CAF50';
-      form.appendChild(progressBar);
 
-      xhr.open('POST', form.action, true);
-      
-      xhr.upload.onprogress = function(e) {
-        if (e.lengthComputable) {
-          const percentComplete = (e.loaded / e.total) * 100;
-          progressBar.style.width = percentComplete + '%';
-          progressBar.textContent = percentComplete.toFixed(0) + '%';
-        }
-      };
-      
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          console.log('Upload successful');
-          buttonText.textContent = 'Upload Successful';
-        } else {
-          console.error('Upload failed');
-          buttonText.textContent = 'Upload Failed';
-        }
-        submitButton.disabled = false;
-        spinner.classList.add('d-none');
-      };
-      
-      xhr.onerror = function() {
-        console.error('Network error occurred');
-        buttonText.textContent = 'Network Error';
-        submitButton.disabled = false;
-        spinner.classList.add('d-none');
-      };
-      
-      xhr.onabort = function() {
-        console.log('Upload aborted');
-        buttonText.textContent = 'Upload Aborted';
-        submitButton.disabled = false;
-        spinner.classList.add('d-none');
-      };
-      
-      // Set a timeout for the entire request (e.g., 5 minutes)
-      xhr.timeout = 300000; // 5 minutes in milliseconds
-      
-      xhr.ontimeout = function() {
-        console.error('Request timed out');
-        buttonText.textContent = 'Upload Timed Out';
-        submitButton.disabled = false;
-        spinner.classList.add('d-none');
-      };
-
-      // Start the upload
-      xhr.send(formData);
-      
       // Disable the button and show the spinner
       submitButton.disabled = true;
       buttonText.textContent = 'Uploading...';
