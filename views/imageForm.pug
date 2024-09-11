@@ -2,7 +2,6 @@ extends layout
 
 block stylesheets
   link(rel='stylesheet', href='/stylesheets/forms.css')
-  script(src='https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.0/browser-image-compression.min.js')
 
 block content
   div.form-background
@@ -25,6 +24,7 @@ block content
         .success-message
           p= message
 
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.0/browser-image-compression.min.js')
   script.
     async function compressImage(file) {
       const options = {
@@ -55,7 +55,10 @@ block content
 
       const fileInput = document.getElementById('images');
       const files = fileInput.files;
-      const formData = new FormData();
+      const formData = new FormData(this);
+
+      // Remove existing files from formData
+      formData.delete('images');
 
       for (let i = 0; i < files.length; i++) {
         const compressedFile = await compressImage(files[i]);
@@ -65,11 +68,18 @@ block content
       try {
         const response = await fetch(this.action, {
           method: 'POST',
-          body: formData
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            // Add CSRF token if your application uses it
+            // 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          // Don't set Content-Type header, let the browser set it with the correct boundary for FormData
         });
 
         if (!response.ok) {
-          throw new Error('Upload failed');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload failed');
         }
 
         // Redirect to the URL returned by the server
@@ -77,7 +87,7 @@ block content
       } catch (error) {
         console.error('Error:', error);
         // Handle error (e.g., show error message to user)
-        buttonText.textContent = 'Upload Failed';
+        buttonText.textContent = 'Upload Failed: ' + error.message;
       } finally {
         // Re-enable the button and hide the spinner
         submitButton.disabled = false;
