@@ -15,13 +15,18 @@ exports.updateListGET = async (req, res) => {
       })
       .exec();
 
+    // If no updates, render with error message
     if (allUpdates.length === 0) {
-      res.render('updateList', {
+      return res.render('updateList', {
         title: 'Weekly Updates',
         errorMessage: 'No updates found!',
+        updateList: [], // Pass an empty array
+        userId: req.params.userId,
+        projectId: req.params.projectId,
       });
     }
 
+    // Render with updates
     res.render('updateList', {
       title: 'Weekly Updates',
       updateList: allUpdates,
@@ -72,12 +77,8 @@ exports.updateCreatePOST = [
     .withMessage('Week is required')
     .isInt({ min: 1 })
     .withMessage('Week must be a positive integer'),
-  body('title')
-    .notEmpty()
-    .withMessage('Title is required')
-    .trim()
-    .escape(),
-  body('description').optional().trim().escape(),
+  body('title').notEmpty().withMessage('Title is required').trim(),
+  body('description').optional().trim(),
 
   async (req, res, next) => {
     try {
@@ -170,12 +171,8 @@ exports.updateUpdatePOST = [
     .withMessage('Week is required')
     .isInt({ min: 1 })
     .withMessage('Week must be a positive integer'),
-  body('title')
-    .notEmpty()
-    .withMessage('Title is required')
-    .trim()
-    .escape(),
-  body('description').optional().trim().escape(),
+  body('title').notEmpty().withMessage('Title is required').trim(),
+  body('description').optional().trim(),
 
   async (req, res, next) => {
     try {
@@ -227,7 +224,7 @@ exports.updateDeleteGET = async (req, res) => {
     const update = await Update.findById(req.params.updateId).exec();
 
     if (update === null) {
-      res.redirect(
+      return res.redirect(
         `/users/${req.params.userId}/project/${req.params.projectId}/weekly-updates`,
       );
     }
@@ -251,7 +248,7 @@ exports.updateDeletePOST = async (req, res) => {
     res.redirect(
       `/users/${req.params.userId}/project/${req.params.projectId}/weekly-updates`,
     );
-  } catch {
+  } catch (err) {
     res.status(err.status || 500).render('updateDelete', {
       message: 'Error deleting client: ' + err.message,
     });

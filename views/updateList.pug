@@ -8,7 +8,7 @@ block content
     div.wrapper
       h1 #{title}
 
-      if updateList === undefined
+      if updateList === undefined || updateList.length === 0
         p.secondary-text.user-list-li No updates found!
       else
         ul

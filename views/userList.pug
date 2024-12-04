@@ -9,7 +9,7 @@ block content
       h1.list-title #{title}
 
       if errorMessage !== null || userList === undefined
-        p.user-list-li No clients found!
+        p.secondary-text.user-list-li No clients found!
       else
         ul
           each user in userList
