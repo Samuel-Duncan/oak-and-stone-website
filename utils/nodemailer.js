@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const sendEmail = (email, subject, html) => {
+const sendEmail = (emails, subject, html) => {
   let transporter = nodemailer.createTransport({
     host: 'smtp.zoho.com',
     port: 465,
@@ -11,18 +11,23 @@ const sendEmail = (email, subject, html) => {
     },
   });
 
+  // Ensure `emails` is a string of comma-separated email addresses
+  const recipientList = Array.isArray(emails)
+    ? emails.join(',')
+    : emails;
+
   let mailOptions = {
     from: process.env.MAIL_USERNAME,
-    to: email,
+    to: recipientList,
     subject: subject,
     html: html,
   };
 
   transporter.sendMail(mailOptions, function (err, data) {
     if (err) {
-      console.log('Error ' + err);
+      console.log('Error: ' + err);
     } else {
-      console.log('Email sent successfully');
+      console.log('Email sent successfully to:', recipientList);
     }
   });
 };

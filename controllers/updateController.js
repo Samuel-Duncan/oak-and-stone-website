@@ -90,7 +90,10 @@ exports.updateCreatePOST = [
 
       const [project, user] = await Promise.all([
         Project.findById(req.params.projectId),
-        User.findById(req.params.userId, 'name email'),
+        User.findById(
+          req.params.userId,
+          'name email additionalEmailOne additionalEmailTwo',
+        ),
       ]);
 
       if (!project) {
@@ -111,25 +114,38 @@ exports.updateCreatePOST = [
 
       try {
         const userHtml = `
-        <p>Dear, ${user.name.split(' ')[0]}</p>
-        <p>We're excited to inform you that a new weekly update for the project at ${
-          project.address
-        } is available to view.</p>
-        <p>To track the progress of your project, please click the link below:</p>
-        <p><a href="${
-          process.env.LINK
-        }">Oak and Stone Client Portal</a></p>
-        <p>Thank you for choosing Oak and Stone!</p>
-      `;
-        await sendEmail(
+          <p>Dear, ${user.name.split(' ')[0]}</p>
+          <p>We're excited to inform you that a new weekly update for the project at ${
+            project.address
+          } is available to view.</p>
+          <p>To track the progress of your project, please click the link below:</p>
+          <p><a href="${
+            process.env.LINK
+          }">Oak and Stone Client Portal</a></p>
+          <p>Thank you for choosing Oak and Stone!</p>
+        `;
+
+        // Gather all email addresses into an array, filtering out `null` values
+        const emailAddresses = [
           user.email,
+          user.additionalEmailOne,
+          user.additionalEmailTwo,
+        ].filter((email) => email !== null);
+
+        // Send the email to all collected addresses
+        await sendEmail(
+          emailAddresses,
           'Weekly Update from Oak and Stone',
           userHtml,
         );
-        console.log('Email sent successfully');
+
+        console.log(
+          'Email sent successfully to:',
+          emailAddresses.join(', '),
+        );
       } catch (emailError) {
         console.error('Failed to send email:', emailError);
-        // Decide if you want to handle this error differently
+        // Optional: Add additional error handling logic if necessary
       }
     } catch (err) {
       res.status(500).render('updateForm', {

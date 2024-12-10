@@ -65,8 +65,6 @@ exports.userDetailGET = async (req, res) => {
       });
     }
 
-    console.log(project);
-
     res.render('userDetail', {
       title: 'Client Details',
       user,
@@ -126,6 +124,22 @@ exports.userUpdatePOST = [
     .withMessage('Invalid email format')
     .escape(), // Sanitize to lowercase
 
+  // Additional Email One
+  body('additionalEmailOne')
+    .trim()
+    .optional({ checkFalsy: true })
+    .isEmail()
+    .withMessage('Invalid email format')
+    .escape(), // Sanitize to lowercase
+
+  // Additional Email Two
+  body('additionalEmailTwo')
+    .trim()
+    .optional({ checkFalsy: true })
+    .isEmail()
+    .withMessage('Invalid email format')
+    .escape(), // Sanitize to lowercase
+
   // Phone number
   body('phoneNumber')
     .trim()
@@ -142,7 +156,6 @@ async function userUpdateLogic(req, res, next) {
     const errors = validationResult(req);
 
     const existingUser = await User.findById(req.params.userId);
-    console.log(existingUser);
     if (!existingUser) {
       return res
         .status(404)
@@ -152,6 +165,8 @@ async function userUpdateLogic(req, res, next) {
     const updatedUserData = {
       name: req.body.name,
       email: req.body.email,
+      additionalEmailOne: req.body.additionalEmailOne || null,
+      additionalEmailTwo: req.body.additionalEmailTwo || null,
       phoneNumber: req.body.phoneNumber,
     };
 

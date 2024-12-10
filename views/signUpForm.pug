@@ -14,6 +14,12 @@ block content
         div.input-field  
           input(type="email" id="email" name="email" value=(user && user.email) required)
           label(for="email") Email:
+        div.input-field  
+          input(type="email" id="additionalEmailOne" name="additionalEmailOne" value=(user && user.additionalEmailOne))
+          label(for="additionalEmailOne") Additional Email:
+        div.input-field  
+          input(type="email" id="additionalEmailTwo" name="additionalEmailTwo" value=(user && user.additionalEmailTwo))
+          label(for="additionalEmailTwo") Additional Email:
         if !isUpdate
           div.input-field
             input(type="password" id="password" name="password" required)

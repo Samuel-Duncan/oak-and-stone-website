@@ -34,6 +34,22 @@ exports.signUpPOST = [
     .withMessage('Invalid email format')
     .escape(), // Sanitize to lowercase
 
+  // Additional Email One
+  body('additionalEmailOne')
+    .trim()
+    .optional({ checkFalsy: true })
+    .isEmail()
+    .withMessage('Invalid email format')
+    .escape(), // Sanitize to lowercase
+
+  // Additional Email Two
+  body('additionalEmailTwo')
+    .trim()
+    .optional({ checkFalsy: true })
+    .isEmail()
+    .withMessage('Invalid email format')
+    .escape(), // Sanitize to lowercase
+
   // Password
   body('password')
     .trim()
@@ -61,6 +77,8 @@ async function signUpLogic(req, res, next) {
     const user = new User({
       name: req.body.name,
       email: req.body.email,
+      additionalEmailOne: req.body.additionalEmailOne || null,
+      additionalEmailTwo: req.body.additionalEmailTwo || null,
       password: req.body.password,
       phoneNumber: req.body.phoneNumber,
     });
@@ -103,8 +121,16 @@ async function signUpLogic(req, res, next) {
         <p>Thank you for choosing Oak & Stone!</p>
       `;
 
-      sendEmail(
+      // Collect email addresses, including only non-null values
+      const emailAddresses = [
         user.email,
+        user.additionalEmailOne,
+        user.additionalEmailTwo,
+      ].filter((email) => email !== null);
+
+      // Send the email to all provided addresses
+      sendEmail(
+        emailAddresses,
         'Oak and Stone Portal Login Info',
         welcomeHtml,
       );

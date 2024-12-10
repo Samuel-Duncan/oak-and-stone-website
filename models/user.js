@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    additionalEmailOne: {
+      type: String,
+      default: null,
+    },
+    additionalEmailTwo: {
+      type: String,
+      default: null,
+    },
     password: { type: String, required: true, minLength: 6 },
     phoneNumber: {
       type: String,
