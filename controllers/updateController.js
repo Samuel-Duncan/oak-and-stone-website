@@ -45,15 +45,21 @@ exports.updateDetailGET = async (req, res) => {
     const update = await Update.findById(req.params.updateId).exec();
 
     if (update === null) {
-      res.render('updateDetail', {
+      return res.render('updateDetail', {
         title: 'Update Details',
         errMsg: 'No update found!',
       });
     }
 
+    // Split the description by line breaks and trim extra spaces
+    const descriptionArray = update.description
+      ? update.description.split(/\r?\n/).map((line) => line.trim())
+      : [];
+
+    // Pass the processed description (array of lines) to the view
     res.render('updateDetail', {
       title: 'Update Details',
-      update: update ? update : null,
+      update: { ...update.toObject(), description: descriptionArray },
       userId: req.params.userId,
       projectId: req.params.projectId,
     });

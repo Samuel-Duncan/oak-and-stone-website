@@ -63,6 +63,11 @@ form {
   -webkit-backdrop-filter: blur(8px);
 }
 
+.form-wrapper.update-form-wrapper {
+  width: 80%;
+  max-width: 800px;
+}
+
 .project-form-button {
   margin-top: var(--spacing-lg);
 }
@@ -108,14 +113,28 @@ form {
 }
 
 .textarea-input-field {
+  width: 100%;
+  max-width: 100%;
   position: relative;
   border-bottom: 2px solid var(--color-secondary);
   margin: var(--spacing-md) 0;
 }
 
+.update-textarea {
+  width: 100%; /* Matches the parent width */
+  min-height: 150px; /* Set a minimum height for better usability */
+  max-height: 515px; /* Prevents it from becoming too tall */
+  font-size: 1rem; /* Ensures text is readable */
+  resize: vertical; /* Allows users to resize only vertically */
+  box-sizing: border-box; /* Includes padding in width/height calculations */
+  border-radius: var(--border-radius);
+  border: var(--border-width) solid rgba(0, 0, 0, 0.2);
+}
+
 .textarea-input-field label {
+  display: block;
   position: absolute;
-  top: 50%;
+  top: var(--spacing-lg);
   left: 0;
   transform: translateY(-50%);
   color: var(--color-primary);
@@ -237,8 +256,13 @@ form {
 
 @media (max-width: 480px) {
   .form-wrapper,
-  .project-form-wrapper {
+  .project-form-wrapper,
+  .form-wrapper.update-form-wrapper {
     width: 100%;
+  }
+
+  .update-textarea {
+    min-height: 100px;
   }
 
   .sign-in-form-background::before {

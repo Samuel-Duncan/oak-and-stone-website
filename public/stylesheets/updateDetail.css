@@ -28,7 +28,8 @@
 
 .update-detail-wrapper {
   color: var(--color-primary);
-  width: 400px;
+  width: 80%;
+  max-width: 900px;
   border-radius: var(--border-radius);
   padding: var(--spacing-lg);
   border: var(--border-width) solid rgba(255, 255, 255, 0.5);
@@ -39,4 +40,10 @@
   gap: var(--spacing-sm);
   margin-top: 80px; /* Adjust this value based on your header height */
   margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+  .update-detail-wrapper {
+    width: 100%;
+  }
 }

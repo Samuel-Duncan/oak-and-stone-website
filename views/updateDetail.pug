@@ -12,7 +12,9 @@ block content
         h1 Week #{update.week}
         div.info-text
           p.medium-text.subtitle #{update.title}
-          p.secondary-text.text-left #{update.description}
+          if update.description && update.description.length > 0
+            each line in update.description
+              p.secondary-text.text-left= line
 
         div.actions
           if currentUser && currentUser.isAdmin

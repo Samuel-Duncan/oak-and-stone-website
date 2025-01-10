@@ -161,10 +161,22 @@ exports.projectDetailGET = async (req, res) => {
       project.images.sort((a, b) => b.createdAt - a.createdAt);
     }
 
+    // Process the update description if it exists
+    const processedUpdate = update
+      ? {
+          ...update.toObject(),
+          description: update.description
+            ? update.description
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+            : [],
+        }
+      : null;
+
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: project,
-      update: update || null,
+      update: processedUpdate,
       moreThanOneProject: projectCount > 1,
       userName: userName ? userName.name : 'Unknown User',
       files: file ? file : null,

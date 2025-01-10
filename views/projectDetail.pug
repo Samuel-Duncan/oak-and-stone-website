@@ -73,8 +73,9 @@ block content
                 a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/weekly-updates`) View All
             if update !== null
               p.secondary-text.subtitle.project-detail-subtitle Week #{update.week} - #{update.title}
-              if update.description 
-                p.update-description.secondary-text= update.description
+              if update.description
+                each line in update.description
+                  p.update-description.secondary-text= line
             else
               p.secondary-text No updates to see yet!
 
