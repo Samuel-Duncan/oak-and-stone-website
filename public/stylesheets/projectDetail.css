@@ -155,12 +155,6 @@
   transform: translate(25%, -45%);
 }
 
-#exampleModal .modal-dialog {
-  max-width: 1600px; /* Set your desired max-width */
-  width: fit-content; /* Ensure it adapts to the max width */
-  transform: scale(1.2);
-}
-
 .modal-content {
   border-radius: var(
     --border-radius
@@ -177,6 +171,12 @@
   ); /* Optional: Add translucent background for consistency */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Optional: Add a subtle shadow for depth */
   margin: auto; /* Center the modal */
+}
+
+#exampleModal .modal-dialog {
+  max-width: 1600px; /* Set your desired max-width */
+  width: fit-content; /* Ensure it adapts to the max width */
+  transform: scale(1.2);
 }
 
 #modalImage {
@@ -196,6 +196,12 @@
   margin-top: var(--spacing-xxs);
 }
 
+@media (max-width: 768px) {
+  #exampleModal .modal-dialog {
+    transform: scale(1);
+  }
+}
+
 @media (max-width: 600px) {
   .dashboard {
     width: 95%;
@@ -209,10 +215,6 @@
 
   .image-gallery {
     grid-template-columns: 1fr;
-  }
-
-  #exampleModal .modal-dialog {
-    transform: scale(1);
   }
 }
 
@@ -244,9 +246,5 @@
 
   .project-header {
     margin-bottom: var(--spacing-sm);
-  }
-
-  #exampleModal .modal-dialog {
-    transform: scale(1);
   }
 }
