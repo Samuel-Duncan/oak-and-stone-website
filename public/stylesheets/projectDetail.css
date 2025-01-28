@@ -175,9 +175,29 @@
 
 /* DELETE FOR AUTO IMAGE SIZING !!!!! */
 #exampleModal .modal-dialog {
+  max-height: 90vh; /* Constrain modal height to 90% of viewport height */
+  max-width: fit-content; /* Set your desired max-width */
+  width: 100%; /* Ensure it adapts to the max width */
+  margin: 0 auto; /* Center the modal */
+}
+
+#exampleModal .modal-content {
+  height: 100%; /* Ensure the content fills the dialog */
+  overflow: hidden; /* Prevent overflow */
+}
+
+#exampleModal .modal-body {
+  max-height: 75vh; /* Constrain the body height */
+  overflow-y: auto; /* Enable scroll for large content */
+  padding: 0;
 }
 
 #modalImage {
+  max-height: 100%; /* Constrain to the modal body's height */
+  width: auto; /* Ensure it adapts to modal's width */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Prevent inline element spacing issues */
+  margin: 0 auto; /* Center the image */
 }
 
 .header-button:has(> svg) {
