@@ -175,17 +175,9 @@
 
 /* DELETE FOR AUTO IMAGE SIZING !!!!! */
 #exampleModal .modal-dialog {
-  max-width: 700px; /* Set your desired max-width */
-  width: 100%; /* Ensure it adapts to the max width */
 }
 
 #modalImage {
-  max-height: 100%; /* Constrain to the modal's height */
-  max-width: 700px; /* Constrain to the modal's width */
-  width: 100%; /* Maintain aspect ratio */
-  height: auto; /* Maintain aspect ratio */
-  display: block; /* Prevent inline element spacing issues */
-  margin: 0 auto; /* Center the image */
 }
 
 .header-button:has(> svg) {
