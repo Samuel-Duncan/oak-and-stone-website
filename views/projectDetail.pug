@@ -137,12 +137,25 @@ block content
 
   if projectDetail.images && projectDetail.images.length > 0
     div#exampleModal.modal.fade(tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true")
-      div.modal-dialog.modal-dialog-centered
-        div.modal-content
+      div.modal-dialog.modal-dialog-centered.modal-lg
+        div.modal-content.bg-dark
           div.modal-header
             button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Close")
-          div.modal-body
-            img#modalImage.img-fluid(src="/images/placeholder-image.png" alt="Modal Image")
+          div.modal-body.p-0
+            div#imageCarousel.carousel.slide
+              div.carousel-inner
+                each image, index in projectDetail.images
+                  div.carousel-item(class=index === 0 ? 'active' : '')
+                    img.d-block.w-100(src=image.url alt="Project Image")
+                    //- if image.createdAt
+                    //-   div.carousel-caption
+                    //-     p.image-date.mb-0 #{image.createdAt.toLocaleDateString()}
+              button.carousel-control-prev(type="button" data-bs-target="#imageCarousel" data-bs-slide="prev")
+                span.carousel-control-prev-icon.bg-dark.carousel-btn(aria-hidden="true")
+                span.visually-hidden Previous
+              button.carousel-control-next(type="button" data-bs-target="#imageCarousel" data-bs-slide="next")
+                span.carousel-control-next-icon.bg-dark.carousel-btn(aria-hidden="true")
+                span.visually-hidden Next
 
   script.
     document.addEventListener('DOMContentLoaded', function() {
@@ -200,6 +213,30 @@ block content
         form.addEventListener('click', function(event) {
           event.stopPropagation(); // Prevent event from bubbling up to parent elements
         });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('exampleModal');
+      const carousel = document.getElementById('imageCarousel');
+      const imagePreviews = document.querySelectorAll('.image-preview');
+      
+      // Initialize the carousel
+      const carouselInstance = new bootstrap.Carousel(carousel, {
+        interval: false // Disable auto-sliding
+      });
+      
+      imagePreviews.forEach((preview, index) => {
+        preview.addEventListener('click', function(event) {
+          event.preventDefault();
+          // Go to the clicked image in the carousel
+          carouselInstance.to(index);
+        });
+      });
+
+      // Reset carousel to first image when modal is closed
+      modal.addEventListener('hidden.bs.modal', function () {
+        carouselInstance.to(0);
       });
     });
 
