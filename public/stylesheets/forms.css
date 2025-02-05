@@ -65,8 +65,7 @@ form {
 
 .sign-up-form-wrapper {
   color: var(--color-primary);
-  width: 80%;
-  max-width: 900px;
+  width: 400px;
   border-radius: var(--border-radius);
   padding: var(--spacing-lg);
   text-align: center;
