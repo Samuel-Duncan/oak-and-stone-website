@@ -63,6 +63,23 @@ form {
   -webkit-backdrop-filter: blur(8px);
 }
 
+.sign-up-form-wrapper {
+  color: var(--color-primary);
+  width: 80%;
+  max-width: 900px;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  text-align: center;
+  border: var(--border-width) solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: 80px; /* Adjust this value based on your header height */
+  margin-bottom: 20px;
+}
+
 .form-wrapper.update-form-wrapper {
   width: 80%;
   max-width: 800px;
