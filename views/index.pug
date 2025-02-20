@@ -19,7 +19,7 @@ block content
         else if currentUser.isAdmin 
           a(href="/users/").button View Clients 
         else
-          p.secondary-text Nothing to see here yet!
+          p.secondary-text #{message}
       else
         h1 Welcome! 
         a.button(href="/auth/sign-in") Sign In

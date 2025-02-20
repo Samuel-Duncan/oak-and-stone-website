@@ -26,7 +26,7 @@ router.get('/', async function (req, res, next) {
       } else {
         res.render('index', {
           title: 'Oak and Stone Client Portal',
-          message: 'No projects found for this user.',
+          message: 'Nothing to see here yet.',
         });
       }
     } else {
