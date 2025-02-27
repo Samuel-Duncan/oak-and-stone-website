@@ -19,11 +19,15 @@ const projectSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  phaseName: {
+    type: String,
+    required: true,
+  },
   currentPhase: {
     type: Number,
     required: true,
     min: 1,
-    max: 4,
+    max: 100,
     default: 1,
   },
   userId: {

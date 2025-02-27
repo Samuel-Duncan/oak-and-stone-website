@@ -30,12 +30,19 @@ exports.projectCreatePOST = [
   // Description (optional)
   body('description').optional().trim().escape(),
 
+  // Phase Name
+  body('phaseName')
+    .notEmpty()
+    .withMessage('Phase Name is required')
+    .trim()
+    .escape(),
+
   // Current Phase
   body('currentPhase')
     .notEmpty()
     .withMessage('Current Phase is required')
-    .isInt({ min: 1, max: 4 })
-    .withMessage('Current Phase must be between 1 and 4'),
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Current Phase must be between 1 and 100'),
 
   // Type
   body('type')
@@ -78,6 +85,7 @@ async function projectCreateLogic(req, res, next) {
     const project = new Project({
       address: req.body.address,
       description: req.body.description ? req.body.description : '',
+      phaseName: req.body.phaseName,
       currentPhase: req.body.currentPhase,
       userId: req.params.userId,
       type: req.body.type,
@@ -265,12 +273,19 @@ exports.projectUpdatePOST = [
   // Description (optional)
   body('description').optional().trim().escape(),
 
+  // Phase Name
+  body('phaseName')
+    .notEmpty()
+    .withMessage('Phase Name is required')
+    .trim()
+    .escape(),
+
   // Current Phase
   body('currentPhase')
     .notEmpty()
     .withMessage('Current Phase is required')
-    .isInt({ min: 1, max: 4 })
-    .withMessage('Current Phase must be between 1 and 4'),
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Current Phase must be between 1 and 100'),
 
   // Type
   body('type')
@@ -317,6 +332,7 @@ async function updateProjectLogic(req, res, next) {
     const updatedProjectData = {
       address: req.body.address,
       description: req.body.description || '',
+      phaseName: req.body.phaseName,
       currentPhase: req.body.currentPhase,
       userId: req.params.userId, // Ensure we keep the userId
       type: req.body.type,

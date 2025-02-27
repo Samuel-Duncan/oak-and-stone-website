@@ -37,23 +37,15 @@ block content
           .detail-item
             h2.dashboard-header Phase
             .phase-items
-              if projectDetail.currentPhase === 1
-                p.secondary-text 1 out of 4
-              else if projectDetail.currentPhase === 2
-                p.secondary-text 2 out of 4
-              else if projectDetail.currentPhase === 3
-                p.secondary-text 3 out of 4
-              else 
-                p.secondary-text 4 out of 4
-              div.progress(role='progressbar', aria-label='Warning example', aria-valuenow='75', aria-valuemin='0', aria-valuemax='100')
-                if projectDetail.currentPhase === 1
-                  div.progress-bar(style='width: 25%')
-                else if projectDetail.currentPhase === 2
-                  div.progress-bar(style='width: 50%')
-                else if projectDetail.currentPhase === 3
-                  div.progress-bar(style='width: 75%')
-                else 
-                  div.progress-bar(style='width: 100%')
+              p.secondary-text #{projectDetail.phaseName}
+          
+          .detail-item
+            h2.dashboard-header Completion Rate
+            .phase-items
+              p.secondary-text #{projectDetail.currentPhase}%
+              div.progress(role='progressbar', aria-label='Progress', aria-valuenow=projectDetail.currentPhase, aria-valuemin='0', aria-valuemax='100')
+                div.progress-bar(style=`width: ${projectDetail.currentPhase}%`, aria-valuenow=projectDetail.currentPhase, aria-valuemin='0', aria-valuemax='100')
+
 
           if currentUser && currentUser.isAdmin
             .detail-item
@@ -77,7 +69,7 @@ block content
                 each line in update.description
                   p.update-description.secondary-text= line
             else
-              p.secondary-text No updates to see yet!
+              p.secondary-text No updates to see yet.
 
         // FILES
         .updates-container 
@@ -101,7 +93,7 @@ block content
                             path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
                           span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else
-              p.secondary-text No files to see yet!
+              p.secondary-text No files to see yet.
 
         // IMAGES
         if projectDetail.images && projectDetail.images.length > 0
@@ -133,7 +125,7 @@ block content
                   a.button.header-button.project-button(href=`/users/${projectDetail.userId}/project/${projectDetail._id}/images`)
                     svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
                       path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
-            p.secondary-text No images to see yet!
+            p.secondary-text No images to see yet.
 
   if projectDetail.images && projectDetail.images.length > 0
     div#exampleModal.modal.fade(tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true")
