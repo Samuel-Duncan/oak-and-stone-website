@@ -32,7 +32,7 @@ async function processAndUploadImage(filePath) {
   try {
     const compressedPath = `${filePath}-compressed.jpg`;
 
-    // Resize and compress the image
+    // Resize and compress the image using Sharp
     await sharp(filePath)
       .resize({ width: 1920, height: 1080, fit: 'inside' })
       .jpeg({ quality: 70 })

@@ -1,9 +1,11 @@
 const {
   cloudinary,
   upload,
+  processAndUploadImage,
   addTransformation,
 } = require('../utils/cloudinary');
 const File = require('../models/file');
+const fs = require('fs');
 
 exports.fileCreateGET = (req, res, next) => {
   res.render('fileForm', {
@@ -22,31 +24,54 @@ exports.fileCreatePOST = [
       }
 
       let fileType;
+      let result;
+
       if (req.file.mimetype.startsWith('image/')) {
+        // Image processing with Sharp
         fileType = 'image';
+        result = await processAndUploadImage(req.file.path);
+
+        if (!result) {
+          return res.render('error', {
+            message: 'Error processing image',
+          });
+        }
       } else if (req.file.mimetype === 'application/pdf') {
+        // PDF file upload
         fileType = 'pdf';
+        result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'Progress',
+          resource_type: 'auto',
+        });
       } else if (
         req.file.mimetype === 'application/msword' ||
         req.file.mimetype ===
           'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       ) {
+        // Word document upload
         fileType = 'document';
+        result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'Progress',
+          resource_type: 'auto',
+        });
       } else {
         return res.render('error', {
           message: 'Unsupported file type',
         });
       }
 
+      // Save the file to the database
       const newFile = new File({
         filename: req.file.originalname,
-        cloudinaryUrl: req.file.path,
-        cloudinaryPublicId: req.file.filename,
+        cloudinaryUrl: addTransformation(result.secure_url, fileType), // Apply transformation to Cloudinary URL
+        cloudinaryPublicId: result.public_id,
         fileType: fileType,
         projectId: req.params.projectId,
       });
 
       await newFile.save();
+      // Clean up the temporary file after successful upload
+      fs.unlinkSync(req.file.path);
 
       res.redirect(
         `/users/${req.params.userId}/project/${req.params.projectId}`,
