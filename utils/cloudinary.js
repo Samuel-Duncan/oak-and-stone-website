@@ -1,7 +1,8 @@
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 cloudinary.config({
@@ -10,21 +11,57 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Progress',
-    allowedFormats: ['jpeg', 'png', 'jpg', 'pdf', 'doc', 'docx'],
-    resource_type: 'auto',
+// Multer storage for temporary local uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = 'uploads/'; // Ensure this folder exists
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
+const upload = multer({ storage });
+
+// Function to compress and upload images to Cloudinary
+async function processAndUploadImage(filePath) {
+  try {
+    const compressedPath = `${filePath}-compressed.jpg`;
+
+    // Resize and compress the image
+    await sharp(filePath)
+      .resize({ width: 1920, height: 1080, fit: 'inside' })
+      .jpeg({ quality: 70 })
+      .toFile(compressedPath);
+
+    // Upload the optimized image to Cloudinary
+    const result = await cloudinary.uploader.upload(compressedPath, {
+      folder: 'Progress',
+      resource_type: 'image',
+    });
+
+    // Clean up local temp files
+    fs.unlinkSync(filePath);
+    fs.unlinkSync(compressedPath);
+
+    return result;
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return null;
+  }
+}
+
+// Function to modify Cloudinary URLs with transformations
 function addTransformation(url, fileType) {
   if (fileType === 'pdf' || fileType === 'document') {
     return `${url}?fl_attachment=true`;
   }
 
-  // For images, apply the existing transformation
+  // Apply image transformations
   const transformation =
     'c_limit,w_1280,h_720,q_auto:eco,f_auto,fl_strip_profile';
   const parts = url.split('/upload/');
@@ -38,7 +75,8 @@ function addTransformation(url, fileType) {
 }
 
 module.exports = {
-  cloudinary: cloudinary,
-  upload: multer({ storage }),
+  cloudinary,
+  upload,
+  processAndUploadImage,
   addTransformation,
 };

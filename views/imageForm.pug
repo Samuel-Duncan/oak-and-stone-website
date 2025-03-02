@@ -25,136 +25,23 @@ block content
           p= message
 
   script.
-    // Function to compress an image
-    async function compressImage(file, maxSizeMB = 1) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          const img = new Image();
-          img.onload = function () {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
+    document.getElementById('projectForm').addEventListener('submit', function(event) {
+      // Only prevent default if we're doing validation
+      // If all validation passes, let the form submit naturally
 
-            // Calculate the width and height, constraining the proportions for 1080p
-            if (width > height) {
-              if (width > 1920) {
-                height *= 1920 / width;
-                width = 1920;
-              }
-            } else {
-              if (height > 1080) {
-                width *= 1080 / height;
-                height = 1080;
-              }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Convert the canvas to a Blob
-            canvas.toBlob((blob) => {
-              resolve(new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-              }));
-            }, 'image/jpeg', 0.7); // Adjust quality here (0.7 is 70% quality)
-          };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Function to handle file selection and compression
-    async function handleFiles(files) {
-      const compressedFiles = [];
-      let totalSize = 0;
-      const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
-
-      for (let file of files) {
-        if (file.type.startsWith('image/')) {
-          const compressedFile = await compressImage(file);
-          totalSize += compressedFile.size;
-          
-          if (totalSize > maxTotalSize) {
-            alert('Total file size exceeds 10MB. Please remove some images.');
-            return null;
-          }
-          
-          compressedFiles.push(compressedFile);
-        } else {
-          compressedFiles.push(file);
-        }
-      }
+      const fileInput = this.querySelector('input[type="file"]');
       
-      return compressedFiles;
-    }
+      if (fileInput && fileInput.files.length > 0) {
+        const submitButton = document.getElementById('submitButton');
+        const buttonText = submitButton.querySelector('.button-text');
+        const spinner = submitButton.querySelector('.spinner-border');
 
-    // Function to create a FormData object with compressed images
-    async function createFormDataWithCompressedImages(formElement) {
-      const formData = new FormData(formElement);
-      const fileInput = formElement.querySelector('input[type="file"]');
-      const compressedFiles = await handleFiles(fileInput.files);
-      
-      if (!compressedFiles) return null;
-      
-      // Remove the original file input data
-      formData.delete('images');
-      
-      // Append compressed files
-      for (let file of compressedFiles) {
-        formData.append('images', file);
-      }
-      
-      return formData;
-    }
-
-    // Event listener for form submission
-    document.getElementById('projectForm').addEventListener('submit', async function(event) {
-      event.preventDefault();
-      
-      const submitButton = document.getElementById('submitButton');
-      const buttonText = submitButton.querySelector('.button-text');
-      const spinner = submitButton.querySelector('.spinner-border');
-
-      // Disable the button and show the spinner
-      submitButton.disabled = true;
-      buttonText.textContent = 'Uploading...';
-      spinner.classList.remove('d-none');
-
-      const formData = await createFormDataWithCompressedImages(this);
-      
-      if (!formData) {
-        // Re-enable the button and hide the spinner
-        submitButton.disabled = false;
-        buttonText.textContent = 'Upload Images';
-        spinner.classList.add('d-none');
-        return;
-      }
-
-      // Send the form data using fetch
-      try {
-        const response = await fetch(this.action, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (response.ok) {
-          window.location.href = response.url; // Redirect to the response URL
-        } else {
-          throw new Error('Server responded with an error');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while uploading. Please try again.');
+        // Disable the button and show the spinner
+        submitButton.disabled = true;
+        buttonText.textContent = 'Uploading...';
+        spinner.classList.remove('d-none');
         
-        // Re-enable the button and hide the spinner
-        submitButton.disabled = false;
-        buttonText.textContent = 'Upload Images';
-        spinner.classList.add('d-none');
+        // Let the form submit naturally - the backend will handle compression
       }
     });
 

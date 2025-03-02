@@ -9,6 +9,9 @@ const {
   addTransformation,
 } = require('../utils/cloudinary.js');
 const { sendEmail } = require('../utils/nodemailer.js');
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
 require('dotenv').config();
 
 exports.projectCreateGET = (req, res, next) => {
@@ -437,7 +440,6 @@ exports.addImagesGET = async (req, res) => {
 exports.addImagesPOST = async (req, res) => {
   try {
     const errors = validationResult(req);
-
     const project = await Project.findById(req.params.projectId);
 
     if (!project) {
@@ -464,16 +466,41 @@ exports.addImagesPOST = async (req, res) => {
       );
     }
 
-    // Handle new images uploaded via multer and CloudinaryStorage
-    const newImages = req.files
-      ? req.files.map((file) => ({
-          url: addTransformation(file.path, 'image'),
-          publicId: file.filename,
-        }))
-      : [];
+    // Process new images with Sharp
+    const compressedImages = await Promise.all(
+      (req.files || []).map(async (file) => {
+        const compressedPath = path.join(
+          'uploads',
+          `compressed-${file.filename}.jpg`,
+        );
 
-    // Combine remaining existing and new images
-    project.images = [...imagesToKeep, ...newImages];
+        await sharp(file.path)
+          .resize({ width: 1920, height: 1080, fit: 'inside' })
+          .jpeg({ quality: 70 })
+          .toFile(compressedPath);
+
+        // Upload the compressed image to Cloudinary
+        const result = await cloudinary.uploader.upload(
+          compressedPath,
+          {
+            folder: 'Progress',
+            resource_type: 'image',
+          },
+        );
+
+        // Clean up local temp files
+        fs.unlinkSync(file.path);
+        fs.unlinkSync(compressedPath);
+
+        return {
+          url: addTransformation(result.secure_url, 'image'),
+          publicId: result.public_id,
+        };
+      }),
+    );
+
+    // Combine images
+    project.images = [...imagesToKeep, ...compressedImages];
 
     await project.save();
 
@@ -485,7 +512,7 @@ exports.addImagesPOST = async (req, res) => {
     res.status(500).render('imageForm', {
       title: 'Manage Images',
       formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
-      project: req.body, // To preserve form data in case of error
+      project: req.body,
       error: 'Error managing images: ' + err.message,
     });
   }
