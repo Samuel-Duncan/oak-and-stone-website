@@ -37,8 +37,7 @@ exports.projectCreatePOST = [
   body('phaseName')
     .notEmpty()
     .withMessage('Phase Name is required')
-    .trim()
-    .escape(),
+    .trim(),
 
   // Current Phase
   body('currentPhase')
@@ -280,8 +279,7 @@ exports.projectUpdatePOST = [
   body('phaseName')
     .notEmpty()
     .withMessage('Phase Name is required')
-    .trim()
-    .escape(),
+    .trim(),
 
   // Current Phase
   body('currentPhase')
