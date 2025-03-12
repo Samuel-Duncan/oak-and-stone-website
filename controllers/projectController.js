@@ -147,20 +147,23 @@ exports.projectListGET = async (req, res) => {
 
 exports.projectDetailGET = async (req, res) => {
   try {
-    const [project, projectCount, update, userName, file] =
+    const [project, projectCount, update, user, file] =
       await Promise.all([
         Project.findById(req.params.projectId).exec(),
         Project.countDocuments({ userId: req.user._id }).exec(),
         Update.findOne({ projectId: req.params.projectId })
           .sort({ createdAt: -1 })
           .exec(),
-        User.findById(req.params.userId).select('name').lean().exec(),
+        User.findById(req.params.userId)
+          .select('name lastLogin')
+          .lean()
+          .exec(), // Fetch name and lastLogin
         File.find({ projectId: req.params.projectId })
           .sort({ createdAt: -1 })
           .exec(),
       ]);
 
-    if (project === null) {
+    if (!project) {
       return res.render('projectDetail', {
         title: 'Project Details',
         errMsg: 'No Project found!',
@@ -188,7 +191,8 @@ exports.projectDetailGET = async (req, res) => {
       projectDetail: project,
       update: processedUpdate,
       moreThanOneProject: projectCount > 1,
-      userName: userName ? userName.name : 'Unknown User',
+      userName: user ? user.name : 'Unknown User',
+      lastLogin: user ? user.lastLogin : null, // Send lastLogin to Pug
       files: file ? file : null,
     });
   } catch (err) {
@@ -210,7 +214,6 @@ exports.userProjectDetailGET = async (req, res, next) => {
       Project.countDocuments({ userId: req.params.userId }),
     ]);
 
-    console.log(projectCount);
     if (!userProject) {
       return res.render('projectDetail', {
         title: 'Project Details',

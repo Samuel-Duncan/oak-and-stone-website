@@ -171,11 +171,20 @@ exports.signInPOST = (req, res, next) => {
         errorMessage: info.message || 'Invalid username or password', // Customize the message
       });
     } else {
-      // Login successful - redirect to home
-      req.logIn(user, (err) => {
+      // Login successful
+      req.logIn(user, async (err) => {
         if (err) {
           return next(err);
         }
+
+        try {
+          // Update lastLogin timestamp
+          user.lastLogin = new Date();
+          await user.save();
+        } catch (error) {
+          return next(error);
+        }
+
         return res.redirect('/'); // Redirect instead of render
       });
     }
