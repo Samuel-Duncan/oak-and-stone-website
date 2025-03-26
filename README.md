@@ -28,8 +28,8 @@ Oak and Stone Construction Client Portal is a web application designed to keep c
 ### Steps
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo.git
-   cd your-repo
+   git clone git@github.com:Samuel-Duncan/oak-and-stone-website.git
+   cd oak-and-stone-website
    ```
 2. Install dependencies:
    ```sh
