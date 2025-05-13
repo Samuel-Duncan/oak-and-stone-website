@@ -165,7 +165,6 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   margin: auto; /* Good for centering within modal-dialog if dialog is wider */
   overflow: hidden; /* Add this to ensure content doesn't break out of rounded corners or padding */
-  max-width: 800px;
 }
 
 #exampleModal {
@@ -177,7 +176,7 @@
   max-height: 90vh; /* Constrain modal height */
   /* CHANGE THIS: Avoid fit-content during transitions */
   /* max-width: fit-content; */
-  max-width: 80vw; /* Example: 80% of viewport width. Adjust as needed. */
+  /* Example: 80% of viewport width. Adjust as needed. */
   /* Or a fixed value like: max-width: 900px; */
   width: 100%; /* Ensure it adapts up to the max-width */
   margin: 30px auto; /* Standard Bootstrap way to center and provide top margin */
