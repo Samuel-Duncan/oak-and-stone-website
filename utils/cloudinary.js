@@ -35,7 +35,7 @@ async function processAndUploadImage(filePath) {
     // Resize and compress the image using Sharp
     await sharp(filePath)
       .resize({ width: 1920, height: 1080, fit: 'inside' })
-      .jpeg({ quality: 70 })
+      .jpeg({ quality: 100 })
       .toFile(compressedPath);
 
     // Upload the optimized image to Cloudinary
