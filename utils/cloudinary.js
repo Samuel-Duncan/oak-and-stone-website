@@ -33,15 +33,23 @@ async function processAndUploadImage(filePath) {
     const compressedPath = `${filePath}-compressed.jpg`;
 
     // Resize and compress the image using Sharp
+    // Balanced resolution and quality settings
     await sharp(filePath)
-      .resize({ width: 1920, height: 1080, fit: 'inside' })
-      .jpeg({ quality: 100 })
+      .resize({
+        width: 1920,
+        height: 1080,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .jpeg({ quality: 80 })
       .toFile(compressedPath);
 
-    // Upload the optimized image to Cloudinary
+    // Upload the optimized image to Cloudinary with balanced quality settings
     const result = await cloudinary.uploader.upload(compressedPath, {
       folder: 'Progress',
       resource_type: 'image',
+      quality: 80,
+      fetch_format: 'auto',
     });
 
     // Clean up local temp files
@@ -61,9 +69,9 @@ function addTransformation(url, fileType) {
     return `${url}?fl_attachment=true`;
   }
 
-  // Apply image transformations
-  const transformation =
-    'c_limit,w_1280,h_720,q_auto:eco,f_auto,fl_strip_profile';
+  // Apply optimized image transformations
+  // Balanced transformation for quality and performance
+  const transformation = 'c_limit,w_1920,h_1080,q_80,f_auto,dpr_auto';
   const parts = url.split('/upload/');
 
   if (parts.length !== 2) {

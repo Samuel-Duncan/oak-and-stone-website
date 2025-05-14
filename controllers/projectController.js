@@ -477,7 +477,7 @@ exports.addImagesPOST = async (req, res) => {
 
         await sharp(file.path)
           .resize({ width: 1920, height: 1080, fit: 'inside' })
-          .jpeg({ quality: 100 })
+          .jpeg({ quality: 80 })
           .toFile(compressedPath);
 
         // Upload the compressed image to Cloudinary
