@@ -18,7 +18,7 @@ html
         if currentUser && currentUser.isAdmin 
           nav.navbar
             div.container-fluid
-              button.navbar-toggler(type='button', data-bs-toggle='offcanvas',   
+              button.navbar-toggler(type='button', data-bs-toggle='offcanvas',   
               data-bs-target='#offcanvasNavbar', aria-controls='offcanvasNavbar', aria-label='Toggle navigation')
                 svg(xmlns="http://www.w3.org/2000/svg", width="20", height="20", fill="currentColor", class="bi bi-list", viewBox="0 0 16 16")
                   path(fill-rule="evenodd", d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5")
@@ -43,3 +43,19 @@ html
           a.button.main-header-button(href="/auth/sign-in") Sign In
     main
       block content
+    
+    script.
+      // Header scroll effect
+      const header = document.querySelector('.main-header');
+      const scrollThreshold = 100; // Adjust this value to change when the background appears
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > scrollThreshold) {
+          // Add dark, semi-transparent background after scrolling
+          header.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+          header.style.transition = 'background-color 0.3s ease';
+        } else {
+          // Return to transparent when scrolled back to top
+          header.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+        }
+      });
