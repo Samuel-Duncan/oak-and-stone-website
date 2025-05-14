@@ -34,7 +34,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 1);
+  background-color: rgba(0, 0, 0, 0.7);
   background: url('../images/Client\ Log\ In\ Photo-1.png'),
     var(--color-background);
   background-position: center;
