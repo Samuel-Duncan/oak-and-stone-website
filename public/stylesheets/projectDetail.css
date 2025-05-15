@@ -165,7 +165,6 @@
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   margin: auto; /* Good for centering within modal-dialog if dialog is wider */
-  overflow: hidden; /* Add this to ensure content doesn't break out of rounded corners or padding */
 }
 
 #exampleModal {
