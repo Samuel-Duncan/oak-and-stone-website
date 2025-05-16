@@ -198,7 +198,6 @@ block content
         preview.addEventListener('click', function(event) {
           event.preventDefault(); // Prevent any default action
           const imageUrl = this.getAttribute('data-image-url');
-          console.log(imageUrl);
           modalImage.src = imageUrl;
         });
       });
@@ -304,32 +303,24 @@ block content
       function setModalBodyHeight(newHeight, animate) {
         if (newHeight <= 0) return; // Don't set invalid or zero height
 
-        console.log(`Request to set height: ${newHeight}px, Animate: ${animate}`);
-        console.log(`Current inline transition style: '${modalBody.style.transition}'`);
         const computedTransition = getComputedStyle(modalBody).transition;
-        console.log(`Computed transition style: '${computedTransition}'`);
 
 
         if (animate) {
           // Ensure transition is enabled for animation
           if (modalBody.style.transition === 'none' || !computedTransition.includes('height') || computedTransition.includes('0s')) {
-            console.log('Animation requested, but transition was off. Turning on.');
             modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
             requestAnimationFrame(() => {
-              console.log(`Setting height (deferred for animation): ${newHeight}px`);
               modalBody.style.height = newHeight + 'px';
             });
           } else {
-            console.log(`Setting height (transition should be active): ${newHeight}px`);
             modalBody.style.height = newHeight + 'px';
           }
         } else {
-          console.log('Setting height instantly (no animation).');
           modalBody.style.transition = 'none';
           modalBody.style.height = newHeight + 'px';
           void modalBody.offsetHeight; // Force reflow to apply instant height change
           modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
-          console.log('Transition restored for future animations.');
         }
         currentImageHeight = newHeight;
       }
