@@ -156,6 +156,7 @@
   transform: translate(25%, -45%);
 }
 
+/* Existing CSS for .modal-content */
 .modal-content {
   border-radius: var(--border-radius);
   text-align: center;
@@ -164,7 +165,7 @@
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  margin: auto; /* Good for centering within modal-dialog if dialog is wider */
+  margin: auto;
 }
 
 #exampleModal {
@@ -173,84 +174,68 @@
 
 /* Modal Dialog - CRITICAL FOR STABILITY */
 #exampleModal .modal-dialog {
-  max-height: 90vh; /* Constrain modal height */
-  /* CHANGE THIS: Avoid fit-content during transitions */
-  /* max-width: fit-content; */
-  /* Example: 80% of viewport width. Adjust as needed. */
-  /* Or a fixed value like: max-width: 900px; */
-  width: 100%; /* Ensure it adapts up to the max-width */
-  margin: 30px auto; /* Standard Bootstrap way to center and provide top margin */
-  display: flex; /* Added to help with vertical alignment of modal-content */
-  align-items: center; /* Vertically centers modal-content within the dialog */
+  max-height: 90vh;
+  width: 100%; /* Adapts up to the max-width set by .modal-lg or custom */
+  margin: 30px auto;
+  display: flex;
+  align-items: center;
 }
 
 /* Modal Content within Dialog */
 #exampleModal .modal-content {
-  width: 100%; /* Make modal-content fill the modal-dialog */
-  /* height: 100%; */ /* Avoid fixed height; let content dictate it up to a max */
+  width: 100%;
   max-height: calc(
     90vh - 60px
-  ); /* Optional: Ensure padding/margins of dialog are respected */
-  /* This assumes 30px top/bottom margin on modal-dialog */
-  display: flex; /* Allow flex properties for children if needed */
-  flex-direction: column; /* Stack header, body, footer */
-  overflow: hidden; /* Already good, reinforces no overflow */
+  ); /* Assuming 30px top/bottom margin on modal-dialog */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Modal Body - Container for the Carousel */
 #exampleModal .modal-body {
-  /* max-height: 75vh; */ /* This might be too restrictive if header/footer take space */
-  /* Let's allow it to fill available space in modal-content */
-  flex-grow: 1; /* Allow modal-body to take up available vertical space */
-  overflow: hidden; /* IMPORTANT: Prevent carousel from overflowing modal-body */
-  padding: 0; /* You have this, good */
-  display: flex; /* To help center the carousel */
-  align-items: center; /* Vertically center carousel */
-  justify-content: center; /* Horizontally center carousel */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background-color: rgba(0, 0, 0, 0.5);
+  flex-grow: 1;
+  overflow: hidden; /* Crucial for height animation and content clipping */
+  padding: 0; /* As you have it */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px); /* Your existing style */
+  -webkit-backdrop-filter: blur(8px); /* Your existing style */
+  background-color: rgba(0, 0, 0, 0.5); /* Your existing style */
+
+  /* Add this for smooth height transition */
+  transition: height 0.35s ease-in-out; /* Adjust timing & easing as you like */
 }
 
 /* Carousel Styling */
 #imageCarousel {
   width: 100%;
-  height: 100%; /* Allow carousel to fill the modal-body */
-  /* Ensure it doesn't create an overflow context that clips too early */
+  height: 100%;
 }
 
 #imageCarousel .carousel-inner {
-  position: relative; /* Bootstrap default, essential for absolutely positioned items */
+  position: relative;
   width: 100%;
-  height: 100%; /* Allow carousel-inner to fill #imageCarousel */
-  overflow: hidden; /* THIS IS THE KEY one for clipping sliding items correctly */
+  height: 100%;
+  overflow: hidden; /* Key for clipping sliding items */
 }
 
 #imageCarousel .carousel-item {
-  /* DO NOT set display: flex or block here directly. */
-  /* Bootstrap JS handles display (block for active, none for others) and transitions. */
   width: 100%;
-  height: 100%; /* Allow item to fill carousel-inner */
-  text-align: center; /* Helps in centering the image if it's not block with margin auto */
-  /* Remove 'overflow: hidden;' from the item itself. */
-  /* Bootstrap's transitions might need the item's content to 'overflow' temporarily */
-  /* during the actual slide before being clipped by .carousel-inner. */
-
-  /* backface-visibility: hidden; */ /* Usually safe, can help with flickering during CSS transforms */
-  /* but remove if still facing issues */
+  height: 100%;
+  text-align: center;
 }
 
 /* Styling for the Image itself */
 #imageCarousel .carousel-item img {
-  display: block; /* Or 'inline-block' if you prefer finer control with text-align */
-  max-width: 100%; /* Image should not exceed the width of .carousel-item */
-  max-height: 70vh; /* YOUR KEY SIZING CONSTRAINT - Keep this. Adjust 70vh as needed. */
-  /* This should be less than the effective height of .modal-body */
-  width: auto; /* Maintain aspect ratio based on max-height */
-  height: auto; /* Maintain aspect ratio */
-  margin: 0 auto; /* Centers the image if it's 'display: block' */
-  object-fit: contain; /* Ensures entire image is visible, letterboxed if necessary */
-  /* Avoid complex positioning on the image that might fight the carousel item's transform */
+  display: block;
+  max-width: 100%;
+  max-height: 70vh; /* Your key sizing constraint */
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain; /* Ensures entire image is visible */
 }
 
 .header-button:has(> svg) {
