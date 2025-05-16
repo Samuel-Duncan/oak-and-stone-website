@@ -259,22 +259,22 @@ block content
     });
 
     document.addEventListener('DOMContentLoaded', function () {
-      var myModalEl = document.getElementById('exampleModal');
-      var imageCarousel = document.getElementById('imageCarousel');
+      const myModalEl = document.getElementById('exampleModal');
+      const imageCarousel = document.getElementById('imageCarousel');
 
       if (!myModalEl || !imageCarousel) {
         // console.error('Modal or Image Carousel element not found.');
         return;
       }
 
-      var modalBody = myModalEl.querySelector('.modal-body');
+      const modalBody = myModalEl.querySelector('.modal-body');
 
       if (!modalBody) {
         // console.error('Modal body not found.');
         return;
       }
 
-      var currentImageHeight = 0;
+      let currentImageHeight = 0;
       const SCRIPT_ANIMATION_DURATION_CSS = 'height 0.35s ease-in-out'; // Match your CSS
 
       // Function to calculate the target height of an image
@@ -312,40 +312,35 @@ block content
 
         if (animate) {
           // Ensure transition is enabled for animation
-          // If current inline style is 'none', or if computed style shows no transition for height
           if (modalBody.style.transition === 'none' || !computedTransition.includes('height') || computedTransition.includes('0s')) {
             console.log('Animation requested, but transition was off. Turning on.');
             modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
-            // Defer height change to next frame to ensure transition is applied
             requestAnimationFrame(() => {
               console.log(`Setting height (deferred for animation): ${newHeight}px`);
               modalBody.style.height = newHeight + 'px';
             });
           } else {
-            // Transition is already (or should be) active from CSS
             console.log(`Setting height (transition should be active): ${newHeight}px`);
             modalBody.style.height = newHeight + 'px';
           }
         } else {
-          // No animation desired: set transition to none, change height, then restore for future animations
           console.log('Setting height instantly (no animation).');
           modalBody.style.transition = 'none';
           modalBody.style.height = newHeight + 'px';
           void modalBody.offsetHeight; // Force reflow to apply instant height change
-          modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS; // Restore for next animation
+          modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
           console.log('Transition restored for future animations.');
         }
-        currentImageHeight = newHeight; // Update tracked height
+        currentImageHeight = newHeight;
       }
 
-      // Set initial height when modal is shown (no animation)
       myModalEl.addEventListener('shown.bs.modal', function () {
-        var activeImage = imageCarousel.querySelector('.carousel-item.active img');
+        const activeImage = imageCarousel.querySelector('.carousel-item.active img');
         if (activeImage) {
           const setInitial = () => {
-            var imageHeight = activeImage.offsetHeight; // Image is rendered, offsetHeight is reliable
+            const imageHeight = activeImage.offsetHeight;
             if (imageHeight > 0) {
-              setModalBodyHeight(imageHeight, false); // false = do not animate
+              setModalBodyHeight(imageHeight, false);
             }
           };
           if (activeImage.complete && activeImage.naturalHeight > 0) setInitial();
@@ -353,15 +348,14 @@ block content
         }
       });
 
-      // Before a new slide is shown (animate this change)
       imageCarousel.addEventListener('slide.bs.carousel', function (event) {
-        var nextImage = event.relatedTarget.querySelector('img');
+        const nextImage = event.relatedTarget.querySelector('img');
         if (nextImage) {
           const prepareNext = () => {
-            var containerWidth = modalBody.clientWidth;
-            var nextCalcHeight = calculateImageDisplayHeight(nextImage, containerWidth);
+            const containerWidth = modalBody.clientWidth;
+            const nextCalcHeight = calculateImageDisplayHeight(nextImage, containerWidth);
             if (nextCalcHeight > 0) {
-              setModalBodyHeight(nextCalcHeight, true); // true = animate
+              setModalBodyHeight(nextCalcHeight, true);
             }
           };
           if (nextImage.complete && nextImage.naturalHeight > 0) prepareNext();
@@ -369,22 +363,19 @@ block content
         }
       });
 
-      // After a slide transition is completed (corrective, animate if different)
       imageCarousel.addEventListener('slid.bs.carousel', function (event) {
-        var activeImage = event.relatedTarget.querySelector('img');
+        const activeImage = event.relatedTarget.querySelector('img');
         if (activeImage) {
           const finalize = () => {
-            var renderedHeight = activeImage.offsetHeight;
+            const renderedHeight = activeImage.offsetHeight;
             if (renderedHeight > 0 && renderedHeight !== currentImageHeight) {
-              // Only update if there's a difference, and animate the correction
-              setModalBodyHeight(renderedHeight, true); // true = animate
+              setModalBodyHeight(renderedHeight, true);
             } else if (renderedHeight > 0) {
-                currentImageHeight = renderedHeight; // Ensure currentImageHeight is accurate
+                currentImageHeight = renderedHeight;
             }
-            // Fallback if offsetHeight is 0 but image is loaded
             else if (activeImage.complete && activeImage.naturalHeight > 0) {
-                var containerWidth = modalBody.clientWidth;
-                var calculatedFallbackHeight = calculateImageDisplayHeight(activeImage, containerWidth);
+                const containerWidth = modalBody.clientWidth;
+                const calculatedFallbackHeight = calculateImageDisplayHeight(activeImage, containerWidth);
                 if (calculatedFallbackHeight > 0 && calculatedFallbackHeight !== currentImageHeight) {
                     setModalBodyHeight(calculatedFallbackHeight, true);
                 } else if (calculatedFallbackHeight > 0) {
@@ -393,22 +384,20 @@ block content
             }
           };
           if (activeImage.complete && activeImage.naturalHeight > 0) {
-            // Small delay to ensure image is fully rendered if offsetHeight was briefly 0
             requestAnimationFrame(finalize);
           }
           else activeImage.onload = () => requestAnimationFrame(finalize);
         }
       });
 
-      // Handle window resize (no animation)
       window.addEventListener('resize', function () {
         if (myModalEl.classList.contains('show')) {
-          var activeImage = imageCarousel.querySelector('.carousel-item.active img');
+          const activeImage = imageCarousel.querySelector('.carousel-item.active img');
           if (activeImage && activeImage.complete && activeImage.naturalHeight > 0) {
-            var containerWidth = modalBody.clientWidth;
-            var newHeight = calculateImageDisplayHeight(activeImage, containerWidth);
+            const containerWidth = modalBody.clientWidth;
+            const newHeight = calculateImageDisplayHeight(activeImage, containerWidth);
             if (newHeight > 0) {
-              setModalBodyHeight(newHeight, false); // false = do not animate
+              setModalBodyHeight(newHeight, false);
             }
           }
         }
