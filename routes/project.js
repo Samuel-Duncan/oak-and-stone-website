@@ -14,6 +14,7 @@ router.get(
 router.post(
   '/:userId/project',
   adminCheck.adminCheck,
+  // Removed upload.array() as it's already included in the controller middleware chain
   projectController.projectCreatePOST,
 );
 
@@ -35,6 +36,7 @@ router.get(
 router.post(
   '/:userId/project/:projectId',
   adminCheck.adminCheck,
+  // Removed upload.array() as it's already included in the controller middleware chain
   projectController.projectUpdatePOST,
 );
 
@@ -73,6 +75,13 @@ router.post(
 // delete POST
 router.post(
   '/:userId/project/:projectId/image/:imageId/delete',
+  adminCheck.adminCheck,
+  projectController.deleteImage,
+);
+
+// Add a new route for deleting images through API if needed
+router.delete(
+  '/:userId/project/:projectId/image/:imageId',
   adminCheck.adminCheck,
   projectController.deleteImage,
 );

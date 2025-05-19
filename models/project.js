@@ -1,24 +1,12 @@
+// models/Project.js
 const mongoose = require('mongoose');
-
-const imageSchema = new mongoose.Schema({
-  url: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
 
 const projectSchema = new mongoose.Schema({
   address: {
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-  },
+  description: String,
   phaseName: {
     type: String,
     required: true,
@@ -40,7 +28,6 @@ const projectSchema = new mongoose.Schema({
     required: true,
     enum: ['Residential', 'Commercial'],
   },
-  images: [imageSchema],
 });
 
 projectSchema.virtual('url').get(function () {

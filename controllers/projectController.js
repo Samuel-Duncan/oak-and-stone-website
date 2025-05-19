@@ -1,4 +1,5 @@
 const Project = require('../models/project.js');
+const Image = require('../models/image.js'); // Import the new Image model
 const User = require('../models/user.js');
 const Update = require('../models/update.js');
 const File = require('../models/file.js');
@@ -101,8 +102,17 @@ async function projectCreateLogic(req, res, next) {
         errors: errors.array(),
       });
     } else {
-      await project.save();
-      res.redirect(`/users/${project.userId}${project.url}`);
+      // First save the project to get an ID
+      const savedProject = await project.save();
+
+      // Process and upload images if any
+      if (req.files && req.files.length > 0) {
+        await processAndSaveImages(req.files, savedProject._id);
+      }
+
+      res.redirect(
+        `/users/${savedProject.userId}${savedProject.url}`,
+      );
 
       // Email sending logic remains the same...
     }
@@ -114,6 +124,47 @@ async function projectCreateLogic(req, res, next) {
       errors: [{ msg: 'Error creating project' }],
     });
   }
+}
+
+// Helper function to process and save images
+async function processAndSaveImages(files, projectId) {
+  // Process new images with Sharp
+  const compressedImages = await Promise.all(
+    (files || []).map(async (file) => {
+      const compressedPath = path.join(
+        'uploads',
+        `compressed-${file.filename}.jpg`,
+      );
+
+      await sharp(file.path)
+        .resize({ width: 1920, height: 1080, fit: 'inside' })
+        .jpeg({ quality: 80 })
+        .toFile(compressedPath);
+
+      // Upload the compressed image to Cloudinary
+      const result = await cloudinary.uploader.upload(
+        compressedPath,
+        {
+          folder: 'Progress',
+          resource_type: 'image',
+        },
+      );
+
+      // Clean up local temp files
+      fs.unlinkSync(file.path);
+      fs.unlinkSync(compressedPath);
+
+      // Create and save a new Image document
+      const image = new Image({
+        url: addTransformation(result.secure_url, 'image'),
+        projectId: projectId,
+      });
+
+      return image.save();
+    }),
+  );
+
+  return compressedImages;
 }
 
 exports.projectListGET = async (req, res) => {
@@ -147,7 +198,7 @@ exports.projectListGET = async (req, res) => {
 
 exports.projectDetailGET = async (req, res) => {
   try {
-    const [project, projectCount, update, user, file] =
+    const [project, projectCount, update, user, file, images] =
       await Promise.all([
         Project.findById(req.params.projectId).exec(),
         Project.countDocuments({ userId: req.user._id }).exec(),
@@ -161,6 +212,10 @@ exports.projectDetailGET = async (req, res) => {
         File.find({ projectId: req.params.projectId })
           .sort({ createdAt: -1 })
           .exec(),
+        // Get images associated with this project
+        Image.find({ projectId: req.params.projectId })
+          .sort({ createdAt: -1 })
+          .exec(),
       ]);
 
     if (!project) {
@@ -168,10 +223,6 @@ exports.projectDetailGET = async (req, res) => {
         title: 'Project Details',
         errMsg: 'No Project found!',
       });
-    }
-
-    if (project.images && project.images.length > 0) {
-      project.images.sort((a, b) => b.createdAt - a.createdAt);
     }
 
     // Process the update description if it exists
@@ -189,6 +240,7 @@ exports.projectDetailGET = async (req, res) => {
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: project,
+      images: images, // Pass the images separately
       update: processedUpdate,
       moreThanOneProject: projectCount > 1,
       userName: user ? user.name : 'Unknown User',
@@ -204,7 +256,7 @@ exports.projectDetailGET = async (req, res) => {
 
 exports.userProjectDetailGET = async (req, res, next) => {
   try {
-    const [userProject, projectCount] = await Promise.all([
+    const [userProject, projectCount, images] = await Promise.all([
       Project.findOne({
         _id: req.params.projectId,
         userId: req.params.userId,
@@ -212,6 +264,10 @@ exports.userProjectDetailGET = async (req, res, next) => {
         .populate('update')
         .lean(),
       Project.countDocuments({ userId: req.params.userId }),
+      // Get images associated with this project
+      Image.find({ projectId: req.params.projectId })
+        .sort({ createdAt: -1 })
+        .lean(),
     ]);
 
     if (!userProject) {
@@ -221,13 +277,10 @@ exports.userProjectDetailGET = async (req, res, next) => {
       });
     }
 
-    if (userProject.images && userProject.images.length > 0) {
-      userProject.images.sort((a, b) => b.createdAt - a.createdAt);
-    }
-
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: userProject,
+      images: images, // Pass the images separately
       moreThanOneProject: projectCount > 1,
     });
   } catch (err) {
@@ -239,9 +292,12 @@ exports.userProjectDetailGET = async (req, res, next) => {
 
 exports.projectUpdateGET = async (req, res) => {
   try {
-    const project = await Project.findById(
-      req.params.projectId,
-    ).exec();
+    const [project, images] = await Promise.all([
+      Project.findById(req.params.projectId).exec(),
+      Image.find({ projectId: req.params.projectId })
+        .sort({ createdAt: -1 })
+        .exec(),
+    ]);
 
     if (project === null) {
       const err = new Error('Project not found');
@@ -249,15 +305,11 @@ exports.projectUpdateGET = async (req, res) => {
       return next(err);
     }
 
-    if (project.images && project.images.length > 0) {
-      project.images.sort((a, b) => b.createdAt - a.createdAt);
-    }
-
     res.render('projectForm', {
       title: 'Update Project',
       formAction: `/users/${req.params.userId}/project/${project._id}`,
       project,
-      images: project.images.length > 0 ? project.images : [],
+      images: images || [],
     });
   } catch (err) {
     res.status(err.status || 500).render('error', {
@@ -343,6 +395,13 @@ async function updateProjectLogic(req, res, next) {
     };
 
     if (!errors.isEmpty()) {
+      // Fetch images for this project to pass to the view
+      const images = await Image.find({
+        projectId: req.params.projectId,
+      })
+        .sort({ createdAt: -1 })
+        .exec();
+
       return res.render('projectForm', {
         title: 'Update Project',
         formAction: `/users/${req.params.userId}/project/${req.params.projectId}`,
@@ -350,6 +409,7 @@ async function updateProjectLogic(req, res, next) {
           ...existingProject.toObject(),
           ...updatedProjectData,
         },
+        images: images,
         errors: errors.array(),
       });
     }
@@ -365,6 +425,11 @@ async function updateProjectLogic(req, res, next) {
       return res.status(404).render('error', {
         message: 'Project not found during update',
       });
+    }
+
+    // Process and upload new images if any
+    if (req.files && req.files.length > 0) {
+      await processAndSaveImages(req.files, updatedProject._id);
     }
 
     res.redirect(
@@ -406,9 +471,14 @@ exports.projectDeleteGET = async (req, res) => {
 
 exports.projectDeletePOST = async (req, res) => {
   try {
+    // Delete all images associated with this project
+    await Image.deleteMany({ projectId: req.params.projectId });
+
+    // Then delete the project
     await Project.findByIdAndDelete(req.params.projectId);
+
     res.redirect(`/users/${req.params.userId}`);
-  } catch {
+  } catch (err) {
     res.status(err.status || 500).render('projectDelete', {
       message: 'Error deleting project: ' + err.message,
     });
@@ -417,7 +487,12 @@ exports.projectDeletePOST = async (req, res) => {
 
 exports.addImagesGET = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.projectId);
+    const [project, images] = await Promise.all([
+      Project.findById(req.params.projectId),
+      Image.find({ projectId: req.params.projectId })
+        .sort({ createdAt: -1 })
+        .exec(),
+    ]);
 
     if (!project) {
       return res
@@ -429,6 +504,7 @@ exports.addImagesGET = async (req, res) => {
       title: 'Upload Images',
       formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
       project: project,
+      images: images,
     });
   } catch (err) {
     console.error(err);
@@ -450,60 +526,36 @@ exports.addImagesPOST = async (req, res) => {
     }
 
     if (!errors.isEmpty()) {
+      const images = await Image.find({
+        projectId: req.params.projectId,
+      })
+        .sort({ createdAt: -1 })
+        .exec();
+
       return res.render('imageForm', {
         title: 'Upload Images',
         formAction: `/users/${req.params.userId}/project/${req.params.projectId}/images`,
         project: project,
+        images: images,
         errors: errors.array(),
       });
     }
 
-    // Handle existing images
-    let imagesToKeep = project.images;
-    if (req.body.imagesToRemove) {
-      imagesToKeep = project.images.filter(
-        (image) =>
-          !req.body.imagesToRemove.includes(image._id.toString()),
-      );
+    // Handle image deletion if requested
+    if (
+      req.body.imagesToRemove &&
+      req.body.imagesToRemove.length > 0
+    ) {
+      await Image.deleteMany({
+        _id: { $in: req.body.imagesToRemove },
+        projectId: req.params.projectId,
+      });
     }
 
-    // Process new images with Sharp
-    const compressedImages = await Promise.all(
-      (req.files || []).map(async (file) => {
-        const compressedPath = path.join(
-          'uploads',
-          `compressed-${file.filename}.jpg`,
-        );
-
-        await sharp(file.path)
-          .resize({ width: 1920, height: 1080, fit: 'inside' })
-          .jpeg({ quality: 80 })
-          .toFile(compressedPath);
-
-        // Upload the compressed image to Cloudinary
-        const result = await cloudinary.uploader.upload(
-          compressedPath,
-          {
-            folder: 'Progress',
-            resource_type: 'image',
-          },
-        );
-
-        // Clean up local temp files
-        fs.unlinkSync(file.path);
-        fs.unlinkSync(compressedPath);
-
-        return {
-          url: addTransformation(result.secure_url, 'image'),
-          publicId: result.public_id,
-        };
-      }),
-    );
-
-    // Combine images
-    project.images = [...imagesToKeep, ...compressedImages];
-
-    await project.save();
+    // Process and upload new images if any
+    if (req.files && req.files.length > 0) {
+      await processAndSaveImages(req.files, project._id);
+    }
 
     res.redirect(
       `/users/${req.params.userId}/project/${req.params.projectId}`,
@@ -523,26 +575,21 @@ exports.deleteImage = async (req, res) => {
   try {
     const { projectId, imageId } = req.params;
 
+    // Check if project exists
     const project = await Project.findById(projectId);
-
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Find the index of the image to remove
-    const imageIndex = project.images.findIndex(
-      (img) => img._id.toString() === imageId,
-    );
+    // Delete the image directly from the Image collection
+    const result = await Image.findOneAndDelete({
+      _id: imageId,
+      projectId: projectId,
+    });
 
-    if (imageIndex === -1) {
+    if (!result) {
       return res.status(404).json({ message: 'Image not found' });
     }
-
-    // Remove the image from the array
-    project.images.splice(imageIndex, 1);
-
-    // Save the updated project
-    await project.save();
 
     // Send a success response
     res.status(200).json({ message: 'Image deleted successfully' });

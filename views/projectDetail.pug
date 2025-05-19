@@ -101,7 +101,7 @@ block content
               p.secondary-text No files to see yet.
 
         // IMAGES
-        if projectDetail.images && projectDetail.images.length > 0
+        if images && images.length > 0
           .detail-item
             .updates-header
               h2.dashboard-header Pictures
@@ -111,7 +111,7 @@ block content
                       path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             .image-gallery
               .gallery-grid
-                each image in projectDetail.images
+                each image in images
                   div.image-container(id=`image-container-${image._id}`)
                     div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
                       img.gallery-image(src=image.url alt="Project Image")
@@ -132,7 +132,7 @@ block content
                       path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             p.secondary-text No images to see yet.
 
-  if projectDetail.images && projectDetail.images.length > 0
+  if images && images.length > 0
     div#exampleModal.modal.fade(tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true")
       div.modal-dialog.modal-dialog-centered.modal-lg
         div.modal-content
@@ -141,7 +141,7 @@ block content
           div.modal-body.p-0
             div#imageCarousel.carousel.slide
               div.carousel-inner
-                each image, index in projectDetail.images
+                each image, index in images
                   div.carousel-item(class=index === 0 ? 'active' : '')
                     img.d-block.w-100(src=image.url alt="Project Image")
                     //- if image.createdAt
