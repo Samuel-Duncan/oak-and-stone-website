@@ -37,7 +37,7 @@ block content
             if lastLogin
               .detail-item
                 h2.dashboard-header Last Login 
-                p.secondary-text= new Date(lastLogin).toLocaleString('en-US', { weekday: 'long', month: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/New_York' })
+                p.secondary-text= new Date(lastLogin).toLocaleString('en-US', { weekday: 'long', month: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
           
           .detail-item
             h2.dashboard-header Phase
@@ -113,7 +113,7 @@ block content
               .gallery-grid
                 each image in images
                   div.image-container(id=`image-container-${image._id}`)
-                    div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url)
+                    div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url data-image-id=image._id)
                       img.gallery-image(src=image.url alt="Project Image")
                       p.image-date #{image.createdAt.toLocaleDateString()}
                     if currentUser && currentUser.isAdmin
@@ -142,7 +142,7 @@ block content
             div#imageCarousel.carousel.slide
               div.carousel-inner
                 each image, index in images
-                  div.carousel-item(class=index === 0 ? 'active' : '')
+                  div.carousel-item(class=index === 0 ? 'active' : '', data-image-id=image._id)
                     img.d-block.w-100(src=image.url alt="Project Image")
                     //- if image.createdAt
                     //-   div.carousel-caption
@@ -153,110 +153,260 @@ block content
               button.carousel-control-next(type="button" data-bs-target="#imageCarousel" data-bs-slide="next")
                 span.carousel-control-next-icon.carousel-btn.bg-dark(aria-hidden="true")
                 span.visually-hidden Next
+            // Comments Section
+            div.image-comments-container
+              div#comments-loading-spinner.text-center.d-none(role='status')
+                span.spinner-border.spinner-border-sm
+              div.comments-list
+                // Comments will be loaded here by JavaScript
+              form.comment-form(data-image-id="")
+                textarea.form-control.comment-input(name="text" placeholder="Add a comment..." rows="2" required)
+                button.button.header-button.project-button.comment-submit-btn(type="submit") Post
 
   script.
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.delete-image-button').forEach(form => {
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-          const formAction = this.getAttribute('action');
-          fetch(formAction, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.message === 'Image deleted successfully') {
-              // Find the parent image-container and remove it
-              const imageContainer = this.closest('.image-container');
-              if (imageContainer) {
-                imageContainer.remove();
-              }
-            } else {
-              throw new Error(data.message || 'Failed to delete the image');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to delete the image. Please try again.');
-          });
-        });
-      });
-    });
+    const projectUserId = !{JSON.stringify(projectDetail.userId)};
+    const projectId = !{JSON.stringify(projectDetail._id)};
+    const currentUserId = !{currentUser && currentUser._id ? JSON.stringify(currentUser._id) : null};
+    const currentUserIsAdmin = !{currentUser && currentUser.isAdmin ? JSON.stringify(currentUser.isAdmin) : false};
 
     document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('exampleModal');
-      const modalImage = document.getElementById('modalImage');
-      const imagePreviews = document.querySelectorAll('.image-preview');
+      // Define myModalEl and imageCarousel at the very top of this block
+      const myModalEl = document.getElementById('exampleModal');
+      const imageCarousel = document.getElementById('imageCarousel'); 
       
-      imagePreviews.forEach(preview => {
-        preview.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent any default action
-          const imageUrl = this.getAttribute('data-image-url');
-          modalImage.src = imageUrl;
-        });
-      });
+      // Initialize Bootstrap Modal instance once
+      const modalInstance = myModalEl ? new bootstrap.Modal(myModalEl) : null;
 
-      modal.addEventListener('hidden.bs.modal', function () {
-        modalImage.src = '';
-      });
+      // console.log('[DOMContentLoaded] Initialized myModalEl:', myModalEl);
+      // console.log('[DOMContentLoaded] Initialized imageCarousel:', imageCarousel);
+      // console.log('[DOMContentLoaded] Initialized modalInstance:', modalInstance);
 
-      // Prevent form submission from triggering modal
-      const deleteForms = document.querySelectorAll('.delete-image-button');
-      deleteForms.forEach(form => {
-        form.addEventListener('click', function(event) {
-          event.stopPropagation(); // Prevent event from bubbling up to parent elements
-        });
-      });
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = document.getElementById('exampleModal');
-      const carousel = document.getElementById('imageCarousel');
+      // --- Moved from separate block ---
       const imagePreviews = document.querySelectorAll('.image-preview');
-      
-      // Initialize the carousel
-      const carouselInstance = new bootstrap.Carousel(carousel, {
-        interval: false // Disable auto-sliding
-      });
+      // imageCarousel is now defined before use here
+      const carouselInstance = imageCarousel ? new bootstrap.Carousel(imageCarousel, { interval: false }) : null;
+
+      // No global flags needed for this simplified approach
+      let g_clickedImageIndex = -1; // Only to help shown.bs.modal know if index 0 was the target
       
       imagePreviews.forEach((preview, index) => {
         preview.addEventListener('click', function(event) {
           event.preventDefault();
-          // Go to the clicked image in the carousel
-          carouselInstance.to(index);
+          g_clickedImageIndex = index; // Store the target index for shown.bs.modal
+          
+          // console.log('[imagePreview click] Clicked Index:', index);
+          
+          if (carouselInstance) {
+            carouselInstance.to(index); // Command carousel to go to the clicked image's index
+          }
+
+          if (modalInstance) {
+            modalInstance.show(); // Then show the modal
+          } else {
+            // console.error('[imagePreview click] modalInstance is not defined, cannot show modal.');
+          }
         });
       });
 
-      // Reset carousel to first image when modal is closed
-      modal.addEventListener('hidden.bs.modal', function () {
-        carouselInstance.to(0);
+      // Reset relevant states when modal is closed
+      myModalEl.addEventListener('hidden.bs.modal', function () {
+        // console.log('[hidden.bs.modal] Event Fired. Resetting state.');
+        g_clickedImageIndex = -1;
+        
+        const commentsListElement = myModalEl.querySelector('.comments-list');
+        if (commentsListElement) {
+          commentsListElement.innerHTML = ''; // Clear comments
+        }
+        
+        const commentForm = myModalEl.querySelector('.comment-form');
+        if (commentForm) {
+          commentForm.dataset.imageId = ''; // Clear form's image ID
+          commentForm.querySelector('textarea[name="text"]').value = ''; // Clear textarea
+        }
+
+        if (carouselInstance) {
+          // carouselInstance.to(0); // Optionally reset carousel to first slide
+          // For now, let's not reset to 0, as the next click will dictate the slide.
+          // The critical part is resetting our tracking variables and clearing content.
+        }
+        // Clear any lingering opacity classes from previous hide/show attempts if they exist
+        const modalBody = myModalEl.querySelector('.modal-body');
+        if (modalBody && modalBody.classList.contains('modal-content-loading')) {
+            modalBody.classList.remove('modal-content-loading');
+            modalBody.style.transition = 'none'; // Remove any lingering transition
+            modalBody.style.opacity = '1'; // Ensure it's visible for next time
+        }
+
       });
-    });
+      // --- End Moved Code ---
 
-    document.getElementById('viewProject').addEventListener('click', function(event) {
-      const buttonText = document.getElementById('button-text');
-      const spinner = document.getElementById('spinner-border');
+      // Functions moved here for correct scope
+      function formatTimestamp(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleString('en-US', {
+          month: 'long', 
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true,
+        });
+      }
 
-      // Disable the button and show the spinner
-      buttonText.classList.add('d-none');
-      spinner.classList.remove('d-none');
-    });
+      function displayComment(comment, commentsListElement) {
+        const commentItem = document.createElement('div');
+        commentItem.classList.add('comment-item');
+        commentItem.dataset.commentId = comment._id; // Add commentId for easy access
 
-    window.addEventListener('pageshow', function(event) {
-      const buttonText = document.getElementById('button-text');
-      const spinner = document.getElementById('spinner-border');
+        const fullUserName = comment.userId && comment.userId.name ? comment.userId.name : 'User';
+        const userName = fullUserName.split(' ')[0]; // Get only the first word
+        const commentUser = document.createElement('p');
+        commentUser.classList.add('comment-user');
+        commentUser.textContent = userName;
+        const commentText = document.createElement('p');
+        commentText.classList.add('comment-text');
+        commentText.textContent = comment.text;
+        const commentTimestamp = document.createElement('p');
+        commentTimestamp.classList.add('comment-timestamp');
+        commentTimestamp.textContent = formatTimestamp(comment.createdAt);
+        commentItem.appendChild(commentUser);
+        commentItem.appendChild(commentText);
+        commentItem.appendChild(commentTimestamp);
 
-      // Restore the button text and hide the spinner
-      buttonText.classList.remove('d-none') // Set this to whatever the original text was
-      spinner.classList.add('d-none');
-    });
+        // Add delete button if the comment belongs to the current user
+        // Ensure comment.userId has _id, not just populated name. Adjust if backend sends full user object.
+        // Assuming comment.userId is an object with _id or just the ID string.
+        const commentOwnerId = comment.userId && typeof comment.userId === 'object' ? comment.userId._id : comment.userId;
 
-    document.addEventListener('DOMContentLoaded', function () {
-      const myModalEl = document.getElementById('exampleModal');
-      const imageCarousel = document.getElementById('imageCarousel');
+        if (currentUserIsAdmin || (currentUserId && commentOwnerId && currentUserId === commentOwnerId.toString())) {
+          const deleteButton = document.createElement('button');
+          deleteButton.classList.add('button', 'header-button', 'project-button', 'file-button', 'delete-button', 'comment-delete-btn');
+          deleteButton.setAttribute('type', 'button'); // Important: not a submit button
+          deleteButton.dataset.commentId = comment._id;
+          // We'll need imageId if it's not easily accessible from the form or modal data when deleting
+          // Assuming imageId will be retrieved from the commentForm's dataset.imageId or similar context
+
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('width', '16');
+          svg.setAttribute('height', '16');
+          svg.setAttribute('fill', 'none');
+          svg.setAttribute('stroke', 'currentColor');
+          svg.setAttribute('class', 'bi bi-x-lg');
+          svg.setAttribute('viewBox', '0 0 16 16');
+          svg.setAttribute('stroke-width', '1');
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', 'M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z');
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('stroke-linejoin', 'round');
+          svg.appendChild(path);
+          deleteButton.appendChild(svg);
+
+          commentItem.appendChild(deleteButton);
+        }
+        
+        commentsListElement.appendChild(commentItem);
+      }
+
+      async function loadComments(imageId, commentsListElement) {
+        // ALWAYS clear existing comments and messages at the very start
+        if (commentsListElement) {
+          commentsListElement.innerHTML = ''; 
+        }
+
+        // console.log('[loadComments] Called with imageId:', imageId);
+        
+        const commentsSpinner = myModalEl.querySelector('#comments-loading-spinner');
+        if (commentsSpinner) {
+          commentsSpinner.classList.remove('d-none'); // Show spinner
+        }
+
+        if (!imageId) {
+          // console.warn('[loadComments] No imageId provided.');
+          if (commentsSpinner) {
+            commentsSpinner.classList.add('d-none'); // Hide spinner if no imageId
+          }
+          commentsListElement.innerHTML = ''; // Ensure list is clear even if no imageId
+          commentsListElement.innerHTML = '<p class="text-center secondary-text">No comments yet. Be the first to comment!</p>';
+          requestAnimationFrame(() => updateModalBodyHeightForContent());
+          return;
+        }
+
+        // Always clear existing comments at the start
+        commentsListElement.innerHTML = '';
+
+        try {
+          // console.log(`[loadComments] Fetching comments for imageId: ${imageId}`);
+          const response = await fetch(`/users/${projectUserId}/project/${projectId}/image/${imageId}/comments`);
+          // console.log('[loadComments] Fetch response status:', response.status);
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Failed to parse error JSON' }));
+            // console.error('[loadComments] Error fetching comments:', errorData);
+            throw new Error(errorData.message || 'Failed to load comments');
+          }
+          const comments = await response.json();
+          // console.log('[loadComments] Received comments:', comments);
+
+          if (comments.length === 0) {
+            // console.log('[loadComments] No comments found, displaying message.');
+            commentsListElement.innerHTML = '<p class="text-center secondary-text">No comments yet. Be the first to comment!</p>';
+          } else {
+            // console.log(`[loadComments] Displaying ${comments.length} comments.`);
+            comments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            comments.forEach(comment => displayComment(comment, commentsListElement));
+          }
+          // console.log('[loadComments] Requesting animation frame for height update.');
+          requestAnimationFrame(() => updateModalBodyHeightForContent());
+        } catch (error) {
+          // console.error('[loadComments] Catch block error:', error);
+          commentsListElement.innerHTML = '<p class="text-center text-danger">Error loading comments.</p>';
+          requestAnimationFrame(() => updateModalBodyHeightForContent());
+        } finally {
+          if (commentsSpinner) {
+            commentsSpinner.classList.add('d-none'); // Hide spinner
+          }
+        }
+      }
+
+      async function handleCommentSubmit(event) {
+        event.preventDefault();
+        const form = event.target;
+        const imageId = form.dataset.imageId;
+        const commentText = form.querySelector('textarea[name="text"]').value.trim();
+        if (!commentText || !imageId) return;
+        try {
+          const response = await fetch(`/users/${projectUserId}/project/${projectId}/image/${imageId}/comment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: commentText }),
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to post comment');
+          }
+          const newComment = await response.json();
+          const commentsListElement = form.previousElementSibling;
+          const noCommentsMessage = commentsListElement.querySelector('.secondary-text');
+          if (noCommentsMessage && noCommentsMessage.textContent.includes('No comments yet')) {
+              commentsListElement.innerHTML = '';
+          }
+          displayComment(newComment, commentsListElement);
+          form.querySelector('textarea[name="text"]').value = '';
+          requestAnimationFrame(() => updateModalBodyHeightForContent(true)); // Animate for new comment
+        } catch (error) {
+          // console.error('Error posting comment:', error);
+        }
+      }
+
+      // All other modal logic including myModalEl, imageCarousel, etc. definitions and event listeners
+      // updateModalBodyHeightForContent, setModalBodyHeight etc. are already within this DOMContentLoaded block
+
+      const commentForm = myModalEl.querySelector('.comment-form');
+      const commentsListElement = myModalEl.querySelector('.comments-list');
+
+      // console.log('[DOMContentLoaded] myModalEl is:', myModalEl); // Log myModalEl after definition
+
+      if (commentForm) {
+        commentForm.addEventListener('submit', handleCommentSubmit);
+      }
 
       if (!myModalEl || !imageCarousel) {
         // console.error('Modal or Image Carousel element not found.');
@@ -270,8 +420,9 @@ block content
         return;
       }
 
-      let currentImageHeight = 0;
+      let currentSetModalBodyHeight = 0; // Renamed from currentImageHeight
       const SCRIPT_ANIMATION_DURATION_CSS = 'height 0.35s ease-in-out'; // Match your CSS
+      const HEIGHT_UPDATE_THRESHOLD = 1; // Pixels threshold to prevent jitter
 
       // Function to calculate the target height of an image
       function calculateImageDisplayHeight(imageElement, containerWidth) {
@@ -296,12 +447,54 @@ block content
         return displayHeight;
       }
 
+      // New function to calculate and update modal body height based on content
+      function updateModalBodyHeightForContent(animate = true) {
+          // console.log('[updateModalBodyHeightForContent] Called. Animate:', animate);
+          const activeImageElement = imageCarousel.querySelector('.carousel-item.active img');
+          const commentsContainer = myModalEl.querySelector('.image-comments-container');
+
+          let imageHeight = 0;
+          if (activeImageElement && activeImageElement.complete && activeImageElement.naturalHeight > 0) {
+              imageHeight = activeImageElement.offsetHeight;
+              // console.log('[updateModalBodyHeightForContent] Image Height (offsetHeight):', imageHeight);
+          } else if (activeImageElement) {
+               const containerWidth = modalBody.clientWidth;
+               imageHeight = calculateImageDisplayHeight(activeImageElement, containerWidth);
+               // console.log('[updateModalBodyHeightForContent] Image Height (calculatedDisplayHeight):', imageHeight);
+          }
+
+          const commentsHeight = commentsContainer ? commentsContainer.offsetHeight : 0;
+          // console.log('[updateModalBodyHeightForContent] Comments Container Height (offsetHeight):', commentsHeight);
+
+          const totalContentHeight = imageHeight + commentsHeight;
+          // console.log('[updateModalBodyHeightForContent] Total Content Height (image + comments):', totalContentHeight);
+          // console.log('[updateModalBodyHeightForContent] Current Set Modal Body Height (before update attempt):', currentSetModalBodyHeight);
+
+           // Use a threshold to prevent height jittering on minor changes
+           requestAnimationFrame(() => {
+                if (Math.abs(totalContentHeight - currentSetModalBodyHeight) > HEIGHT_UPDATE_THRESHOLD || totalContentHeight === 0 && currentSetModalBodyHeight !== 0) {
+                    // console.log('[updateModalBodyHeightForContent] Attempting to set new height via setModalBodyHeight.');
+                    setModalBodyHeight(totalContentHeight, animate);
+                } else {
+                    // console.log('[updateModalBodyHeightForContent] New height change below threshold or same, not updating.');
+                }
+           });
+      }
+
+
       // Centralized function to set modal body height
       function setModalBodyHeight(newHeight, animate) {
-        if (newHeight <= 0) return; // Don't set invalid or zero height
+        // console.log(`[setModalBodyHeight] Called. New Height: ${newHeight}, Animate: ${animate}, Current Set Height: ${currentSetModalBodyHeight}`);
+        if (newHeight <= 0 && currentSetModalBodyHeight === 0) {
+            // console.log('[setModalBodyHeight] New height is 0 and current is 0, aborting.');
+            return; // Don't set invalid or zero height if already zero
+        }
+        if (Math.abs(newHeight - currentSetModalBodyHeight) < HEIGHT_UPDATE_THRESHOLD && newHeight !== 0) {
+            // console.log('[setModalBodyHeight] Height change below threshold, not setting.');
+            return;
+        }
 
         const computedTransition = getComputedStyle(modalBody).transition;
-
 
         if (animate) {
           // Ensure transition is enabled for animation
@@ -309,85 +502,157 @@ block content
             modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
             requestAnimationFrame(() => {
               modalBody.style.height = newHeight + 'px';
+              currentSetModalBodyHeight = newHeight;
             });
           } else {
             modalBody.style.height = newHeight + 'px';
+             currentSetModalBodyHeight = newHeight;
+             // console.log('[setModalBodyHeight] Height set (animated branch):', newHeight);
           }
         } else {
           modalBody.style.transition = 'none';
           modalBody.style.height = newHeight + 'px';
           void modalBody.offsetHeight; // Force reflow to apply instant height change
           modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
+          currentSetModalBodyHeight = newHeight;
+          // console.log('[setModalBodyHeight] Height set (non-animated branch):', newHeight);
         }
-        currentImageHeight = newHeight;
       }
 
-      myModalEl.addEventListener('shown.bs.modal', function () {
-        const activeImage = imageCarousel.querySelector('.carousel-item.active img');
-        if (activeImage) {
-          const setInitial = () => {
-            const imageHeight = activeImage.offsetHeight;
-            if (imageHeight > 0) {
-              setModalBodyHeight(imageHeight, false);
-            }
-          };
-          if (activeImage.complete && activeImage.naturalHeight > 0) setInitial();
-          else activeImage.onload = setInitial;
-        }
+      // console.log('[DOMContentLoaded] Attaching Bootstrap modal event listeners to:', myModalEl);
+      myModalEl.addEventListener('show.bs.modal', function (event) {
+        // console.log('[show.bs.modal] Event Fired! Target:', event.target, 'RelatedTarget:', event.relatedTarget);
       });
 
-      imageCarousel.addEventListener('slide.bs.carousel', function (event) {
-        const nextImage = event.relatedTarget.querySelector('img');
-        if (nextImage) {
-          const prepareNext = () => {
-            const containerWidth = modalBody.clientWidth;
-            const nextCalcHeight = calculateImageDisplayHeight(nextImage, containerWidth);
-            if (nextCalcHeight > 0) {
-              setModalBodyHeight(nextCalcHeight, true);
+      myModalEl.addEventListener('shown.bs.modal', function () {
+        // console.log('[shown.bs.modal] Event Fired. Clicked index was:', g_clickedImageIndex);
+        // This event is mostly a trigger. The main work is done by slid.bs.carousel.
+        // However, if the clicked image was index 0, slid.bs.carousel might not fire
+        // if the carousel was already on index 0. So, handle that specific case here.
+        const currentActiveItem = imageCarousel.querySelector('.carousel-item.active');
+        const currentActiveIndex = currentActiveItem ? Array.from(imageCarousel.querySelectorAll('.carousel-item')).indexOf(currentActiveItem) : -1;
+
+        if (g_clickedImageIndex === 0 && currentActiveIndex === 0) {
+            // console.log('[shown.bs.modal] Target was index 0 and carousel is on index 0. Manually loading comments.');
+            const imageId = currentActiveItem?.dataset.imageId;
+            const commentsListElement = myModalEl.querySelector('.comments-list');
+            const commentForm = myModalEl.querySelector('.comment-form');
+
+            if (imageId && commentsListElement) {
+                loadComments(imageId, commentsListElement);
             }
-          };
-          if (nextImage.complete && nextImage.naturalHeight > 0) prepareNext();
-          else nextImage.onload = prepareNext;
+            if (commentForm && imageId) {
+                commentForm.dataset.imageId = imageId;
+            }
+            // Height update for index 0 case
+            if (currentActiveItem) {
+                setTimeout(() => {
+                    const updateOnImageLoad = () => updateModalBodyHeightForContent(false);
+                    const imgElement = currentActiveItem.querySelector('img');
+                    if (imgElement && imgElement.complete) {
+                        updateOnImageLoad();
+                    } else if (imgElement) {
+                        imgElement.onload = updateOnImageLoad;
+                    } else {
+                        updateModalBodyHeightForContent(false);
+                    }
+                    requestAnimationFrame(() => updateModalBodyHeightForContent(false));
+                }, 50);
+            }
         }
+        g_clickedImageIndex = -1; // Reset after use
       });
 
       imageCarousel.addEventListener('slid.bs.carousel', function (event) {
-        const activeImage = event.relatedTarget.querySelector('img');
-        if (activeImage) {
-          const finalize = () => {
-            const renderedHeight = activeImage.offsetHeight;
-            if (renderedHeight > 0 && renderedHeight !== currentImageHeight) {
-              setModalBodyHeight(renderedHeight, true);
-            } else if (renderedHeight > 0) {
-                currentImageHeight = renderedHeight;
-            }
-            else if (activeImage.complete && activeImage.naturalHeight > 0) {
-                const containerWidth = modalBody.clientWidth;
-                const calculatedFallbackHeight = calculateImageDisplayHeight(activeImage, containerWidth);
-                if (calculatedFallbackHeight > 0 && calculatedFallbackHeight !== currentImageHeight) {
-                    setModalBodyHeight(calculatedFallbackHeight, true);
-                } else if (calculatedFallbackHeight > 0) {
-                    currentImageHeight = calculatedFallbackHeight;
-                }
-            }
-          };
-          if (activeImage.complete && activeImage.naturalHeight > 0) {
-            requestAnimationFrame(finalize);
-          }
-          else activeImage.onload = () => requestAnimationFrame(finalize);
+        // console.log('[slid.bs.carousel] Event Fired. New active slide index:', event.to);
+        modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
+
+        const activeCarouselItem = event.relatedTarget; // The carousel item that just became active
+        const activeImageId = activeCarouselItem.dataset.imageId;
+        const commentsListElement = myModalEl.querySelector('.comments-list');
+        const commentForm = myModalEl.querySelector('.comment-form');
+
+        if (activeImageId && commentsListElement) {
+          // console.log('[slid.bs.carousel] Loading comments for activeImageId:', activeImageId);
+          loadComments(activeImageId, commentsListElement); 
         }
+        if (commentForm && activeImageId) {
+          commentForm.dataset.imageId = activeImageId;
+          // console.log('[slid.bs.carousel] Set comment form imageId to:', activeImageId);
+        }
+
+        if (activeCarouselItem) {
+            const updateOnImageLoad = () => requestAnimationFrame(() => updateModalBodyHeightForContent(true));
+             const imgElement = activeCarouselItem.querySelector('img');
+            if (imgElement && imgElement.complete) {
+                updateOnImageLoad();
+            } else if (imgElement) {
+                imgElement.onload = updateOnImageLoad;
+            } else {
+                updateModalBodyHeightForContent(true);
+            }
+        }
+         requestAnimationFrame(() => updateModalBodyHeightForContent(true));
       });
 
       window.addEventListener('resize', function () {
         if (myModalEl.classList.contains('show')) {
-          const activeImage = imageCarousel.querySelector('.carousel-item.active img');
-          if (activeImage && activeImage.complete && activeImage.naturalHeight > 0) {
-            const containerWidth = modalBody.clientWidth;
-            const newHeight = calculateImageDisplayHeight(activeImage, containerWidth);
-            if (newHeight > 0) {
-              setModalBodyHeight(newHeight, false);
-            }
-          }
+           requestAnimationFrame(() => updateModalBodyHeightForContent(false)); // Update height non-animated on resize
         }
       });
+
+       // Initial setup on modal open (attaching handlers, etc.) remains mostly the same
+       // The logic for loading comments and initial height is now in 'shown.bs.modal'
+
+      // Event listener for deleting comments (using event delegation)
+      const commentsContainer = myModalEl.querySelector('.image-comments-container');
+      if (commentsContainer) {
+        commentsContainer.addEventListener('click', async function(event) {
+          const deleteButton = event.target.closest('.comment-delete-btn');
+          if (!deleteButton) return; // Click was not on a delete button
+
+          const commentItem = deleteButton.closest('.comment-item');
+          const commentId = deleteButton.dataset.commentId;
+          // The imageId is needed for the endpoint and should be on the comment form
+          const commentFormForImageId = myModalEl.querySelector('.comment-form');
+          const imageId = commentFormForImageId ? commentFormForImageId.dataset.imageId : null;
+
+          if (!commentId || !imageId) {
+            // console.error('Missing commentId or imageId for delete operation.');
+            return;
+          }
+
+          try {
+            const response = await fetch(`/users/${projectUserId}/project/${projectId}/image/${imageId}/comment/${commentId}`, {
+              method: 'DELETE',
+              headers: {
+                // Add any necessary headers, like CSRF token if your app uses them
+                'Content-Type': 'application/json' 
+              }
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({ message: 'Failed to parse error from server'}));
+              throw new Error(errorData.message || 'Failed to delete comment from server');
+            }
+
+            // Successfully deleted from server
+            if (commentItem) {
+              commentItem.remove();
+            }
+            
+            // Check if any comments are left
+            const remainingCommentItems = commentsContainer.querySelectorAll('.comment-item');
+            const commentsList = commentsContainer.querySelector('.comments-list');
+            if (commentsList && remainingCommentItems.length === 0) {
+              commentsList.innerHTML = '<p class="text-center secondary-text">No comments yet. Be the first to comment!</p>';
+            }
+
+            requestAnimationFrame(() => updateModalBodyHeightForContent(true)); // Update modal height
+
+          } catch (error) {
+            // console.error('Error deleting comment:', error);
+          }
+        });
+      }
     });

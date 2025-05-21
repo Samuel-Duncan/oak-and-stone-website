@@ -177,29 +177,29 @@
   max-height: 90vh;
   width: 100%; /* Adapts up to the max-width set by .modal-lg or custom */
   margin: 30px auto;
-  display: flex;
-  align-items: center;
+  /* display: flex; */ /* Removed to restore standard block behavior for scrolling */
+  /* align-items: center; */ /* Removed with display: flex */
+  overflow-y: auto; /* Explicitly enable vertical scrolling for the dialog */
 }
 
 /* Modal Content within Dialog */
 #exampleModal .modal-content {
   width: 100%;
-  max-height: calc(
-    90vh - 60px
-  ); /* Assuming 30px top/bottom margin on modal-dialog */
+  /* max-height: calc(90vh - 60px); */ /* Removed to allow content to define height */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* overflow: hidden; */ /* Removed to allow full height measurement */
 }
 
 /* Modal Body - Container for the Carousel */
 #exampleModal .modal-body {
-  flex-grow: 1;
-  overflow: hidden; /* Crucial for height animation and content clipping */
+  /* flex-grow: 1; */ /* Removed: height should be explicitly set by JS */
+  /* overflow: hidden; */ /* Removed to allow full height measurement */
   padding: 0; /* As you have it */
   display: flex;
+  flex-direction: column; /* Stack image and comments vertically */
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the top */
   backdrop-filter: blur(8px); /* Your existing style */
   -webkit-backdrop-filter: blur(8px); /* Your existing style */
   background-color: rgba(0, 0, 0, 0.5); /* Your existing style */
@@ -208,10 +208,18 @@
   transition: height 0.35s ease-in-out; /* Adjust timing & easing as you like */
 }
 
+/* Class to hide modal content during initial load/slide */
+.modal-content-loading #imageCarousel,
+.modal-content-loading .image-comments-container {
+  opacity: 0;
+  transition: opacity 0s; /* No transition initially, then enable for fade-in */
+}
+
 /* Carousel Styling */
 #imageCarousel {
   width: 100%;
-  height: 100%;
+  /* height: auto; Let content dictate height, or set specific percentage */
+  flex-shrink: 0; /* Prevent carousel from shrinking if comments are too long */
 }
 
 #imageCarousel .carousel-inner {
@@ -238,12 +246,140 @@
   object-fit: contain; /* Ensures entire image is visible */
 }
 
+/* Styles for the comments section within the modal */
+.image-comments-container {
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.5); /* Match modal body background */
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Subtle separator */
+  width: 100%;
+}
+
+.comments-list {
+  margin-bottom: var(--spacing-md);
+}
+
+.comment-item {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Slightly lighter than container */
+  padding: var(--spacing-sm);
+  border-radius: var(
+    --border-radius
+  ); /* Applied border radius to match .detail-item */
+  margin-bottom: var(--spacing-sm);
+  position: relative; /* Needed for absolute positioning of the delete button */
+  display: flex; /* Add flex display */
+  flex-wrap: wrap; /* Allow items to wrap */
+  justify-content: space-between; /* Push user and timestamp to ends */
+  align-items: flex-start; /* Align items to the top */
+}
+
+.comment-user {
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xxs); /* Keep existing margin */
+  /* No change to flex properties, default is fine */
+}
+
+.comment-text {
+  color: var(--color-primary);
+  word-wrap: break-word;
+  margin-bottom: var(--spacing-xxs);
+  width: 100%; /* Make text take full width to start on new line */
+  order: 3; /* Ensure text comes after user and timestamp */
+}
+
+.comment-timestamp {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  margin-right: var(--spacing-lg); /* Increased right margin */
+  /* No change to flex properties, default is fine */
+  /* order: 2; (Implicitly after user, before text if not wrapped) */
+}
+
+/* Removed the more specific rule as .secondary-text should now apply directly */
+
+.comment-form textarea {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius-sm);
+}
+
+.comment-form textarea:focus {
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Keep background same on focus */
+  border-color: var(
+    --color-primary
+  ); /* Change border color on focus */
+  color: var(--color-primary); /* Keep text color same as unfocused */
+  outline: none; /* Remove default outline */
+  box-shadow: none; /* Remove default box shadow on focus */
+}
+
+.comment-form textarea::placeholder {
+  color: var(--color-secondary-text);
+}
+
+/* Style for the comment post button */
+.comment-form .comment-submit-btn {
+  margin-top: var(--spacing-md); /* Reverted space */
+}
+
+.comment-form .btn-primary {
+  background-color: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-primary);
+}
+
 .header-button:has(> svg) {
   padding: 8px var(--spacing-sm);
 }
 
 .project-detail-subtitle {
   margin-top: var(--spacing-xxs);
+}
+
+/* Style for comment delete button */
+.comment-delete-btn {
+  position: absolute;
+  top: var(--spacing-xxs); /* Position from the top */
+  right: var(--spacing-xxs); /* Position from the right */
+  width: 32px; /* Revert width to 32px */
+  height: 32px; /* Revert height to 32px */
+  padding: 0;
+  border-radius: 50%;
+  transform: none; /* Remove vertical centering transform */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.comment-delete-btn svg {
+  transform: translate(
+    -1px,
+    0.5px
+  ); /* Keep transform for centering in 32px button */
+  /* Removed width and height to use SVG attributes (16px) */
+  /* stroke-width is handled by SVG attribute or defaults */
+}
+
+/* Style for comments loading spinner */
+#comments-loading-spinner .spinner-border {
+  color: var(--color-primary); /* Set spinner color */
+}
+
+/* Style for image delete button SVG */
+.delete-image-button button svg {
+  transform: translateY(-1.5px); /* Raise SVG slightly */
 }
 
 @media (max-width: 768px) {

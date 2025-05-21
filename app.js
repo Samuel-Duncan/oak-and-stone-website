@@ -29,6 +29,7 @@ const users = require('./routes/user');
 const projects = require('./routes/project');
 const updates = require('./routes/update');
 const files = require('./routes/file.js');
+const imageComments = require('./routes/imageComment.js');
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use('/users', users);
 app.use('/users', projects);
 app.use('/users', updates);
 app.use('/users', files);
+app.use('/users', imageComments);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
