@@ -162,7 +162,6 @@
   text-align: center;
   border: var(--border-width) solid rgba(255, 255, 255, 0.5);
   /* backdrop-filter: blur(8px); */
-  -webkit-backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   margin: auto;
@@ -201,7 +200,6 @@
   align-items: center;
   justify-content: flex-start; /* Align items to the top */
   /* backdrop-filter: blur(8px); */
-  -webkit-backdrop-filter: blur(8px); /* Your existing style */
   background-color: rgba(0, 0, 0, 0.5); /* Your existing style */
 
   /* Add this for smooth height transition */
@@ -439,7 +437,17 @@
 @media (max-width: 480px) {
   .dashboard {
     width: 100%;
+    /* backdrop-filter: blur(8px); */
   }
+
+  /* #exampleModal .modal-body {
+    backdrop-filter: blur(8px);
+  }
+
+  .modal-content {
+    backdrop-filter: blur(8px);
+  } */
+
   .updates-header > a {
     min-width: fit-content;
     text-align: center;
