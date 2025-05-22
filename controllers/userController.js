@@ -45,6 +45,8 @@ exports.userDetailGET = async (req, res) => {
     const user = await User.findById(req.params.userId, {
       name: 1,
       email: 1,
+      additionalEmailOne: 1,
+      additionalEmailTwo: 1,
       phoneNumber: 1,
     }).exec();
 

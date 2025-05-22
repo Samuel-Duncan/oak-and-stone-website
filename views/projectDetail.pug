@@ -179,6 +179,8 @@ block content
       // Initialize Bootstrap Modal instance once
       const modalInstance = myModalEl ? new bootstrap.Modal(myModalEl) : null;
 
+      let activeCommentLoadCall = null; // For tracking the latest loadComments call
+
       // console.log('[DOMContentLoaded] Initialized myModalEl:', myModalEl);
       // console.log('[DOMContentLoaded] Initialized imageCarousel:', imageCarousel);
       // console.log('[DOMContentLoaded] Initialized modalInstance:', modalInstance);
@@ -231,6 +233,9 @@ block content
           // For now, let's not reset to 0, as the next click will dictate the slide.
           // The critical part is resetting our tracking variables and clearing content.
         }
+        // Clear the URL hash
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+
         // Clear any lingering opacity classes from previous hide/show attempts if they exist
         const modalBody = myModalEl.querySelector('.modal-body');
         if (modalBody && modalBody.classList.contains('modal-content-loading')) {
@@ -314,6 +319,9 @@ block content
           commentsListElement.innerHTML = ''; 
         }
 
+        const thisCallSymbol = Symbol();
+        activeCommentLoadCall = thisCallSymbol;
+
         // console.log('[loadComments] Called with imageId:', imageId);
         
         const commentsSpinner = myModalEl.querySelector('#comments-loading-spinner');
@@ -347,6 +355,8 @@ block content
           const comments = await response.json();
           // console.log('[loadComments] Received comments:', comments);
 
+          if (activeCommentLoadCall !== thisCallSymbol) return; // Stale call, do not update DOM
+
           if (comments.length === 0) {
             // console.log('[loadComments] No comments found, displaying message.');
             commentsListElement.innerHTML = '<p class="text-center secondary-text">No comments yet. Be the first to comment!</p>';
@@ -358,10 +368,12 @@ block content
           // console.log('[loadComments] Requesting animation frame for height update.');
           requestAnimationFrame(() => updateModalBodyHeightForContent());
         } catch (error) {
+          if (activeCommentLoadCall !== thisCallSymbol) return; // Stale call, do not update DOM
           // console.error('[loadComments] Catch block error:', error);
           commentsListElement.innerHTML = '<p class="text-center text-danger">Error loading comments.</p>';
           requestAnimationFrame(() => updateModalBodyHeightForContent());
         } finally {
+          if (activeCommentLoadCall !== thisCallSymbol) return; // Stale call, do not update DOM
           if (commentsSpinner) {
             commentsSpinner.classList.add('d-none'); // Hide spinner
           }
@@ -527,42 +539,28 @@ block content
       });
 
       myModalEl.addEventListener('shown.bs.modal', function () {
-        // console.log('[shown.bs.modal] Event Fired. Clicked index was:', g_clickedImageIndex);
-        // This event is mostly a trigger. The main work is done by slid.bs.carousel.
-        // However, if the clicked image was index 0, slid.bs.carousel might not fire
-        // if the carousel was already on index 0. So, handle that specific case here.
+        // This listener ensures comments are loaded whenever the modal is shown.
+        // It finds the currently active carousel item and loads comments for its image ID.
+        // console.log('[shown.bs.modal] Event Fired. Loading comments for active image.');
+
         const currentActiveItem = imageCarousel.querySelector('.carousel-item.active');
-        const currentActiveIndex = currentActiveItem ? Array.from(imageCarousel.querySelectorAll('.carousel-item')).indexOf(currentActiveItem) : -1;
+        const imageId = currentActiveItem?.dataset.imageId;
+        const commentsListElement = myModalEl.querySelector('.comments-list');
+        const commentForm = myModalEl.querySelector('.comment-form');
 
-        if (g_clickedImageIndex === 0 && currentActiveIndex === 0) {
-            // console.log('[shown.bs.modal] Target was index 0 and carousel is on index 0. Manually loading comments.');
-            const imageId = currentActiveItem?.dataset.imageId;
-            const commentsListElement = myModalEl.querySelector('.comments-list');
-            const commentForm = myModalEl.querySelector('.comment-form');
-
-            if (imageId && commentsListElement) {
-                loadComments(imageId, commentsListElement);
-            }
-            if (commentForm && imageId) {
-                commentForm.dataset.imageId = imageId;
-            }
-            // Height update for index 0 case
-            if (currentActiveItem) {
-                setTimeout(() => {
-                    const updateOnImageLoad = () => updateModalBodyHeightForContent(false);
-                    const imgElement = currentActiveItem.querySelector('img');
-                    if (imgElement && imgElement.complete) {
-                        updateOnImageLoad();
-                    } else if (imgElement) {
-                        imgElement.onload = updateOnImageLoad;
-                    } else {
-                        updateModalBodyHeightForContent(false);
-                    }
-                    requestAnimationFrame(() => updateModalBodyHeightForContent(false));
-                }, 50);
-            }
+        if (imageId && commentsListElement) {
+          loadComments(imageId, commentsListElement);
+          history.replaceState(null, '', `#image-${imageId}`);
         }
-        g_clickedImageIndex = -1; // Reset after use
+        if (commentForm && imageId) {
+          commentForm.dataset.imageId = imageId;
+        }
+        if (imageId) {
+          history.replaceState(null, '', `#image-${imageId}`);
+        }
+
+        requestAnimationFrame(() => updateModalBodyHeightForContent(false));
+
       });
 
       imageCarousel.addEventListener('slid.bs.carousel', function (event) {
@@ -575,12 +573,14 @@ block content
         const commentForm = myModalEl.querySelector('.comment-form');
 
         if (activeImageId && commentsListElement) {
-          // console.log('[slid.bs.carousel] Loading comments for activeImageId:', activeImageId);
-          loadComments(activeImageId, commentsListElement); 
+          loadComments(activeImageId, commentsListElement);
+          history.replaceState(null, '', `#image-${activeImageId}`);
         }
         if (commentForm && activeImageId) {
           commentForm.dataset.imageId = activeImageId;
-          // console.log('[slid.bs.carousel] Set comment form imageId to:', activeImageId);
+        }
+        if (activeImageId) {
+          history.replaceState(null, '', `#image-${activeImageId}`);
         }
 
         if (activeCarouselItem) {
@@ -657,4 +657,36 @@ block content
           }
         });
       }
+
+      function handlePageLoadImageHash() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#image-')) {
+          const imageIdFromHash = hash.substring('#image-'.length);
+          if (imageIdFromHash && carouselInstance && modalInstance) {
+            const items = imageCarousel.querySelectorAll('.carousel-item');
+            let imageIndex = -1;
+            items.forEach((item, index) => {
+              if (item.dataset.imageId === imageIdFromHash) {
+                imageIndex = index;
+              }
+            });
+
+            if (imageIndex !== -1) {
+              // Store this index so shown.bs.modal knows it was from a direct link
+              // This is important if the target is index 0, as slid.bs.carousel might not fire.
+              g_clickedImageIndex = imageIndex; 
+              carouselInstance.to(imageIndex); // Go to the slide
+              modalInstance.show(); // Show the modal
+            } else {
+              // console.warn('Image ID from hash not found in carousel items:', imageIdFromHash);
+            }
+          } else {
+            // console.log('No image ID in hash, or carousel/modal not ready.');
+          }
+        }
+      }
+
+      // Call the new function on DOMContentLoaded
+      handlePageLoadImageHash();
+
     });

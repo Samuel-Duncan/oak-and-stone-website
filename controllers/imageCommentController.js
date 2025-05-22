@@ -1,6 +1,10 @@
 const ImageComment = require('../models/imageComment.js');
 const Image = require('../models/image.js');
+const Project = require('../models/project.js');
+const User = require('../models/user.js');
+const { sendEmail } = require('../utils/nodemailer');
 const { body, validationResult } = require('express-validator');
+require('dotenv').config();
 
 // Create a new comment
 exports.createComment = [
@@ -35,6 +39,47 @@ exports.createComment = [
 
       // Populate user details for the response
       await savedComment.populate('userId', 'name');
+
+      // Send email notification if commenter is admin
+      if (req.user.isAdmin) {
+        const imageRecord = await Image.findById(
+          req.params.imageId,
+        ).populate('projectId');
+        if (imageRecord && imageRecord.projectId) {
+          const project = imageRecord.projectId;
+          const projectOwner = await User.findById(project.userId);
+
+          if (projectOwner) {
+            const recipientEmails = [projectOwner.email];
+            if (projectOwner.additionalEmailOne) {
+              recipientEmails.push(projectOwner.additionalEmailOne);
+            }
+            if (projectOwner.additionalEmailTwo) {
+              recipientEmails.push(projectOwner.additionalEmailTwo);
+            }
+
+            const rawLink = process.env.LINK;
+            const anChorLink =
+              rawLink &&
+              (rawLink.startsWith('http://') ||
+                rawLink.startsWith('https://'))
+                ? rawLink
+                : `http://${rawLink}`;
+
+            const subject = 'New Comment on Your Project Image';
+            const emailHtml = `
+              <p>Hello ${projectOwner.name},</p>
+              <p>A new comment has been added to one of your project images by an administrator.</p>
+              <p>Comment: "${savedComment.text}"</p>
+              <p>Please click the link below to view the comment:</p>
+              <a href="${anChorLink}/users/${project.userId}/project/${project._id}#image-${imageRecord._id}">View Comment</a>
+              <p>Thank you,</p>
+              <p>The Oak & Stone Team</p>
+            `;
+            sendEmail(recipientEmails, subject, emailHtml);
+          }
+        }
+      }
 
       res.status(201).json(savedComment);
     } catch (err) {

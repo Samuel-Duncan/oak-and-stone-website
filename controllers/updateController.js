@@ -119,15 +119,21 @@ exports.updateCreatePOST = [
       );
 
       try {
+        const rawLink = process.env.LINK;
+        const anChorLink =
+          rawLink &&
+          (rawLink.startsWith('http://') ||
+            rawLink.startsWith('https://'))
+            ? rawLink
+            : `http://${rawLink}`;
+
         const userHtml = `
           <p>Dear, ${user.name.split(' ')[0]}</p>
           <p>We're excited to inform you that a new weekly update for the project at ${
             project.address
           } is available to view.</p>
           <p>To track the progress of your project, please click the link below:</p>
-          <p><a href="${
-            process.env.LINK
-          }">Oak and Stone Client Portal</a></p>
+          <p><a href="${anChorLink}">Oak and Stone Client Portal</a></p>
           <p>Thank you for choosing Oak and Stone!</p>
         `;
 
