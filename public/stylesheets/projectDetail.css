@@ -9,9 +9,9 @@
   padding: var(--spacing-lg);
   text-align: left;
   border: var(--border-width) solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
+  /* backdrop-filter: blur(8px); */
   -webkit-backdrop-filter: blur(8px);
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   color: var(--color-primary);
   display: flex;
   flex-direction: column;
@@ -161,7 +161,7 @@
   border-radius: var(--border-radius);
   text-align: center;
   border: var(--border-width) solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
+  /* backdrop-filter: blur(8px); */
   -webkit-backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -200,7 +200,7 @@
   flex-direction: column; /* Stack image and comments vertically */
   align-items: center;
   justify-content: flex-start; /* Align items to the top */
-  backdrop-filter: blur(8px); /* Your existing style */
+  /* backdrop-filter: blur(8px); */
   -webkit-backdrop-filter: blur(8px); /* Your existing style */
   background-color: rgba(0, 0, 0, 0.5); /* Your existing style */
 
@@ -244,6 +244,12 @@
   height: auto;
   margin: 0 auto;
   object-fit: contain; /* Ensures entire image is visible */
+}
+
+/* Carousel control buttons - always focused style */
+#imageCarousel .carousel-control-prev,
+#imageCarousel .carousel-control-next {
+  opacity: 0.9; /* Set to Bootstrap's typical hover/focus opacity */
 }
 
 /* Styles for the comments section within the modal */
@@ -290,11 +296,11 @@
   margin-bottom: var(--spacing-xxs);
   width: 100%; /* Make text take full width to start on new line */
   order: 3; /* Ensure text comes after user and timestamp */
+  text-align: left; /* Align text to the left */
 }
 
 .comment-timestamp {
   font-size: 0.8rem;
-  color: var(--color-primary);
   margin-right: var(--spacing-lg); /* Increased right margin */
   /* No change to flex properties, default is fine */
   /* order: 2; (Implicitly after user, before text if not wrapped) */
@@ -326,6 +332,32 @@
 
 .comment-form textarea::placeholder {
   color: var(--color-secondary-text);
+}
+
+/* New styles for comment input wrapper */
+.comment-input-wrapper {
+  position: relative; /* For positioning the button */
+  display: flex;
+  align-items: center; /* Vertically align items if button/textarea heights differ */
+}
+
+.comment-input-wrapper textarea.comment-input {
+  flex-grow: 1; /* Textarea takes up available space */
+  margin-right: var(
+    --spacing-sm
+  ); /* Add some space between textarea and button */
+  /* Adjust padding if needed to ensure text doesn't go under the button */
+  /* padding-right: 50px; /* Example: if button is roughly 40px wide + spacing */
+}
+
+.comment-input-wrapper .comment-submit-btn {
+  /* The button is already styled, we might not need much here */
+  /* position: absolute; */ /* If you wanted it absolutely positioned inside */
+  /* right: var(--spacing-sm); */
+  /* top: 50%; */
+  /* transform: translateY(-50%); */
+  margin-top: 0; /* Override previous margin-top */
+  white-space: nowrap; /* Prevent button text from wrapping */
 }
 
 /* Style for the comment post button */

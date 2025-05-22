@@ -160,8 +160,10 @@ block content
               div.comments-list
                 // Comments will be loaded here by JavaScript
               form.comment-form(data-image-id="")
-                textarea.form-control.comment-input(name="text" placeholder="Add a comment..." rows="2" required)
-                button.button.header-button.project-button.comment-submit-btn(type="submit") Post
+                // New wrapper for textarea and button
+                div.comment-input-wrapper 
+                  textarea.form-control.comment-input(name="text" placeholder="Add a comment..." rows="2" required)
+                  button.button.header-button.project-button.comment-submit-btn(type="submit") Post
 
   script.
     const projectUserId = !{JSON.stringify(projectDetail.userId)};
@@ -266,7 +268,7 @@ block content
         commentText.classList.add('comment-text');
         commentText.textContent = comment.text;
         const commentTimestamp = document.createElement('p');
-        commentTimestamp.classList.add('comment-timestamp');
+        commentTimestamp.classList.add('comment-timestamp', 'secondary-text');
         commentTimestamp.textContent = formatTimestamp(comment.createdAt);
         commentItem.appendChild(commentUser);
         commentItem.appendChild(commentText);
