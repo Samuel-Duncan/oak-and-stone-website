@@ -112,12 +112,10 @@ exports.createComment = [
             const subject = 'New User Comment on Project Image';
             const emailHtml = `
               <p>Hello ${adminUser.name},</p>
-              <p>A new comment has been made by ${savedComment.userId.name} on an image in the project at: ${project.address}.</p>
+              <p>A new comment has been made by ${savedComment.userId.name} on an image for the project at: ${project.address}.</p>
               <p>Comment: "${savedComment.text}"</p>
               <p>Please click the link below to view the comment:</p>
               <a href="${anChorLink}/users/${project.userId}/project/${project._id}#image-${imageRecord._id}">View Comment</a>
-              <p>Thank you,</p>
-              <p>The Oak & Stone Team</p>
             `;
             sendEmail(recipientEmails, subject, emailHtml);
           }

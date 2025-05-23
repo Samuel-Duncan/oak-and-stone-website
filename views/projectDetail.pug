@@ -385,7 +385,20 @@ block content
         const form = event.target;
         const imageId = form.dataset.imageId;
         const commentText = form.querySelector('textarea[name="text"]').value.trim();
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+
         if (!commentText || !imageId) return;
+
+        // Disable button and show spinner
+        submitButton.disabled = true;
+        submitButton.innerHTML = ''; // Clear current content
+        const spinner = document.createElement('span');
+        spinner.classList.add('spinner-border', 'spinner-border-sm');
+        spinner.setAttribute('role', 'status');
+        spinner.setAttribute('aria-hidden', 'true');
+        submitButton.appendChild(spinner);
+
         try {
           const response = await fetch(`/users/${projectUserId}/project/${projectId}/image/${imageId}/comment`, {
             method: 'POST',
@@ -407,6 +420,11 @@ block content
           requestAnimationFrame(() => updateModalBodyHeightForContent(true)); // Animate for new comment
         } catch (error) {
           // console.error('Error posting comment:', error);
+          // Optionally, display an error message to the user
+        } finally {
+          // Restore button state
+          submitButton.innerHTML = originalButtonText;
+          submitButton.disabled = false;
         }
       }
 

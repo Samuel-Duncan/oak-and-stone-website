@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminCheck = require('../utils/adminCheck.js');
+const authCheck = require('../utils/authCheck.js');
 const { upload } = require('../utils/cloudinary.js');
 
 const projectController = require('../controllers/projectController');
@@ -24,6 +25,7 @@ router.get('/:userId/projects', projectController.projectListGET);
 // Read Project
 router.get(
   '/:userId/project/:projectId',
+  authCheck,
   projectController.projectDetailGET,
 );
 

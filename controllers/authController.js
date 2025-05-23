@@ -160,21 +160,31 @@ exports.signInGET = (req, res, next) => {
 };
 
 exports.signInPOST = (req, res, next) => {
+  const { email, password } = req.body; // Or however you get email/password
+  // Temporarily store redirectTo if it exists, as req.logIn might regenerate the session
+  const sessionRedirectTo = req.session.redirectTo;
+
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       return next(err); // Pass errors to next error handler
     }
     if (!user) {
       // Login failed - display error message
+      // Preserve redirectTo in the session for the next attempt if it was there
+      if (sessionRedirectTo) {
+        req.session.redirectTo = sessionRedirectTo;
+      }
       return res.render('signInForm', {
         title: 'Sign In',
         errorMessage: info.message || 'Invalid username or password', // Customize the message
       });
     } else {
       // Login successful
-      req.logIn(user, async (err) => {
-        if (err) {
-          return next(err);
+      req.logIn(user, async (loginErr) => {
+        // Changed err to loginErr to avoid conflict
+        if (loginErr) {
+          // Changed err to loginErr
+          return next(loginErr); // Changed err to loginErr
         }
 
         try {
@@ -185,7 +195,17 @@ exports.signInPOST = (req, res, next) => {
           return next(error);
         }
 
-        return res.redirect('/'); // Redirect instead of render
+        // Restore redirectTo from the temporary variable after login
+        const finalRedirectTo = sessionRedirectTo || '/';
+        // It's good practice to delete it from session if it was there,
+        // though if sessionRedirectTo was populated, it means req.session.redirectTo
+        // might have been cleared by req.logIn.
+        // If sessionRedirectTo was originally from req.session.redirectTo, clear it.
+        if (req.session.redirectTo) {
+          delete req.session.redirectTo;
+        }
+
+        return res.redirect(finalRedirectTo);
       });
     }
   })(req, res, next);
