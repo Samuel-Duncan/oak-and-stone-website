@@ -79,6 +79,49 @@ exports.createComment = [
             sendEmail(recipientEmails, subject, emailHtml);
           }
         }
+      } else {
+        // Send email notification to admin if commenter is not admin
+        const imageRecord = await Image.findById(
+          req.params.imageId,
+        ).populate('projectId');
+        if (imageRecord && imageRecord.projectId) {
+          const project = imageRecord.projectId;
+          // Assuming admin user details are stored in a way that can be queried, e.g., by a specific role or a known ID
+          // For this example, let's assume there's a way to identify the admin.
+          // This might need adjustment based on how admin users are actually identified in your system.
+          // For instance, if admin has a specific known email or a flag in their user model:
+          const adminUser = await User.findOne({ isAdmin: true }); // Example: find an admin user
+
+          if (adminUser) {
+            const recipientEmails = [adminUser.email];
+            if (adminUser.additionalEmailOne) {
+              recipientEmails.push(adminUser.additionalEmailOne);
+            }
+            if (adminUser.additionalEmailTwo) {
+              recipientEmails.push(adminUser.additionalEmailTwo);
+            }
+
+            const rawLink = process.env.LINK;
+            const anChorLink =
+              rawLink &&
+              (rawLink.startsWith('http://') ||
+                rawLink.startsWith('https://'))
+                ? rawLink
+                : `http://${rawLink}`;
+
+            const subject = 'New User Comment on Project Image';
+            const emailHtml = `
+              <p>Hello ${adminUser.name},</p>
+              <p>A new comment has been made by ${savedComment.userId.name} on an image in the project at: ${project.address}.</p>
+              <p>Comment: "${savedComment.text}"</p>
+              <p>Please click the link below to view the comment:</p>
+              <a href="${anChorLink}/users/${project.userId}/project/${project._id}#image-${imageRecord._id}">View Comment</a>
+              <p>Thank you,</p>
+              <p>The Oak & Stone Team</p>
+            `;
+            sendEmail(recipientEmails, subject, emailHtml);
+          }
+        }
       }
 
       res.status(201).json(savedComment);
