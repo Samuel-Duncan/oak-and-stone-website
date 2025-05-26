@@ -12,10 +12,7 @@ const { body, validationResult } = require('express-validator');
  */
 exports.userListGET = async (req, res) => {
   try {
-    const allUsers = await User.find(
-      { isAdmin: { $ne: true } },
-      { name: 1 },
-    )
+    const allUsers = await User.find({}, { name: 1 })
       .sort({
         name: 1,
       })
