@@ -136,3 +136,4 @@ dist
 updatedb.js
 cleanup_old_images_array.js
 migrate_images.js
+notifyCommentFeature.js
