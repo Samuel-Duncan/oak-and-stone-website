@@ -30,7 +30,8 @@ router.get('/', async function (req, res, next) {
         res.render('index', {
           title: `${process.env.COMPANY_NAME} Client Portal`,
           companyName: process.env.COMPANY_NAME,
-          message: 'Nothing to see here yet.',
+          message:
+            "There's nothing to see here yet. When your project becomes available to view, you'll be able to view it here.",
         });
       }
     } else {

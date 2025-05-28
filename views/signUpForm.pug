@@ -13,13 +13,13 @@ block content
           label(for="name") Name:
         div.input-field  
           input(type="email" id="email" name="email" value=(user && user.email) required)
-          label(for="email") Email:
+          label(for="email") Email 1:
         div.input-field  
           input(type="email" id="additionalEmailOne" name="additionalEmailOne" value=(user && user.additionalEmailOne))
-          label(for="additionalEmailOne") Additional Email 1:
+          label(for="additionalEmailOne") Email 2:
         div.input-field  
           input(type="email" id="additionalEmailTwo" name="additionalEmailTwo" value=(user && user.additionalEmailTwo))
-          label(for="additionalEmailTwo") Additional Email 2:
+          label(for="additionalEmailTwo") Email 3:
         if !isUpdate
           div.input-field
             input(type="password" id="password" name="password" required)
