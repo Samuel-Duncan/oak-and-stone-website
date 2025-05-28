@@ -40,7 +40,6 @@
   margin-top: 80px; /* Adjust this value based on your header height */
   margin-bottom: 20px;
 }
-
 .update-list-background::before {
   background: url('../images/Client\ Log\ In\ Photo-1.png'),
     var(--color-background);

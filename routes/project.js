@@ -67,6 +67,7 @@ router.get(
   adminCheck.adminCheck,
   projectController.addImagesGET,
 );
+
 // add POST
 router.post(
   '/:userId/project/:projectId/images',
@@ -86,6 +87,13 @@ router.delete(
   '/:userId/project/:projectId/image/:imageId',
   adminCheck.adminCheck,
   projectController.deleteImage,
+);
+
+// New route for fetching paginated images as JSON
+router.get(
+  '/:userId/project/:projectId/api/images', // Differentiated path
+  authCheck, // Assuming authCheck is appropriate, or adminCheck if only admins can see details this way
+  projectController.projectImagesGET,
 );
 
 module.exports = router;

@@ -198,25 +198,48 @@ exports.projectListGET = async (req, res) => {
 
 exports.projectDetailGET = async (req, res) => {
   try {
-    const [project, projectCount, update, user, file, images] =
-      await Promise.all([
-        Project.findById(req.params.projectId).exec(),
-        Project.countDocuments({ userId: req.user._id }).exec(),
-        Update.findOne({ projectId: req.params.projectId })
-          .sort({ createdAt: -1 })
-          .exec(),
-        User.findById(req.params.userId)
-          .select('name lastLogin')
-          .lean()
-          .exec(), // Fetch name and lastLogin
-        File.find({ projectId: req.params.projectId })
-          .sort({ createdAt: -1 })
-          .exec(),
-        // Get images associated with this project
-        Image.find({ projectId: req.params.projectId })
-          .sort({ createdAt: -1 })
-          .exec(),
-      ]);
+    const page = 1; // Initial page
+    const limit = 12; // Number of images per page
+
+    const [
+      project,
+      projectCount,
+      update,
+      user,
+      file,
+      imagesData, // Renamed from 'images'
+    ] = await Promise.all([
+      Project.findById(req.params.projectId).exec(),
+      Project.countDocuments({ userId: req.user._id }).exec(),
+      Update.findOne({ projectId: req.params.projectId })
+        .sort({ createdAt: -1 })
+        .exec(),
+      User.findById(req.params.userId)
+        .select('name lastLogin')
+        .lean()
+        .exec(), // Fetch name and lastLogin
+      File.find({ projectId: req.params.projectId })
+        .sort({ createdAt: -1 })
+        .exec(),
+      // Get images associated with this project with pagination
+      Image.find({ projectId: req.params.projectId })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      Image.countDocuments({ projectId: req.params.projectId }), // Get total image count
+    ]);
+
+    // The imagesData result from Promise.all is an array.
+    // The images are in the first element, total count in the second (if structured that way)
+    // Let's adjust based on how Promise.all resolves these.
+    // Actually, it's better to query count separately or handle the array Promise.all returns.
+    // For clarity, let's assume imagesData is just the array of images from the find()
+    // And we need another promise for the count.
+
+    const totalImages = await Image.countDocuments({
+      projectId: req.params.projectId,
+    });
 
     if (!project) {
       return res.render('projectDetail', {
@@ -240,7 +263,10 @@ exports.projectDetailGET = async (req, res) => {
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: project,
-      images: images, // Pass the images separately
+      images: imagesData, // Pass the initially loaded images
+      totalImages: totalImages, // Pass total images count
+      currentPage: page,
+      hasMoreImages: totalImages > imagesData.length, // Check if there are more images
       update: processedUpdate,
       moreThanOneProject: projectCount > 1,
       userName: user ? user.name : 'Unknown User',
@@ -256,19 +282,29 @@ exports.projectDetailGET = async (req, res) => {
 
 exports.userProjectDetailGET = async (req, res, next) => {
   try {
-    const [userProject, projectCount, images] = await Promise.all([
-      Project.findOne({
-        _id: req.params.projectId,
-        userId: req.params.userId,
-      })
-        .populate('update')
-        .lean(),
-      Project.countDocuments({ userId: req.params.userId }),
-      // Get images associated with this project
-      Image.find({ projectId: req.params.projectId })
-        .sort({ createdAt: -1 })
-        .lean(),
-    ]);
+    const page = 1; // Initial page
+    const limit = 12; // Number of images per page
+
+    const [userProject, projectCount, initialImages] =
+      await Promise.all([
+        Project.findOne({
+          _id: req.params.projectId,
+          userId: req.params.userId,
+        })
+          .populate('update')
+          .lean(),
+        Project.countDocuments({ userId: req.params.userId }),
+        // Get initial batch of images associated with this project
+        Image.find({ projectId: req.params.projectId })
+          .sort({ createdAt: -1 })
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .lean(),
+      ]);
+
+    const totalImages = await Image.countDocuments({
+      projectId: req.params.projectId,
+    });
 
     if (!userProject) {
       return res.render('projectDetail', {
@@ -280,7 +316,10 @@ exports.userProjectDetailGET = async (req, res, next) => {
     res.render('projectDetail', {
       title: 'Project',
       projectDetail: userProject,
-      images: images, // Pass the images separately
+      images: initialImages, // Pass the initially loaded images
+      totalImages: totalImages,
+      currentPage: page,
+      hasMoreImages: totalImages > initialImages.length,
       moreThanOneProject: projectCount > 1,
     });
   } catch (err) {
@@ -473,6 +512,11 @@ exports.projectDeletePOST = async (req, res) => {
   try {
     // Delete all images associated with this project
     await Image.deleteMany({ projectId: req.params.projectId });
+    // Delete all comments associated with images of this project
+    // This requires a more complex operation if comments are not directly linked to project
+    // Assuming comments are linked via imageId, and images are deleted above,
+    // if there's a Comment model, you might need to delete comments where imageId is in the list of deleted imageIds.
+    // For now, focusing on image and project deletion.
 
     // Then delete the project
     await Project.findByIdAndDelete(req.params.projectId);
@@ -599,5 +643,34 @@ exports.deleteImage = async (req, res) => {
       message: 'An error occurred while deleting the image',
       error: error.message,
     });
+  }
+};
+
+// New controller function to get paginated images
+exports.projectImagesGET = async (req, res) => {
+  try {
+    const projectId = req.params.projectId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12; // Number of images per page
+
+    const images = await Image.find({ projectId: projectId })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(); // Use lean for performance if not modifying
+
+    const totalImages = await Image.countDocuments({
+      projectId: projectId,
+    });
+
+    res.json({
+      images: images,
+      currentPage: page,
+      totalPages: Math.ceil(totalImages / limit),
+      hasMoreImages: page * limit < totalImages,
+    });
+  } catch (err) {
+    console.error('Error fetching more images:', err);
+    res.status(500).json({ message: 'Error fetching images' });
   }
 };

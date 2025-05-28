@@ -110,19 +110,23 @@ block content
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
                       path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             .image-gallery
-              .gallery-grid
+              .gallery-grid#image-gallery-grid
                 each image in images
-                  div.image-container(id=`image-container-${image._id}`)
+                  div.image-container(id=`image-container-${image._id}` data-image-id=image._id)
                     div.image-preview(type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-image-url=image.url data-image-id=image._id)
                       img.gallery-image(src=image.url alt="Project Image")
-                      p.image-date #{image.createdAt.toLocaleDateString()}
+                      p.image-date #{new Date(image.createdAt).toLocaleDateString()}
                     if currentUser && currentUser.isAdmin
                       form.delete-image-button(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/image/${image._id}/delete` method="POST")
                         button.button.header-button.project-button.file-button.delete-button.image-delete(type="submit")
                           svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1")
                             path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
+            if hasMoreImages
+              .load-more-container.text-center.mt-3
+                button#loadMoreImagesBtn.button.header-button.project-button Load More Images
+                #imageLoadingSpinner.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
 
-        else
+        else if totalImages === 0
           .detail-item
             .updates-header
                 h2 Photos
@@ -170,6 +174,8 @@ block content
     const projectId = !{JSON.stringify(projectDetail._id)};
     const currentUserId = !{currentUser && currentUser._id ? JSON.stringify(currentUser._id) : null};
     const currentUserIsAdmin = !{currentUser && currentUser.isAdmin ? JSON.stringify(currentUser.isAdmin) : false};
+    let currentPage = !{currentPage ? JSON.stringify(currentPage) : 1};
+    let isLoadingImages = false;
 
     document.addEventListener('DOMContentLoaded', function() {
       // Define myModalEl and imageCarousel at the very top of this block
@@ -581,12 +587,25 @@ block content
 
       });
 
+      // Event listener for when a new slide is about to be shown
+      imageCarousel.addEventListener('slide.bs.carousel', function () {
+        if (modalBody) {
+          // Prevent modal body from expanding due to tall content during slide transition
+          modalBody.style.overflow = 'hidden';
+          // Disable modal body's own height animation during the carousel's slide animation
+          modalBody.style.transition = 'none'; 
+        }
+      });
+
       imageCarousel.addEventListener('slid.bs.carousel', function (event) {
         // console.log('[slid.bs.carousel] Event Fired. New active slide index:', event.to);
-        modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
+        if (modalBody) {
+          // Restore transition for height changes *before* calculating and setting new height
+          modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
+        }
 
         const activeCarouselItem = event.relatedTarget; // The carousel item that just became active
-        const activeImageId = activeCarouselItem.dataset.imageId;
+        const activeImageId = activeCarouselItem ? activeCarouselItem.dataset.imageId : null;
         const commentsListElement = myModalEl.querySelector('.comments-list');
         const commentForm = myModalEl.querySelector('.comment-form');
 
@@ -597,22 +616,52 @@ block content
         if (commentForm && activeImageId) {
           commentForm.dataset.imageId = activeImageId;
         }
-        if (activeImageId) {
-          history.replaceState(null, '', `#image-${activeImageId}`);
-        }
 
-        if (activeCarouselItem) {
-            const updateOnImageLoad = () => requestAnimationFrame(() => updateModalBodyHeightForContent(true));
-             const imgElement = activeCarouselItem.querySelector('img');
-            if (imgElement && imgElement.complete) {
-                updateOnImageLoad();
-            } else if (imgElement) {
-                imgElement.onload = updateOnImageLoad;
-            } else {
-                updateModalBodyHeightForContent(true);
+        const imgElement = activeCarouselItem ? activeCarouselItem.querySelector('img') : null;
+
+        const finalizeHeightUpdateAndRestoreOverflow = () => {
+          requestAnimationFrame(() => {
+            updateModalBodyHeightForContent(true); // true to animate height
+            if (modalBody) {
+              // Restore overflow. The explicit height set by updateModalBodyHeightForContent
+              // should now be controlling the size during its animation.
+              modalBody.style.overflow = ''; // Restore to default behavior
             }
+          });
+        };
+
+        if (imgElement) {
+          if (imgElement.complete && imgElement.naturalHeight > 0) {
+            finalizeHeightUpdateAndRestoreOverflow();
+          } else {
+            let loadedOrTimedOut = false;
+            const loadOrErrorHandler = () => {
+              if (!loadedOrTimedOut) {
+                loadedOrTimedOut = true;
+                imgElement.removeEventListener('load', loadOrErrorHandler);
+                imgElement.removeEventListener('error', loadOrErrorHandler);
+                finalizeHeightUpdateAndRestoreOverflow();
+              }
+            };
+            imgElement.addEventListener('load', loadOrErrorHandler);
+            imgElement.addEventListener('error', loadOrErrorHandler);
+            
+            // Fallback timeout in case load/error events don't fire reliably
+            setTimeout(() => {
+              if (!loadedOrTimedOut) {
+                // console.warn('[slid.bs.carousel] Image load/error event fallback timeout.');
+                loadOrErrorHandler(); 
+              }
+            }, 300); // Reasonably short timeout
+
+            // Handle cases where image might be 'complete' but didn't fire load (e.g. already cached and errored)
+            if (imgElement.complete && !loadedOrTimedOut) {
+                 loadOrErrorHandler();
+            }
+          }
+        } else {
+          finalizeHeightUpdateAndRestoreOverflow(); // No image element, update based on other content (e.g. comments only)
         }
-         requestAnimationFrame(() => updateModalBodyHeightForContent(true));
       });
 
       window.addEventListener('resize', function () {
@@ -706,5 +755,285 @@ block content
 
       // Call the new function on DOMContentLoaded
       handlePageLoadImageHash();
+
+      // --- Lazy Loading Logic for Images ---
+      const loadMoreImagesBtn = document.getElementById('loadMoreImagesBtn');
+      const imageLoadingSpinner = document.getElementById('imageLoadingSpinner');
+      const imageGalleryGrid = document.getElementById('image-gallery-grid');
+      const modalImageCarouselInner = document.querySelector('#imageCarousel .carousel-inner');
+
+      function createImageGalleryItem(image) {
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('image-container');
+        imageContainer.id = `image-container-${image._id}`;
+        imageContainer.dataset.imageId = image._id;
+
+        const imagePreviewDiv = document.createElement('div');
+        imagePreviewDiv.classList.add('image-preview');
+        imagePreviewDiv.type = 'button';
+        imagePreviewDiv.dataset.bsToggle = 'modal';
+        imagePreviewDiv.dataset.bsTarget = '#exampleModal';
+        imagePreviewDiv.dataset.imageUrl = image.url;
+        imagePreviewDiv.dataset.imageId = image._id;
+
+        const imgElement = document.createElement('img');
+        imgElement.classList.add('gallery-image');
+        imgElement.src = image.url;
+        imgElement.alt = 'Project Image';
+
+        const imageDate = document.createElement('p');
+        imageDate.classList.add('image-date');
+        imageDate.textContent = new Date(image.createdAt).toLocaleDateString();
+
+        imagePreviewDiv.appendChild(imgElement);
+        imagePreviewDiv.appendChild(imageDate);
+        imageContainer.appendChild(imagePreviewDiv);
+
+        if (currentUserIsAdmin) {
+          const deleteForm = document.createElement('form');
+          deleteForm.classList.add('delete-image-button');
+          deleteForm.action = `/users/${projectUserId}/project/${projectId}/image/${image._id}/delete`;
+          deleteForm.method = 'POST';
+
+          const deleteButton = document.createElement('button');
+          deleteButton.classList.add('button', 'header-button', 'project-button', 'file-button', 'delete-button', 'image-delete');
+          deleteButton.type = 'submit';
+          deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+          deleteForm.appendChild(deleteButton);
+          imageContainer.appendChild(deleteForm);
+        }
+
+        // Add click listener for the new image preview
+        imagePreviewDiv.addEventListener('click', function(event) {
+          event.preventDefault();
+          // Find index of this image in the updated carousel items
+          const allCarouselItems = modalImageCarouselInner.querySelectorAll('.carousel-item');
+          let clickedImageCarouselIndex = -1;
+          allCarouselItems.forEach((item, idx) => {
+            if (item.dataset.imageId === image._id) {
+              clickedImageCarouselIndex = idx;
+            }
+          });
+
+          g_clickedImageIndex = clickedImageCarouselIndex; 
+
+          if (carouselInstance && clickedImageCarouselIndex !== -1) {
+            carouselInstance.to(clickedImageCarouselIndex);
+          }
+          if (modalInstance) {
+            modalInstance.show();
+          }
+        });
+
+        return imageContainer;
+      }
+
+      function createCarouselItem(image, index, totalInitialImages) {
+          const carouselItem = document.createElement('div');
+          carouselItem.classList.add('carousel-item');
+          // The first image *of this new batch* might need to be active if the carousel was empty.
+          // However, standard behavior is to append, and 'active' is usually handled for the very first item overall.
+          // Let's assume if modalImageCarouselInner is empty, the first *appended* item becomes active.
+          if (modalImageCarouselInner.children.length === 0 && index === 0) { 
+              carouselItem.classList.add('active');
+          }
+          carouselItem.dataset.imageId = image._id;
+
+          const img = document.createElement('img');
+          img.classList.add('d-block', 'w-100');
+          img.src = image.url;
+          img.alt = 'Project Image';
+          carouselItem.appendChild(img);
+          return carouselItem;
+      }
+
+      if (loadMoreImagesBtn) {
+        loadMoreImagesBtn.addEventListener('click', async function() {
+          if (isLoadingImages) return;
+
+          isLoadingImages = true;
+          currentPage++;
+          loadMoreImagesBtn.classList.add('d-none');
+          imageLoadingSpinner.classList.remove('d-none');
+
+          try {
+            const response = await fetch(`/users/${projectUserId}/project/${projectId}/api/images?page=${currentPage}`);
+            if (!response.ok) {
+              throw new Error('Failed to load more images');
+            }
+            const data = await response.json();
+
+            if (data.images && data.images.length > 0) {
+              data.images.forEach((image, index) => {
+                // Append to gallery grid
+                const galleryItem = createImageGalleryItem(image);
+                if (imageGalleryGrid) {
+                  imageGalleryGrid.appendChild(galleryItem);
+                }
+                // Append to modal carousel
+                const carouselItem = createCarouselItem(image, index, modalImageCarouselInner.children.length);
+                if (modalImageCarouselInner) {
+                  modalImageCarouselInner.appendChild(carouselItem);
+                }
+              });
+              // Re-initialize or update carousel if necessary, Bootstrap 5 might handle new items automatically.
+              // If not, you might need: if (carouselInstance) carouselInstance.dispose(); carouselInstance = new bootstrap.Carousel(imageCarousel, { interval: false });
+            }
+
+            if (!data.hasMoreImages) {
+              // No more images to load, hide button permanently (or its container)
+              if (loadMoreImagesBtn.parentElement) {
+                loadMoreImagesBtn.parentElement.classList.add('d-none');
+              }
+            } else {
+              loadMoreImagesBtn.classList.remove('d-none');
+            }
+          } catch (error) {
+            console.error('Error loading more images:', error);
+            loadMoreImagesBtn.classList.remove('d-none'); // Show button again on error
+            // Optionally display an error message to the user
+          } finally {
+            isLoadingImages = false;
+            imageLoadingSpinner.classList.add('d-none');
+          }
+        });
+      }
+      // --- End Lazy Loading Logic ---
+
+      // --- Event Listener for Image Deletion ---
+      const imageGalleryContainer = document.getElementById('image-gallery-grid'); // Or a higher parent if needed
+
+      if (imageGalleryContainer) {
+        imageGalleryContainer.addEventListener('submit', async function(event) {
+          if (event.target.classList.contains('delete-image-button')) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const form = event.target;
+            const actionUrl = form.action;
+            const imageContainer = form.closest('.image-container');
+            const imageId = imageContainer ? imageContainer.dataset.imageId : null;
+
+            if (!imageId) {
+              console.error('Could not find imageId for deletion.');
+              return;
+            }
+
+            const deleteButton = form.querySelector('button[type="submit"]');
+            const originalButtonContent = deleteButton.innerHTML;
+            deleteButton.disabled = true;
+            deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            try {
+              const response = await fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                  // Add CSRF token header here if your application uses them
+                  'Content-Type': 'application/json' // Though body is not sent, server might expect this
+                },
+                // No body is needed for this specific POST based on controller, but fetch might require it for POST
+                // body: JSON.stringify({}) // Send empty JSON object if server expects a body for POST
+              });
+
+              if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Failed to delete image. Server error.' }));
+                throw new Error(errorData.message || 'Failed to delete image');
+              }
+
+              // Success!
+              if (imageContainer) {
+                imageContainer.remove();
+              }
+
+              // Remove from modal carousel
+              const carouselItemToRemove = modalImageCarouselInner.querySelector(`.carousel-item[data-image-id="${imageId}"]`);
+              if (carouselItemToRemove) {
+                const carousel = bootstrap.Carousel.getInstance(imageCarousel);
+                const activeCarouselItem = modalImageCarouselInner.querySelector('.carousel-item.active');
+                let newActiveIndex = 0;
+
+                if (carousel && activeCarouselItem && activeCarouselItem.dataset.imageId === imageId) {
+                  // If the deleted image was active, decide where to go next
+                  const items = Array.from(modalImageCarouselInner.children);
+                  const currentIndex = items.indexOf(carouselItemToRemove);
+                  
+                  carouselItemToRemove.remove(); // Remove it first
+                  const remainingItems = modalImageCarouselInner.children;
+
+                  if (remainingItems.length > 0) {
+                    if (currentIndex >= remainingItems.length) {
+                      newActiveIndex = remainingItems.length - 1; // Go to new last item
+                    } else {
+                      newActiveIndex = currentIndex; // Go to item that took its place
+                    }
+                    carousel.to(newActiveIndex); 
+                    // Manually trigger a slide event if it was the active one and modal is open, to reload comments etc.
+                    // Or simply close the modal if it was the active one
+                    if(myModalEl.classList.contains('show')) {
+                        // If only one image was left and it's deleted, close modal
+                        if(remainingItems.length === 0) modalInstance.hide();
+                        else {
+                             // Trigger loadComments for the new active image
+                             const newActiveImageElement = remainingItems[newActiveIndex];
+                             const newActiveImageId = newActiveImageElement.dataset.imageId;
+                             if (newActiveImageId && commentsListElement) {
+                                loadComments(newActiveImageId, commentsListElement);
+                                history.replaceState(null, '', `#image-${newActiveImageId}`);
+                             }
+                             if (commentForm && newActiveImageId) {
+                                commentForm.dataset.imageId = newActiveImageId;
+                             }
+                        }
+                    }
+                  } else {
+                     modalInstance.hide(); // No items left, hide modal
+                  }
+                } else if (carouselItemToRemove) {
+                  carouselItemToRemove.remove(); // Just remove if not active
+                }
+                // Update carousel instance if items were removed to prevent issues
+                if (carouselInstance && modalImageCarouselInner.children.length === 0) {
+                  // If all images removed, maybe clear modal content or disable carousel buttons.
+                } else if (carouselInstance) {
+                  // Bootstrap 5 should handle item removal dynamically. 
+                  // If issues, may need: carouselInstance.dispose(); new bootstrap.Carousel(imageCarousel);
+                }
+              }
+
+              // Check if any images are left in the gallery
+              const remainingImagesInGallery = imageGalleryGrid.querySelectorAll('.image-container').length;
+              if (remainingImagesInGallery === 0) {
+                if (imageGalleryGrid.parentElement) { // Assuming .detail-item is the parent
+                    const detailItem = imageGalleryGrid.closest('.detail-item');
+                    const updatesHeader = detailItem.querySelector('.updates-header');
+                    
+                    imageGalleryGrid.remove(); // Remove the grid
+                    // Remove load more button if it exists and no images
+                    const loadMoreContainer = detailItem.querySelector('.load-more-container');
+                    if(loadMoreContainer) loadMoreContainer.remove();
+
+                    let noImagesMessage = detailItem.querySelector('.no-images-message');
+                    if (!noImagesMessage) {
+                        noImagesMessage = document.createElement('p');
+                        noImagesMessage.classList.add('secondary-text', 'no-images-message');
+                        noImagesMessage.textContent = 'No images to see yet.';
+                        updatesHeader.insertAdjacentElement('afterend', noImagesMessage);
+                    }
+                }
+              }
+                 // Update totalImages and hasMoreImages related variables if needed
+                 // This might involve decrementing a global or passed-in totalImages count
+                 // and re-evaluating if the "Load More" button should be visible.
+
+            } catch (error) {
+              console.error('Error deleting image:', error);
+              alert('Error deleting image: ' + error.message); // Simple alert for now
+            } finally {
+              deleteButton.disabled = false;
+              deleteButton.innerHTML = originalButtonContent;
+            }
+          }
+        });
+      }
+      // --- End Event Listener for Image Deletion ---
 
     });
