@@ -100,13 +100,11 @@ exports.fileDelete = async (req, res) => {
     await File.findByIdAndDelete(req.params.fileId);
 
     // Respond with JSON on success
-    res
-      .status(200)
-      .json({
-        message: 'File deleted successfully',
-        fileId: req.params.fileId,
-        projectId: file.projectId,
-      });
+    res.status(200).json({
+      message: 'File deleted successfully',
+      fileId: req.params.fileId,
+      projectId: file.projectId,
+    });
   } catch (error) {
     console.error('File deletion error:', error);
     // Ensure error response is JSON
