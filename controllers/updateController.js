@@ -133,8 +133,10 @@ exports.updateCreatePOST = [
             project.address
           } is available to view.</p>
           <p>To track the progress of your project, please click the link below:</p>
-          <p><a href="${anChorLink}">Oak and Stone Client Portal</a></p>
-          <p>Thank you for choosing Oak and Stone!</p>
+          <p><a href="${anChorLink}">${
+          process.env.COMPANY_NAME
+        } Client Portal</a></p>
+          <p>Thank you for choosing ${process.env.COMPANY_NAME}!</p>
         `;
 
         // Gather all email addresses into an array, filtering out `null` values
@@ -147,7 +149,7 @@ exports.updateCreatePOST = [
         // Send the email to all collected addresses
         await sendEmail(
           emailAddresses,
-          'Weekly Update from Oak and Stone',
+          `Weekly Update from ${process.env.COMPANY_NAME}`,
           userHtml,
         );
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Project = require('../models/project');
+require('dotenv').config();
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
@@ -14,25 +15,29 @@ router.get('/', async function (req, res, next) {
 
       if (projectDetails.length > 0 && projectDetails.length === 1) {
         res.render('index', {
-          title: 'Oak and Stone Client Portal',
+          title: `${process.env.COMPANY_NAME} Client Portal`,
+          companyName: process.env.COMPANY_NAME,
           projectId: projectDetails[0]._id,
         });
       } else if (projectDetails.length > 1) {
         res.render('index', {
-          title: 'Oak and Stone Client Portal',
+          title: `${process.env.COMPANY_NAME} Client Portal`,
+          companyName: process.env.COMPANY_NAME,
           projectId: null,
           moreThanOneProject: true,
         });
       } else {
         res.render('index', {
-          title: 'Oak and Stone Client Portal',
+          title: `${process.env.COMPANY_NAME} Client Portal`,
+          companyName: process.env.COMPANY_NAME,
           message: 'Nothing to see here yet.',
         });
       }
     } else {
       // User is not signed in
       res.render('index', {
-        title: 'Oak and Stone Client Portal',
+        title: `${process.env.COMPANY_NAME} Client Portal`,
+        companyName: process.env.COMPANY_NAME,
         message: 'Please sign in to view your project details.',
       });
     }

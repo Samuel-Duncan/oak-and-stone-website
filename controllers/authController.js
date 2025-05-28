@@ -3,6 +3,7 @@ const Project = require('../models/project.js');
 const { body, validationResult } = require('express-validator');
 const passport = require('../utils/passport');
 const { sendEmail } = require('../utils/nodemailer.js');
+require('dotenv').config();
 
 /**
  * Create a new user.
@@ -109,16 +110,16 @@ async function signUpLogic(req, res, next) {
       res.redirect('/users/');
 
       const welcomeHtml = `
-        <h1>Welcome to the Oak and Stone Client Portal, ${
-          user.name.split(' ')[0]
-        }!</h1>
+        <h1>Welcome to the ${
+          process.env.COMPANY_NAME
+        } Client Portal, ${user.name.split(' ')[0]}!</h1>
         <p>We're excited to welcome you to our secure client portal. Now you can stay up to date with the progress of your project!</p>
         <h2>Login Credentials</h2>
         <p>You can access your account with the following credentials:</p>
         <p><strong>Username:</strong> ${user.email}</p>
         <p><strong>Password:</strong> ${req.body.password}</p>
         <p>As of now, there is nothing to see yet. Please look out for another email as soon as progress becomes available to view!</p>
-        <p>Thank you for choosing Oak & Stone!</p>
+        <p>Thank you for choosing ${process.env.COMPANY_NAME}!</p>
       `;
 
       // Collect email addresses, including only non-null values
@@ -131,7 +132,7 @@ async function signUpLogic(req, res, next) {
       // Send the email to all provided addresses
       sendEmail(
         emailAddresses,
-        'Oak and Stone Portal Login Info',
+        `${process.env.COMPANY_NAME} Portal Login Info`,
         welcomeHtml,
       );
     }

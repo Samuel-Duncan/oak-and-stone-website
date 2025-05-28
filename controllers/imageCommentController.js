@@ -74,7 +74,7 @@ exports.createComment = [
               <p>Please click the link below to view the comment:</p>
               <a href="${anChorLink}/users/${project.userId}/project/${project._id}#image-${imageRecord._id}">View Comment</a>
               <p>Thank you,</p>
-              <p>The Oak & Stone Team</p>
+              <p>The ${process.env.COMPANY_NAME} Team</p>
             `;
             sendEmail(recipientEmails, subject, emailHtml);
           }
