@@ -86,19 +86,23 @@ block content
                   svg(xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16")
                     path(d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4")
             if files && files.length > 0
-              each file in files 
-                if file && file.cloudinaryUrl && file.filename
-                  div
-                    a.user-list.text-wrap(href=`${file.cloudinaryUrl}` target="_blank")= file.filename
-                    |  
-                    if currentUser && currentUser.isAdmin && projectDetail && projectDetail._id && file && file._id
-                      form(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/${file._id}/delete` method="POST" style="display: inline;")
-                        button#viewProject.button.header-button.project-button.file-button.delete-button.image-delete(type="submit") 
-                          svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1")
-                            path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
-                          span#spinner-border.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
+              // Add a container for files for easier manipulation
+              div#file-list-container
+                each file in files 
+                  if file && file.cloudinaryUrl && file.filename
+                    // Add a unique ID to each file item for easy removal
+                    div.file-item(id=`file-item-${file._id}` data-file-id=file._id)
+                      a.user-list.text-wrap(href=`${file.cloudinaryUrl}` target="_blank")= file.filename
+                      |  
+                      if currentUser && currentUser.isAdmin && projectDetail && projectDetail._id && file && file._id
+                        // Keep the form for progressive enhancement, but we'll handle with JS
+                        form.delete-file-form(action=`/users/${projectDetail.userId}/project/${projectDetail._id}/file/${file._id}/delete` method="POST" style="display: inline;")
+                          button.button.header-button.project-button.file-button.delete-button.file-delete-btn(type="button" data-file-id=file._id) 
+                            svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16" stroke-width="1")
+                              path(d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" stroke-linecap="round" stroke-linejoin="round")
+                            span.spinner-border.spinner-border-sm.d-none(role='status' aria-hidden='true')
             else
-              p.secondary-text No files to see yet.
+              p.secondary-text#no-files-message No files to see yet.
 
         // IMAGES
         if images && images.length > 0
@@ -1035,5 +1039,77 @@ block content
         });
       }
       // --- End Event Listener for Image Deletion ---
+
+      // --- Event Listener for File Deletion ---
+      const fileListContainer = document.getElementById('file-list-container');
+
+      if (fileListContainer) {
+        fileListContainer.addEventListener('click', async function(event) {
+          const deleteButton = event.target.closest('.file-delete-btn');
+          if (!deleteButton) return; // Click was not on a delete button
+
+          event.preventDefault(); // Prevent default form submission if it was type="submit"
+
+          const fileId = deleteButton.dataset.fileId;
+          const fileItemElement = document.getElementById(`file-item-${fileId}`);
+          
+          if (!fileId || !fileItemElement) {
+            console.error('Could not find fileId or file item element for deletion.');
+            return;
+          }
+
+          // Add spinner to button
+          const originalButtonContent = deleteButton.innerHTML;
+          deleteButton.disabled = true;
+          deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+          try {
+            const response = await fetch(`/users/${projectUserId}/project/${projectId}/file/${fileId}/delete`, {
+              method: 'POST', // Ensure this matches your route definition (POST)
+              headers: {
+                'Content-Type': 'application/json'
+                // Add CSRF token header here if your application uses them
+              },
+              // body: JSON.stringify({}) // Sending an empty body for POST as publicId is in URL
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({ message: 'Failed to delete file. Server error.' }));
+              throw new Error(errorData.message || 'Failed to delete file');
+            }
+            
+            // Success! Remove the file item from the DOM
+            fileItemElement.remove();
+
+            // Check if any files are left
+            const remainingFiles = fileListContainer.querySelectorAll('.file-item').length;
+            if (remainingFiles === 0) {
+              let noFilesMessage = document.getElementById('no-files-message');
+              if (noFilesMessage) {
+                 noFilesMessage.style.display = 'block'; // Or set text content
+              } else {
+                // If the "no files" message element might have been removed or doesn't exist, create it
+                const filesSection = fileListContainer.closest('.updates-container'); // Find the parent .updates-container
+                if(filesSection) {
+                    noFilesMessage = document.createElement('p');
+                    noFilesMessage.classList.add('secondary-text');
+                    noFilesMessage.id = 'no-files-message';
+                    noFilesMessage.textContent = 'No files to see yet.';
+                    fileListContainer.insertAdjacentElement('afterend', noFilesMessage); // Insert after the (now empty) list
+                }
+              }
+            }
+
+          } catch (error) {
+            console.error('Error deleting file:', error);
+            alert('Error deleting file: ' + error.message); // Simple alert for user
+          } finally {
+            // Restore button
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalButtonContent;
+          }
+        });
+      }
+      // --- End Event Listener for File Deletion ---
 
     });

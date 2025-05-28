@@ -99,11 +99,17 @@ exports.fileDelete = async (req, res) => {
     // Delete from database
     await File.findByIdAndDelete(req.params.fileId);
 
-    res.redirect(
-      `/users/${req.params.userId}/project/${file.projectId}`,
-    );
+    // Respond with JSON on success
+    res
+      .status(200)
+      .json({
+        message: 'File deleted successfully',
+        fileId: req.params.fileId,
+        projectId: file.projectId,
+      });
   } catch (error) {
     console.error('File deletion error:', error);
+    // Ensure error response is JSON
     res
       .status(500)
       .json({ message: 'Error deleting file', error: error.message });
