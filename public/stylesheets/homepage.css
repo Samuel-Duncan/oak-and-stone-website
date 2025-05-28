@@ -16,8 +16,8 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 1);
-  background: url('../images/Gigi\ Hammer\ Swing\ Black\ and\ White\ \(1\).png'),
-    rgba(0, 0, 0, 0.6);
+  background: var(--secondary-background-image),
+    var(--color-background);
   background-position: center;
   background-size: cover;
   background-blend-mode: multiply;

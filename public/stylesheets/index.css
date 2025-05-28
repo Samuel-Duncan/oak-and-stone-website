@@ -29,8 +29,10 @@
   /* Padding */
   --padding-xs: 4px;
 
-  /* Backgrounds */
-  --common-background-image: url('../images/background-4.png');
+  /* Backgrounds DON'T FORGET ABOUT PRELOADS AND FAVICON*/
+  --common-background-image: url('../images/background-4.png'); /* Background for all pages */
+  --secondary-background-image: url('../images/Gigi\ Hammer\ Swing\ Black\ and\ White\ \(1\).png'); /* Background for homepage and forms. pay attention to position on mobile */
+  --tertiary-background-image: url('../images/Client\ Log\ In\ Photo-1.png'); /* Background for projectDetail and updateDetail */
 }
 
 * {
