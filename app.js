@@ -50,7 +50,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: false, // Set to true for https in production
+      secure: true, // Set to true for https in production
       maxAge: null,
     }, // Session doesn't expire
   }),
