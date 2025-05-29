@@ -12,8 +12,7 @@ exports.createComment = [
   body('text')
     .notEmpty()
     .withMessage('Comment text is required')
-    .trim()
-    .escape(),
+    .trim(),
 
   async (req, res) => {
     try {

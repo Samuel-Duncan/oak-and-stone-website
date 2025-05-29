@@ -203,16 +203,32 @@ block content
       // No global flags needed for this simplified approach
       let g_clickedImageIndex = -1; // Only to help shown.bs.modal know if index 0 was the target
       
-      imagePreviews.forEach((preview, index) => {
-        preview.addEventListener('click', function(event) {
+      imagePreviews.forEach((preview) => { // Removed 'index' from parameters
+        preview.addEventListener('click', function(event) { // 'this' will be the clicked preview element
           event.preventDefault();
-          g_clickedImageIndex = index; // Store the target index for shown.bs.modal
           
-          // console.log('[imagePreview click] Clicked Index:', index);
+          const clickedImageId = this.dataset.imageId; // Get imageId from the clicked preview
+          const allCarouselItems = modalImageCarouselInner.querySelectorAll('.carousel-item');
+          let targetCarouselIndex = -1;
+
+          allCarouselItems.forEach((item, idx) => {
+            if (item.dataset.imageId === clickedImageId) {
+              targetCarouselIndex = idx;
+            }
+          });
+
+          g_clickedImageIndex = targetCarouselIndex; // Store the target index for shown.bs.modal
           
-          if (carouselInstance) {
-            carouselInstance.to(index); // Command carousel to go to the clicked image's index
+          // console.log('[imagePreview click] Clicked Image ID:', clickedImageId, 'Found Carousel Index:', targetCarouselIndex);
+          
+          if (carouselInstance && targetCarouselIndex !== -1) {
+            carouselInstance.to(targetCarouselIndex); // Command carousel to go to the clicked image's index
+          } else if (carouselInstance && targetCarouselIndex === -1) {
+            console.error('[imagePreview click] Clicked imageId not found in carousel items:', clickedImageId);
+            // Potentially handle this error, e.g., by trying to find the first available image or showing an error
+            // For now, it will simply not change the slide if not found.
           }
+
 
           if (modalInstance) {
             modalInstance.show(); // Then show the modal
@@ -226,12 +242,12 @@ block content
       myModalEl.addEventListener('hidden.bs.modal', function () {
         // console.log('[hidden.bs.modal] Event Fired. Resetting state.');
         g_clickedImageIndex = -1;
-        
+
         const commentsListElement = myModalEl.querySelector('.comments-list');
         if (commentsListElement) {
           commentsListElement.innerHTML = ''; // Clear comments
         }
-        
+
         const commentForm = myModalEl.querySelector('.comment-form');
         if (commentForm) {
           commentForm.dataset.imageId = ''; // Clear form's image ID
@@ -250,8 +266,8 @@ block content
         const modalBody = myModalEl.querySelector('.modal-body');
         if (modalBody && modalBody.classList.contains('modal-content-loading')) {
             modalBody.classList.remove('modal-content-loading');
-            modalBody.style.transition = 'none'; // Remove any lingering transition
-            modalBody.style.opacity = '1'; // Ensure it's visible for next time
+            // Removed height transition reset
+            // Removed opacity reset
         }
 
       });
@@ -261,7 +277,7 @@ block content
       function formatTimestamp(isoString) {
         const date = new Date(isoString);
         return date.toLocaleString('en-US', {
-          month: 'long', 
+          month: 'long',
           day: 'numeric',
           hour: 'numeric',
           minute: 'numeric',
@@ -319,21 +335,21 @@ block content
 
           commentItem.appendChild(deleteButton);
         }
-        
+
         commentsListElement.appendChild(commentItem);
       }
 
       async function loadComments(imageId, commentsListElement) {
         // ALWAYS clear existing comments and messages at the very start
         if (commentsListElement) {
-          commentsListElement.innerHTML = ''; 
+          commentsListElement.innerHTML = '';
         }
 
         const thisCallSymbol = Symbol();
         activeCommentLoadCall = thisCallSymbol;
 
         // console.log('[loadComments] Called with imageId:', imageId);
-        
+
         const commentsSpinner = myModalEl.querySelector('#comments-loading-spinner');
         if (commentsSpinner) {
           commentsSpinner.classList.remove('d-none'); // Show spinner
@@ -346,7 +362,7 @@ block content
           }
           commentsListElement.innerHTML = ''; // Ensure list is clear even if no imageId
           commentsListElement.innerHTML = '<p class="text-center secondary-text">No comments yet. Be the first to comment!</p>';
-          requestAnimationFrame(() => updateModalBodyHeightForContent());
+          // Removed height update call
           return;
         }
 
@@ -375,13 +391,12 @@ block content
             comments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             comments.forEach(comment => displayComment(comment, commentsListElement));
           }
-          // console.log('[loadComments] Requesting animation frame for height update.');
-          requestAnimationFrame(() => updateModalBodyHeightForContent());
+          // Removed height update call
         } catch (error) {
           if (activeCommentLoadCall !== thisCallSymbol) return; // Stale call, do not update DOM
           // console.error('[loadComments] Catch block error:', error);
           commentsListElement.innerHTML = '<p class="text-center text-danger">Error loading comments.</p>';
-          requestAnimationFrame(() => updateModalBodyHeightForContent());
+          // Removed height update call
         } finally {
           if (activeCommentLoadCall !== thisCallSymbol) return; // Stale call, do not update DOM
           if (commentsSpinner) {
@@ -427,7 +442,7 @@ block content
           }
           displayComment(newComment, commentsListElement);
           form.querySelector('textarea[name="text"]').value = '';
-          requestAnimationFrame(() => updateModalBodyHeightForContent(true)); // Animate for new comment
+          // Removed height update call
         } catch (error) {
           // console.error('Error posting comment:', error);
           // Optionally, display an error message to the user
@@ -439,7 +454,7 @@ block content
       }
 
       // All other modal logic including myModalEl, imageCarousel, etc. definitions and event listeners
-      // updateModalBodyHeightForContent, setModalBodyHeight etc. are already within this DOMContentLoaded block
+      // Removed height calculation and update functions
 
       const commentForm = myModalEl.querySelector('.comment-form');
       const commentsListElement = myModalEl.querySelector('.comments-list');
@@ -462,104 +477,10 @@ block content
         return;
       }
 
-      let currentSetModalBodyHeight = 0; // Renamed from currentImageHeight
-      const SCRIPT_ANIMATION_DURATION_CSS = 'height 0.35s ease-in-out'; // Match your CSS
-      const HEIGHT_UPDATE_THRESHOLD = 1; // Pixels threshold to prevent jitter
-
-      // Function to calculate the target height of an image
-      function calculateImageDisplayHeight(imageElement, containerWidth) {
-        if (!imageElement.complete || imageElement.naturalHeight === 0) {
-          return 0;
-        }
-        const naturalWidth = imageElement.naturalWidth;
-        const naturalHeight = imageElement.naturalHeight;
-        const viewportHeight = window.innerHeight;
-        const maxHeightConstraint = 0.70 * viewportHeight;
-
-        let displayWidth = naturalWidth;
-        let displayHeight = naturalHeight;
-
-        if (naturalWidth > containerWidth) {
-          displayWidth = containerWidth;
-          displayHeight = (naturalHeight / naturalWidth) * displayWidth;
-        }
-        if (displayHeight > maxHeightConstraint) {
-          displayHeight = maxHeightConstraint;
-        }
-        return displayHeight;
-      }
-
-      // New function to calculate and update modal body height based on content
-      function updateModalBodyHeightForContent(animate = true) {
-          // console.log('[updateModalBodyHeightForContent] Called. Animate:', animate);
-          const activeImageElement = imageCarousel.querySelector('.carousel-item.active img');
-          const commentsContainer = myModalEl.querySelector('.image-comments-container');
-
-          let imageHeight = 0;
-          if (activeImageElement && activeImageElement.complete && activeImageElement.naturalHeight > 0) {
-              imageHeight = activeImageElement.offsetHeight;
-              // console.log('[updateModalBodyHeightForContent] Image Height (offsetHeight):', imageHeight);
-          } else if (activeImageElement) {
-               const containerWidth = modalBody.clientWidth;
-               imageHeight = calculateImageDisplayHeight(activeImageElement, containerWidth);
-               // console.log('[updateModalBodyHeightForContent] Image Height (calculatedDisplayHeight):', imageHeight);
-          }
-
-          const commentsHeight = commentsContainer ? commentsContainer.offsetHeight : 0;
-          // console.log('[updateModalBodyHeightForContent] Comments Container Height (offsetHeight):', commentsHeight);
-
-          const totalContentHeight = imageHeight + commentsHeight;
-          // console.log('[updateModalBodyHeightForContent] Total Content Height (image + comments):', totalContentHeight);
-          // console.log('[updateModalBodyHeightForContent] Current Set Modal Body Height (before update attempt):', currentSetModalBodyHeight);
-
-           // Use a threshold to prevent height jittering on minor changes
-           requestAnimationFrame(() => {
-                if (Math.abs(totalContentHeight - currentSetModalBodyHeight) > HEIGHT_UPDATE_THRESHOLD || totalContentHeight === 0 && currentSetModalBodyHeight !== 0) {
-                    // console.log('[updateModalBodyHeightForContent] Attempting to set new height via setModalBodyHeight.');
-                    setModalBodyHeight(totalContentHeight, animate);
-                } else {
-                    // console.log('[updateModalBodyHeightForContent] New height change below threshold or same, not updating.');
-                }
-           });
-      }
-
-
-      // Centralized function to set modal body height
-      function setModalBodyHeight(newHeight, animate) {
-        // console.log(`[setModalBodyHeight] Called. New Height: ${newHeight}, Animate: ${animate}, Current Set Height: ${currentSetModalBodyHeight}`);
-        if (newHeight <= 0 && currentSetModalBodyHeight === 0) {
-            // console.log('[setModalBodyHeight] New height is 0 and current is 0, aborting.');
-            return; // Don't set invalid or zero height if already zero
-        }
-        if (Math.abs(newHeight - currentSetModalBodyHeight) < HEIGHT_UPDATE_THRESHOLD && newHeight !== 0) {
-            // console.log('[setModalBodyHeight] Height change below threshold, not setting.');
-            return;
-        }
-
-        const computedTransition = getComputedStyle(modalBody).transition;
-
-        if (animate) {
-          // Ensure transition is enabled for animation
-          if (modalBody.style.transition === 'none' || !computedTransition.includes('height') || computedTransition.includes('0s')) {
-            modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
-            requestAnimationFrame(() => {
-              modalBody.style.height = newHeight + 'px';
-              currentSetModalBodyHeight = newHeight;
-            });
-          } else {
-            modalBody.style.height = newHeight + 'px';
-             currentSetModalBodyHeight = newHeight;
-             // console.log('[setModalBodyHeight] Height set (animated branch):', newHeight);
-          }
-        } else {
-          modalBody.style.transition = 'none';
-          modalBody.style.height = newHeight + 'px';
-          void modalBody.offsetHeight; // Force reflow to apply instant height change
-          modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
-          currentSetModalBodyHeight = newHeight;
-          // console.log('[setModalBodyHeight] Height set (non-animated branch):', newHeight);
-        }
-      }
+      // Removed height related variables
+      // Removed calculateImageDisplayHeight function
+      // Removed updateModalBodyHeightForContent function
+      // Removed setModalBodyHeight function
 
       // console.log('[DOMContentLoaded] Attaching Bootstrap modal event listeners to:', myModalEl);
       myModalEl.addEventListener('show.bs.modal', function (event) {
@@ -587,25 +508,21 @@ block content
           history.replaceState(null, '', `#image-${imageId}`);
         }
 
-        requestAnimationFrame(() => updateModalBodyHeightForContent(false));
+        // Removed height update call
 
       });
 
       // Event listener for when a new slide is about to be shown
       imageCarousel.addEventListener('slide.bs.carousel', function () {
         if (modalBody) {
-          // Prevent modal body from expanding due to tall content during slide transition
-          modalBody.style.overflow = 'hidden';
-          // Disable modal body's own height animation during the carousel's slide animation
-          modalBody.style.transition = 'none'; 
+          // Removed modal body overflow and transition modification
         }
       });
 
       imageCarousel.addEventListener('slid.bs.carousel', function (event) {
         // console.log('[slid.bs.carousel] Event Fired. New active slide index:', event.to);
         if (modalBody) {
-          // Restore transition for height changes *before* calculating and setting new height
-          modalBody.style.transition = SCRIPT_ANIMATION_DURATION_CSS;
+          // Removed transition restoration
         }
 
         const activeCarouselItem = event.relatedTarget; // The carousel item that just became active
@@ -624,14 +541,10 @@ block content
         const imgElement = activeCarouselItem ? activeCarouselItem.querySelector('img') : null;
 
         const finalizeHeightUpdateAndRestoreOverflow = () => {
-          requestAnimationFrame(() => {
-            updateModalBodyHeightForContent(true); // true to animate height
-            if (modalBody) {
-              // Restore overflow. The explicit height set by updateModalBodyHeightForContent
-              // should now be controlling the size during its animation.
-              modalBody.style.overflow = ''; // Restore to default behavior
-            }
-          });
+          // Removed height update call
+          if (modalBody) {
+            // Removed overflow restoration
+          }
         };
 
         if (imgElement) {
@@ -649,12 +562,12 @@ block content
             };
             imgElement.addEventListener('load', loadOrErrorHandler);
             imgElement.addEventListener('error', loadOrErrorHandler);
-            
+
             // Fallback timeout in case load/error events don't fire reliably
             setTimeout(() => {
               if (!loadedOrTimedOut) {
                 // console.warn('[slid.bs.carousel] Image load/error event fallback timeout.');
-                loadOrErrorHandler(); 
+                loadOrErrorHandler();
               }
             }, 300); // Reasonably short timeout
 
@@ -670,7 +583,7 @@ block content
 
       window.addEventListener('resize', function () {
         if (myModalEl.classList.contains('show')) {
-           requestAnimationFrame(() => updateModalBodyHeightForContent(false)); // Update height non-animated on resize
+           // Removed height update call
         }
       });
 
@@ -695,12 +608,17 @@ block content
             return;
           }
 
+          // Add spinner to button
+          const originalButtonContent = deleteButton.innerHTML;
+          deleteButton.disabled = true;
+          deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
           try {
             const response = await fetch(`/users/${projectUserId}/project/${projectId}/image/${imageId}/comment/${commentId}`, {
               method: 'DELETE',
               headers: {
                 // Add any necessary headers, like CSRF token if your app uses them
-                'Content-Type': 'application/json' 
+                'Content-Type': 'application/json'
               }
             });
 
@@ -713,7 +631,7 @@ block content
             if (commentItem) {
               commentItem.remove();
             }
-            
+
             // Check if any comments are left
             const remainingCommentItems = commentsContainer.querySelectorAll('.comment-item');
             const commentsList = commentsContainer.querySelector('.comments-list');
@@ -721,10 +639,14 @@ block content
               commentsList.innerHTML = '<p class="text-center secondary-text">No comments yet. Be the first to comment!</p>';
             }
 
-            requestAnimationFrame(() => updateModalBodyHeightForContent(true)); // Update modal height
+            // Removed height update call
 
           } catch (error) {
             // console.error('Error deleting comment:', error);
+          } finally {
+            // Restore button
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalButtonContent;
           }
         });
       }
@@ -745,7 +667,7 @@ block content
             if (imageIndex !== -1) {
               // Store this index so shown.bs.modal knows it was from a direct link
               // This is important if the target is index 0, as slid.bs.carousel might not fire.
-              g_clickedImageIndex = imageIndex; 
+              g_clickedImageIndex = imageIndex;
               carouselInstance.to(imageIndex); // Go to the slide
               modalInstance.show(); // Show the modal
             } else {
@@ -819,7 +741,7 @@ block content
             }
           });
 
-          g_clickedImageIndex = clickedImageCarouselIndex; 
+          g_clickedImageIndex = clickedImageCarouselIndex;
 
           if (carouselInstance && clickedImageCarouselIndex !== -1) {
             carouselInstance.to(clickedImageCarouselIndex);
@@ -838,7 +760,7 @@ block content
           // The first image *of this new batch* might need to be active if the carousel was empty.
           // However, standard behavior is to append, and 'active' is usually handled for the very first item overall.
           // Let's assume if modalImageCarouselInner is empty, the first *appended* item becomes active.
-          if (modalImageCarouselInner.children.length === 0 && index === 0) { 
+          if (modalImageCarouselInner.children.length === 0 && index === 0) {
               carouselItem.classList.add('active');
           }
           carouselItem.dataset.imageId = image._id;
@@ -911,7 +833,7 @@ block content
         imageGalleryContainer.addEventListener('submit', async function(event) {
           if (event.target.classList.contains('delete-image-button')) {
             event.preventDefault(); // Prevent default form submission
-            
+
             const form = event.target;
             const actionUrl = form.action;
             const imageContainer = form.closest('.image-container');
@@ -929,7 +851,7 @@ block content
 
             try {
               const response = await fetch(actionUrl, {
-                method: 'POST',
+                method: 'POST', // Ensure this matches your route definition (POST)
                 headers: {
                   // Add CSRF token header here if your application uses them
                   'Content-Type': 'application/json' // Though body is not sent, server might expect this
@@ -959,7 +881,7 @@ block content
                   // If the deleted image was active, decide where to go next
                   const items = Array.from(modalImageCarouselInner.children);
                   const currentIndex = items.indexOf(carouselItemToRemove);
-                  
+
                   carouselItemToRemove.remove(); // Remove it first
                   const remainingItems = modalImageCarouselInner.children;
 
@@ -969,7 +891,7 @@ block content
                     } else {
                       newActiveIndex = currentIndex; // Go to item that took its place
                     }
-                    carousel.to(newActiveIndex); 
+                    carousel.to(newActiveIndex);
                     // Manually trigger a slide event if it was the active one and modal is open, to reload comments etc.
                     // Or simply close the modal if it was the active one
                     if(myModalEl.classList.contains('show')) {
@@ -998,7 +920,7 @@ block content
                 if (carouselInstance && modalImageCarouselInner.children.length === 0) {
                   // If all images removed, maybe clear modal content or disable carousel buttons.
                 } else if (carouselInstance) {
-                  // Bootstrap 5 should handle item removal dynamically. 
+                  // Bootstrap 5 should handle item removal dynamically.
                   // If issues, may need: carouselInstance.dispose(); new bootstrap.Carousel(imageCarousel);
                 }
               }
@@ -1009,7 +931,7 @@ block content
                 if (imageGalleryGrid.parentElement) { // Assuming .detail-item is the parent
                     const detailItem = imageGalleryGrid.closest('.detail-item');
                     const updatesHeader = detailItem.querySelector('.updates-header');
-                    
+
                     imageGalleryGrid.remove(); // Remove the grid
                     // Remove load more button if it exists and no images
                     const loadMoreContainer = detailItem.querySelector('.load-more-container');
@@ -1052,7 +974,7 @@ block content
 
           const fileId = deleteButton.dataset.fileId;
           const fileItemElement = document.getElementById(`file-item-${fileId}`);
-          
+
           if (!fileId || !fileItemElement) {
             console.error('Could not find fileId or file item element for deletion.');
             return;
@@ -1077,7 +999,7 @@ block content
               const errorData = await response.json().catch(() => ({ message: 'Failed to delete file. Server error.' }));
               throw new Error(errorData.message || 'Failed to delete file');
             }
-            
+
             // Success! Remove the file item from the DOM
             fileItemElement.remove();
 
