@@ -37,7 +37,7 @@ block content
             if lastLogin
               .detail-item
                 h2.dashboard-header Last Login 
-                p.secondary-text= new Date(lastLogin).toLocaleString('en-US', { weekday: 'long', month: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true })
+                p.secondary-text= new Date(lastLogin).toLocaleString('en-US', { weekday: 'long', month: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/New_York' })
           
           .detail-item
             h2.dashboard-header Phase
